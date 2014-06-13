@@ -16,23 +16,22 @@ Filter(xdata, freq)
 \value{Filtered Array}
 \examples{
   startDates <- c('19901101', '19951101', '20001101')
-  sampleData <- Load('tos', c('i00k'), c('ERSST'), startDates, nleadtime = 124, 
-                     leadtimemin = 1, leadtimemax = 60, output = 'areave', 
+  sampleData <- Load('tos', c('i00k'), c('ERSST'), startDates, nleadtime = 124,
+                     leadtimemin = 1, leadtimemax = 60, output = 'areave',
                      latmin = 30, latmax = 45, lonmin = 0, lonmax = 40)
 
-  for (jmemb in 1:5) {
-    for (jstartdate in 1:3) {
-      spectrum <- Spectrum(sampleData$mod[1, jmemb, jstartdate, ])
-      for (jlen in 1:dim(spectrum)[1]) {
-        if (spectrum[jlen, 2] > spectrum[jlen, 4]) {
-          sampleData$mod[1, jmemb, jstartdate, ] <- Filter(sampleData$mod[1, jmemb, jstartdate, ], 
-                                                           spectrum[jlen, 1])
-        }
+  ensmod <- Mean1Dim(sampleData$mod, 2)
+  for (jstartdate in 1:3) {
+    spectrum <- Spectrum(ensmod[1, jstartdate, ])
+    for (jlen in 1:dim(spectrum)[1]) {
+      if (spectrum[jlen, 2] > spectrum[jlen, 4]) {
+        ensmod[1, jstartdate, ] <- Filter(ensmod[1, jstartdate, ], 
+                                          spectrum[jlen, 1])
       }
     }
   }
-
-  PlotAno(sampleData$mod, sdates = startDates, fileout = 'filtered_data.eps') 
+  PlotAno(InsertDim(ensmod, 2, 1), sdates = startDates, fileout =
+          'filtered_ensemble_mean.eps') 
 }
 \author{
 History:\cr

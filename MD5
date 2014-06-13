@@ -1,10 +1,10 @@
-89056df7dfe7dd8efccf15fc6e009a32 *DESCRIPTION
+59c28ee0c67ef890661bb034d69ad11f *DESCRIPTION
 969d59e14318f0bc4a4c6f40e94eee27 *NAMESPACE
 40911d6469c9cccd917d866c50ef9b86 *R/ACC.R
 68ece3f4182b6527f81f77f64cd08c22 *R/Alpha.R
 3cf764ff32e5a2a32a8f0c88c313a270 *R/Ano.R
 6147258822e990a91af0a60863a17a5a *R/Ano_CrossValid.R
-def4b28243fa4b37ae2090cbe948b925 *R/Clim.R
+241fb31ae71493ea9213d7676338d608 *R/Clim.R
 3e43767bc8094c94e3d00ad042e4dda3 *R/ColorBar.R
 0b44f04c1ccb5a4f40b468c02f2bdff6 *R/Consist_Trend.R
 9b7e26590c0af73f83c1a7d74e007553 *R/Corr.R
@@ -34,7 +34,7 @@ a20b41f8ec408576a39cfda339c39b33 *R/RMSSS.R
 95ed6e4703dff3efe9de83d6d701d35f *R/RatioRMS.R
 6779887130093e3ba289e4f76add392b *R/RatioSDRMS.R
 e76eaa33bc9b839b99d0eb079d8f9495 *R/Regression.R
-e340512131ae32462a20fe836e069072 *R/Season.R
+64e2cf76a3f7239f50591d7a0f2f7de5 *R/Season.R
 1e92ed5c5f93880d809853a10b955218 *R/SelIndices.R
 fc687dcbdd8869c3c845afca025ecbb2 *R/Smoothing.R
 e6a30f319a4f88e0f1a90d7d1f34e830 *R/Spectrum.R
@@ -57,7 +57,7 @@ fb75a760af33ea017eca8998b4cb998e *man/Corr.Rd
 39ee3a615e11893a46b9ea8ae465a436 *man/Enlarge.Rd
 aeb158f25b6bb570523b87a43ffdf95c *man/Eno.Rd
 50f4a9bd496fdc317d18bb63d996c670 *man/EnoNew.Rd
-1a820d99d5bfa29ab98b3c2934e32864 *man/Filter.Rd
+20c6631645d4e168d528c96f7b7a2542 *man/Filter.Rd
 f6a5bcdd2acc2956e756f8bbc602d124 *man/FitAcfCoef.Rd
 28f158f68b653256b09af738430daa20 *man/FitAutocor.Rd
 9df67536ddae0af847efeaf93361691d *man/GenSeries.Rd
@@ -83,7 +83,7 @@ d94aa4895129cbc6441c8b3a7464ef76 *man/RatioSDRMS.Rd
 abc51c321a93806decbbe9b1b44032f0 *man/Season.Rd
 46573958591291a5abc73c23b4df11a6 *man/SelIndices.Rd
 4fdd23e7a5281e510e0cb8b8a94c109e *man/Smoothing.Rd
-a5d1b0128a596116613177cf8c954364 *man/Spectrum.Rd
+22b95c83e7c10a519cb0fe43b225a2ef *man/Spectrum.Rd
 a0f26ac60926fdbdaac28f4151e69875 *man/Spread.Rd
 b33b57d87fe74914ec7878f011e201c3 *man/Trend.Rd
 3bc13fdb4a9d1f02dce1f5cd2a24c15d *man/s2dverification-package.Rd

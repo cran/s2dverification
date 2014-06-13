@@ -68,18 +68,16 @@ Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
     trend_obs <- array(dim = dim(var_exp))
     trend_exp <- array(dim = dim(var_exp))
     for (jdate in 1:dimexp[3]) {
-      trend_exp[, , jdate, , , , ] <- tmp_exp$trend[, , 4, , , 
-                                      , ] + jdate * tmp_exp$trend[, , 2, , , , ]
-      trend_obs[, , jdate, , , , ] <- InsertDim(InsertDim(MeanListDim(
-                                      tmp_obs$trend[, , 4, , , 
-                                      , ] + jdate * tmp_obs$trend[, , 2, , , 
-                                      , ], c(2, 1)), 1, dimexp[1]), 2,
-                                      dimexp[2])
+      trend_exp[, , jdate, , , , ] <- tmp_exp$trend[, , 4, , , , ] 
+                                      + jdate * tmp_exp$trend[, , 2, , , , ]
+      tmp_obs2 <- MeanListDim(tmp_obs$trend,c(2, 1))
+      trend_obs[, , jdate, , , , ] <- InsertDim(InsertDim(tmp_obs2[4, , , , ] + 
+                                      jdate * tmp_obs2[2, , , , ], 1, dimexp[1]),
+                                      2, dimexp[2])
     }
     out_clim_exp <- trend_exp - trend_obs + InsertDim(InsertDim(InsertDim(
                     MeanListDim(out_clim_obs, c(2, 1)), 1, dimexp[1]), 2, 
-                                                                dimexp[2]), 3, 
-                                                      dimexp[3])
+                    dimexp[2]), 3, dimexp[3])
     dim_clim_exp <- dimexp
   } else if (NDV == TRUE) {
     iniobs <- InsertDim(SelIndices(var_obs, 4, c(1, 1)), 4, dimobs[4])
@@ -89,14 +87,14 @@ Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
     reg_obs <- array(dim = dim(var_exp))
     reg_exp <- array(dim = dim(var_exp))
     for (jdate in 1:dimexp[3]) {
-      reg_exp[, , jdate, , , , ] <- tmp_exp$regression[, , 4, , , 
-                                    , ] + iniexp[, , jdate, , , 
-                                    , ] * tmp_exp$regression[, , 2, , , , ]
-      reg_obs[, , jdate, , , , ] <- InsertDim(InsertDim(MeanListDim(
-                                    tmp_obs$regression[, , 4, , , 
-                                    , ] + iniobs[, , jdate, , , 
-                                    , ] * tmp_obs$regression[, , 2, , , , ], 
-                                    c(2, 1)), 1, dimexp[1]), 2, dimexp[2])
+      reg_exp[, , jdate, , , , ] <- tmp_exp$regression[, , 4, , , , ] 
+                                    + iniexp[, , jdate, , , , ] * 
+                                    tmp_exp$regression[, , 2, , , , ]
+      tmp_obs2 <- MeanListDim(tmp_obs$regression,c(2, 1))
+      reg_obs[, , jdate, , , , ] <- InsertDim(InsertDim(tmp_obs2[4, , , , ] 
+                                    + MeanListDim(iniobs,c(2, 1))[jdate, , , , ] 
+                                    * tmp_obs2[2, , , , ], 1, dimexp[1]), 
+                                    2, dimexp[2])
     }
     out_clim_exp <- reg_exp - reg_obs + InsertDim(InsertDim(InsertDim(
                     MeanListDim(out_clim_obs, c(2, 1)), 1, dimexp[1]), 2, 

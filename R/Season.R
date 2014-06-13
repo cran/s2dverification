@@ -29,7 +29,7 @@ Season <- function(var, posdim = 4, monini, moninf, monsup) {
   # 
   dimsvar <- dim(var)
   if (is.null(dimsvar)) {
-    dimsvar < length(var)
+    dimsvar <- length(var)
   }
   ntime <- dimsvar[posdim]
   enlvar <- Enlarge(var, 10)
