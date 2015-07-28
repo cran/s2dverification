@@ -1,21 +1,4 @@
 Filter <- function(xdata, freq) {
-  # This function filters from the xdata array, the signal of frequency freq. 
-  # The filtering is performed by dichotomal seek for the frequency around freq 
-  # and the phase that maximizes the signal to subtract to xdata.
-  # The maximization of the signal to subtract relies on a minimization of the 
-  # mean square differences between xdata and a cosine of given frequency and 
-  # phase.  
-  # 
-  # Params:
-  #   xdata: Array of data to be filtered.
-  #   freq: Frequency to filter.
-  #
-  # Returns:
-  #   Array of filtered data.
-  #
-  # History:
-  #   1.0  #  2012-02  (V. Guemas, virginie.guemas@ic3.cat)  #  Original code
-
   fac1 <- 1
   fac2 <- 1
   ndat <- length(xdata)

@@ -1,28 +1,4 @@
 Spread <- function(var, posdim = 2, narm = TRUE) {
-  # Compute InterQuartile Range, Maximum-Mininum, Standard Deviation and Median 
-  # Absolute Deviation along the (posdim)th dimension of matrix var.
-  # The confidence interval is computed by bootstrapping.
-  #
-  # Args:
-  #   var: Matrix of any number of dimensions up to 10.
-  #   posdim: Dimensions along which to compute IQR/MaxMin/SD/MAD.
-  #   narm: TRUE/FALSE if NA removed/kept before computation. Default = TRUE.
-  #
-  # Returns:
-  #   Matrix with same dimensions as var except along the first posdim 
-  #   dimension which is replaced by a length 3 dimension, corresponding to the 
-  #   lower limit of the 95% confidence interval, the computed spread over the 
-  #   whole sample and the upper limit of the 95% confidence interval for each 
-  #   point of the matrix along all the other dimensions except for the other 
-  #   posdim dimensions which disappear.
-  #   $iqr: InterQuartile Range.
-  #   $maxmin: Maximum - minimum.
-  #   $sd: Standard deviation.
-  #   $mad: Median value.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code         
-
   # 
   #  Enlarge the size of var to 10 and move all posdim to first position 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

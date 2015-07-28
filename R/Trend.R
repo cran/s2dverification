@@ -1,27 +1,4 @@
 Trend <- function(var, posTR = 2, interval = 1) {
-  # Compute trends along the (posTR)th dimension of matrix var by least square 
-  # fitting, and the associated an error interval.
-  # Provide also the detrended data.
-  # The confidence interval relies on a student-T distribution.
-  #
-  # Args:
-  #   var: Matrix of any number of dimensions up to 10.
-  #   posTR: Position along which to compute trends.
-  #   interval: Number of months between 2 points along posTR dimension.
-  #             Default = 1.
-  #
-  # Returns:
-  #   $trend: Same dimensions as var except along posTR dimension which is 
-  #           replaced by a length 3 dimension, corresponding to the lower 
-  #           limit of the  95% confidence interval, the computed trends and 
-  #           the upper limit of the 95% confidence interval for each point of 
-  #           the matrix along all the other dimensions.
-  #   $detrended: Same dimensions as var with linearly detrended var along the 
-  #               posTR dimension.
-  #
-  # History:
-  #   1.0  #  2011-05  (V. Guemas, vguemas@ic3.cat)  #  Original code         
-
   # 
   #  Enlarge the size of var to 10 and move posTR to first position 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

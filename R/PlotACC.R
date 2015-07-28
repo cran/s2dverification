@@ -2,39 +2,6 @@ PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "",
                     limits = NULL, legends = NULL, freq = 12, biglab = FALSE, 
                     fill = FALSE, linezero = FALSE, points = TRUE, vlines = NULL, 
                     fileout = "output_PlotACC.eps") {
-  # Plots time-series of ACC in matrix with dimensions: 
-  #   c(nexp, nobs, nsdates, nltime, 4)
-  # with the fourth dimension of length 4 containing the lower limit of the 95% 
-  # confidence interval, the computed ACC, the upper limit of the 95% 
-  # confidence interval and the 95% significance level given by a one-sided 
-  # T-test.
-  # 
-  # Args:
-  #   ACC: Matrix with with dimensions:
-  #          c(nexp, nobs, nsdates, nltime, 4)
-  #        with the fourth dimension of length 4 containing the lower limit of 
-  #        the 95% confidence interval, the computed ACC, the upper limit of 
-  #        the 95% confidence interval and the 95% significance level.
-  #   sdates: List of starting dates: c('YYYYMMDD','YYYYMMDD').
-  #   toptitle: Main title, optional.
-  #   sizetit: Multiplicative factor to scale title size, optional.
-  #   ytitle: Title of Y-axis for each experiment: c('',''), optional.
-  #   limits: c(lower limit, upper limit): limits of the Y-axis, optional.
-  #   legends: List to be written in the legend as characters, optional.
-  #   freq: 1 = yearly, 12 = monthly, 4 = seasonal, ... Default: 12.
-  #   biglab: TRUE/FALSE for presentation/paper plot, Default = FALSE.
-  #   fill: TRUE/FALSE if filled confidence interval. Default = FALSE.
-  #   linezero: TRUE/FALSE if a line at y=0 should be added. Default = FALSE.
-  #   points: TRUE/FALSE if points instead of lines. Default = TRUE.
-  #   vlines: List of x location where to add vertical black lines, optional.
-  #   fileout: Name of output eps file.
-  # 
-  # Returns:
-  #   This function returns nothing.
-  # 
-  # History:
-  #   1.0  #  2013-08  (V. Guemas, vguemas@ic3.cat)  #  Original code
-  
   if (length(dim(ACC)) != 5 | dim(ACC)[5] != 4) {
     stop("5 dim needed : c(nexp, nobs, nsdates, nltime, 4)")
   }
@@ -111,14 +78,17 @@ PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "",
         }
         if (points) {
           par(new = TRUE)
-          plot(var[2, ], type = "p", lty = 1, lwd = 4, ylim = c(ll, ul), 
-               col = color[numcol], xlab = "", ylab = "", axes = FALSE)
+          plot(var[2, ], type = "p", lty = 1, lwd = 6, ylim = c(ll, ul), 
+               col = color[numcol], xlab = "", ylab = "", axes = FALSE,
+               cex = 0.6)
           par(new = TRUE)
-          plot(var[1, ], type = "p", pch = 6, lwd = 1, ylim = c(ll, ul), 
-               col = color[numcol], xlab = "", ylab = "", axes = FALSE)
+          plot(var[1, ], type = "p", pch = 6, lwd = 3, ylim = c(ll, ul), 
+               col = color[numcol], xlab = "", ylab = "", axes = FALSE,
+               cex = 0.6)
           par(new = TRUE)
-          plot(var[3, ], type = "p", pch = 2, lwd = 1, ylim = c(ll, ul), 
-               col = color[numcol], xlab = "", ylab = "", axes = FALSE)
+          plot(var[3, ], type = "p", pch = 2, lwd = 3, ylim = c(ll, ul), 
+               col = color[numcol], xlab = "", ylab = "", axes = FALSE,
+               cex = 0.6)
           par(new = TRUE)
           for (jind in start:end) {
             lines(c(jind, jind), var[c(1, 3), jind], lwd = 1, 

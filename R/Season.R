@@ -1,25 +1,4 @@
 Season <- function(var, posdim = 4, monini, moninf, monsup) {
-  # Computes seasonal means on time-series organized in a matrix of any number 
-  # of dimensions up to 10 dimensions.
-  #
-  # Args:
-  #   var: Matrix in which are the time-series.
-  #   posdim: Rank of the dimension along with to compute seasonal means.
-  #   monini: Position in the year of the first month of the time-series: 1 to 
-  #           12.
-  #   moninf: Position in the year of the month when to start the seasonal 
-  #           means: 1 to 12.
-  #   monsup: Position in the year of the month when to stop the seasonal 
-  #           means: 1 to 12.
-  #
-  # Returns:
-  #   Matrix with same dimensions as var except along the (posdim)th dimension 
-  #   which length corresponds to the number of seasons. Partial seasons are 
-  #   not accounted for.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-  
   while (monsup < moninf) {
     monsup <- monsup + 12
   }

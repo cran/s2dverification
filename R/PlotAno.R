@@ -4,46 +4,12 @@ PlotAno <- function(exp_ano, obs_ano = NULL, sdates,
                     ytitle = c('', '', '', '', '', '', '', '', '', '', '', '', 
                                '', '', ''), 
                     limits = NULL, legends = NULL, freq = 12, biglab = FALSE, 
-                    fill = TRUE, memb = TRUE, ensmean = TRUE, linezero = FALSE, points = FALSE, 
-                    vlines = NULL, fileout = c('output1_plotano.eps', 
+                    fill = TRUE, memb = TRUE, ensmean = TRUE, linezero = FALSE, 
+                    points = FALSE, vlines = NULL, 
+                    fileout = c('output1_plotano.eps', 
                     'output2_plotano.eps', 'output3_plotano.eps', 
                     'output4_plotano.eps', 'output5_plotano.eps'), 
-                    sizetit = 1) {
-  # Plots time-series of raw or smoothed anomalies of any index output from 
-  # load or ano or smoothed and organized in matrix with dimensions:
-  #   c(nmod/nexp, nmemb/nparam, nsdates, nltime)
-  #   c(nobs, nmemb, nsdates, nltime)
-  #
-  # One plot per experiment
-  #
-  # Args:
-  #   exp_ano: Matrix with experimental data:
-  #              c(nmod/nexp, nmemb/nparam, nsdates, nltime).
-  #   obs_ano: Optional matrix with observational data:
-  #              c(nobs, nmemb, nsdates, nltime)
-  #   sdates: List of starting dates: c('YYYYMMDD','YYYYMMDD')
-  #   toptitle: Main title for each experiment: c('',''), optional.
-  #   ytitle: Title of Y-axis for each experiment: c('',''), optional.
-  #   limits: c(lower limit, upper limit): limits of the Y-axis, optional.
-  #   legends: List of observational dataset names, optional.
-  #   freq: 1 = yearly, 12 = monthly, 4 = seasonal, ... Default: 12.
-  #   biglag: TRUE/FALSE for presentation/paper plot. Default = FALSE.
-  #   fill: TRUE/FALSE if filled spread between members. Default = TRUE.
-  #   memb: TRUE/FALSE if all members/ensemble-mean only should be plotted. 
-  #         Default = TRUE.
-  #   ensmean: TRUE/FALSE if the ensemble-mean should be plotted. Default = TRUE.
-  #   linezero: TRUE/FALSE if a line at y=0 should be added. Default = FALSE.
-  #   points: TRUE/FALSE if points instead of lines. Default = FALSE.
-  #   vlines: List of x location where to add vertical black lines, optional.
-  #   fileout: Name of output ps file for each experiment: c('','').
-  #   sizetit: Multiplicative factor to scale title size, optional.
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code            
-                   
+                    sizetit = 1) {           
   #
   #  Get some arguments
   # ~~~~~~~~~~~~~~~~~~~~

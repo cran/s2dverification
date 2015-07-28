@@ -1,24 +1,4 @@
 RatioRMS <- function(var_exp1, var_exp2, var_obs, posRMS = 1) {
-  # Matrix var_exp1 / var_exp2 / var_obs should have the same dimensions.
-  # The ratio RMSE(var_exp1, var_obs) / RMSE(var_exp2, var_obs) is output.
-  # The p-value is provided by a two-sided Fischer test.
-  #
-  # Args:
-  #   var_exp1: Matrix of experimental data 1.
-  #   var_exp2: Matrix of experimental data 2, same dimensions as var_exp1.
-  #   var_obs: Matrix of observational data, same dimensions as var_exp1.
-  #   posRMS: Dimension along which RMS are to be computed.
-  #
-  # Returns:
-  #   Matrix with the same dimensions than var_exp1/var_exp2/var_obs except 
-  #   along posRMS where the dimension has length 2.
-  #   The dimension 2 corresponds to the ratio between the computed RMSE 
-  #   (RMSE1/RMSE2) and the p.value of the two-sided Fisher test with Ho: 
-  #   RMSE1/RMSE2 = 1.
-  #
-  # History:
-  #   1.0  #  2011-11  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  Enlarge var_exps & var_obs to 10 dim + move posRMS to 1st pos 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

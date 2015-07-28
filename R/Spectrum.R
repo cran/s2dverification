@@ -1,20 +1,4 @@
 Spectrum <- function(xdata) {
-  # This function estimates the frequency spectrum of the xdata array together 
-  # with its 95% and 99% significance level. The output is provided as a matrix 
-  # with dimensions c(number of frequencies, 4). The column contains the
-  # frequency values, the power, the 95% significance level and the 99% one. 
-  # The spectrum estimation relies on a R built-in function and the 
-  # significance levels are estimated by a Monte-Carlo method.
-  #
-  # Params:
-  #   xdata: Input array of data.
-  #
-  # Returns:
-  #   The frequency spectrum.
-  #
-  # History:
-  #   1.0  #  2012-02  (V. Guemas, virginie.guemas@ic3.cat)  #  Original code
-
   print('Warning : Your data are assumed to be evenly spaced in time')
   xdata <- xdata[is.na(xdata) == FALSE]
   ndat <- length(xdata)

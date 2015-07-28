@@ -1,29 +1,4 @@
 RatioSDRMS <- function(var_exp, var_obs) {
-  # Matrix var_exp & var_obs should have the common diagnostic structure:
-  #   between c(nmod/nexp, nmemb/nparam, nsdates, nltime)
-  #   and     c(nmod/nexp, nmemb/nparam, nsdates, nltime, nlevel, nlat, nlon)
-  # The ratio between the standard deviation of the members around the ensemble 
-  # mean in var_exp and the RMSE between var_exp and var_obs is output for each 
-  # experiment and each observational dataset.
-  # The p-value is provided by a one-sided Fischer test.
-  #
-  # Args:
-  #   var_exp: Model data:
-  #              c(nmod/nexp, nmemb/nparam, nsdates, nltime) up to
-  #              c(nmod/nexp, nmemb/nparam, nsdates, nltime, nlevel, nlat, nlon)
-  #   var_obs: Observational data:
-  #              c(nobs, nmemb, nsdates, nltime) up to
-  #              c(nobs, nmemb, nsdates, nltime, nlevel, nlat, nlon)
-  #
-  # Returns:
-  #   Matrix with c(nexp/nmod, nobs, 2, nltime) up to
-  #     c(nexp/nmod, nobs, 2, nltime, nlevel, nlat, nlon) dimensions.
-  #   The dimension 2 corresponds to the ratio (SD/RMSE) and the p.value of the 
-  #   one-sided Fisher test with Ho: SD/RMSE = 1.
-  #
-  # History:
-  #   1.0  #  2011-12  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  Enlarge the number of dimensions of var_exp and var_obs to 7 if necessary
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

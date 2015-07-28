@@ -1,28 +1,4 @@
 Regression <- function(vary, varx, posREG = 2) {
-  # Compute the regression of matrice vary on matrice varx along the (posREG)th 
-  # dimension by least square fitting. Provides the slope of the regression, 
-  # the associated confidence interval, and the intercept.
-  # Provide also the vary data filtered out from the regression onto varx.
-  # The confidence interval relies on a student-T distribution.
-  #
-  # Args:
-  #   varx: Matrix of any number of dimensions up to 10.
-  #   vary: Matrix of any number of dimensions up to 10. 
-  #   posREG: Position along which to compute the regression.
-  #
-  # Returns:
-  #   $regression: Matrix with same dimensions as varx and vary except along 
-  #                posREG dimension which is replaced by a length 4 dimension, 
-  #                corresponding to the lower limit of the  95% confidence 
-  #                interval, the computed slope and the upper limit of the 95% 
-  #                confidence interval and the intercept for each point of the 
-  #                matrice along all the other dimensions.
-  #   $filtered: Same dimensions as vary filtered out from the regression onto 
-  #              varx along the posREG dimension.
-  #
-  # History:
-  #   1.0  #  2013-05  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  Enlarge the size of varx and vary to 10
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

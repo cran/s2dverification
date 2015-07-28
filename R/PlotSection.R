@@ -1,29 +1,6 @@
 PlotSection <- function(var, horiz, depth, toptitle = '', sizetit = 1, 
                         units = '', brks = NULL, cols = NULL, axelab = TRUE, 
                         intydep = 200, intxhoriz = 20, drawleg = TRUE) {
-  # Plot a (longitude,depth) or (latitude,depth) section.
-  #
-  # Args:
-  #   var: Matrix to plot with (longitude/latitude, depth) dimensions.
-  #   horiz: Array of longitudes/latitudes.
-  #   depth: Array of depths.
-  #   toptitle: Title, optional.
-  #   sizetit: Multiplicative factor to increase title size, optional.
-  #   units: Units, optional.
-  #   brks: Colour levels, optional.
-  #   cols: List of colours, optional.
-  #   axelab: TRUE/FALSE, label the axis. Default = TRUE.
-  #   intydep: Interval between depth ticks on y-axis. Default: 200m.
-  #   intxhoriz: Interval between longitude/latitude ticks on x-axis. 
-  #              Default: 20deg.
-  #   drawleg: Draw colorbar. Default: TRUE.
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2012-09  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  Input arguments 
   # ~~~~~~~~~~~~~~~~~

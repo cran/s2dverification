@@ -1,33 +1,5 @@
 RMS <- function(var_exp, var_obs, posloop = 1, posRMS = 2, compROW = NULL, 
-                limits = NULL) {
-  # Matrix var_exp & var_obs should have the same dimensions except along 
-  # posloop where the length can be different (nexp & nobs).
-  # RMS compute for each grid point the Root Mean Square difference along the 
-  # posRMS dimension between each model data in 1:nexp and each observation in 
-  # 1:nobs which gives nexp x nobs RMS dif for each other grid point of the 
-  # matrix.
-  # The confidence interval relies on a chi2 distribution.
-  #        
-  # Args:
-  #   var_exp: Matrix of experimental data.
-  #   var_obs: Matrix of observational data, same dimensions as var_exp except 
-  #            along posloop.
-  #   posloop: Dimension nobs and nexp.
-  #   posRMS: Dimension along which RMSE are to be computed.
-  #   compROW: Data taken into account only if (compROW)th row is complete.
-  #            Default = NULL.
-  #   limits: Complete between limits[1] & limits[2]. Default = NULL.
-  #
-  # Returns:
-  #   Matrix with c(length(posloop) in var_exp, length(posloop) in var_obs, 3, 
-  #   all other dimensions of var_exp & var_obs except posRMS).
-  #   The dimension 3 corresponds to the lower limit of the  95% confidence 
-  #   interval, the computed RMSE and the upper limit of the 95% confidence 
-  #   interval.
-  #
-  # History:
-  #   1.0  #  2011-05  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-          
+                limits = NULL) {       
   #
   #  Remove data along compROW dim if there is at least one NA between limits
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -58,23 +58,22 @@ if (file.exists(paste(savename, '.sav', sep = ''))) {
   load(paste(savename, '.sav', sep = ''))
 } else {
   if (var == 'prlr' | var == 'tos' ) {
-    fnc <- open.ncdf('/home/vguemas/analysis_hui/constant_files/ecearth_mm_lsm.nc'
-                     )
-    mask <- get.var.ncdf(fnc, 'LSM')
+    fnc <- nc_open(system.file("doc/masks", "ecearth_mm_lsm.nc", package = "s2dverification"))
+    mask <- ncvar_get(fnc, 'LSM')
     close.ncdf(fnc)
     if (var == 'prlr') {
-      fnc <- open.ncdf('/cfu/data/dwd/gpcc_combined1x1_v4/constant_fields/land_sea_mask.nc'
-                       )
-      mask_gpcc <- get.var.ncdf(fnc, 'lsm')
+      fnc <- nc_open(system.file("doc/masks", "gpcc_v6_land_sea_mask.nc", package = "s2dverification"))
+      mask_gpcc <- ncvar_get(fnc, 'lsm')
       close.ncdf(fnc)
-      fnc <- open.ncdf('/cfu/data/cru/mask_cru_land.nc')
-      mask_cru <- get.var.ncdf(fnc, 'pre')
-      close.ncdf(fnc)
-      fnc <- open.ncdf('/cfu/data/noaa/gpcp_v2.2/constant_fields/land_sea_mask.nc'
-                       )
+      # Contact mantainer if need this mask
+      #fnc <- nc_open(system.file("doc/masks", "mask_cru_land.nc", package = "s2dverification"))
+      #mask_cru <- get.var.ncdf(fnc, 'pre')
+      #close.ncdf(fnc)
+      fnc <- nc_open(system.file("doc/masks", "gpcp_v2.2_land_sea_mask.nc", package = "s2dverification"))
       mask_gpcp <- get.var.ncdf(fnc, 'LSM')
       close.ncdf(fnc)
-      lstmaskobs <- list(mask_cru, mask_gpcc)
+      #lstmaskobs <- list(mask_cru, mask_gpcc)
+      lstmaskobs <- list(NULL, mask_gpcc)
     } else {
       mask <- 1 - mask
       lstmaskobs <- list(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 

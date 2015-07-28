@@ -1,21 +1,4 @@
 Smoothing <- function(var, runmeanlen = 12, numdimt = 4) {
-  # Smoothes time-series organized in a matrix of any number of dimensions up 
-  # to 10 dimensions (arbitrary choice, can be enlarged if needed --> ask 
-  # Virginie)
-  #
-  # Args:
-  #   var: Matrix in which are the time-series to smooth.
-  #   runmeanlen: Running mean length in number of time-steps (typically 
-  #               months).
-  #   numdimt: Dimension along with to smooth.
-  #
-  # Returns:
-  #   Matrix with same dimensions as var and smoothed time-series along the 
-  #   (numdimt)th dimension.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code         
-
   # 
   #  Enlarge the number of dimensions of var to 10 --> enlvar 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,18 +16,18 @@ Smoothing <- function(var, runmeanlen = 12, numdimt = 4) {
 
   nmr1 <- floor(runmeanlen / 2)
   nltime <- dimsvar[numdimt]
-  for (jtime in (1+nmr1):(nltime - nmr1)) {
-    # First, averaging the two extreme values
-    u[[numdimt]] <- jtime - nmr1
-    left <- enlvar[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]], 
+  if (nmr1 > 0) { 
+    for (jtime in (1+nmr1):(nltime - nmr1)) {
+      # First, averaging the two extreme values
+      u[[numdimt]] <- jtime - nmr1
+      left <- enlvar[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]], 
                    u[[8]], u[[9]], u[[10]]]
-    u[[numdimt]] <- jtime + nmr1
-    right <- enlvar[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]],
+      u[[numdimt]] <- jtime + nmr1
+      right <- enlvar[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]],
                     u[[8]], u[[9]], u[[10]]]
-    u[[numdimt]] <- jtime
-    smt_enlano[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]], u[[8]],
+      u[[numdimt]] <- jtime
+      smt_enlano[u[[1]], u[[2]], u[[3]], u[[4]], u[[5]], u[[6]], u[[7]], u[[8]],
                u[[9]], u[[10]]] <- (left + right) / (2 * (2 * nmr1))
-    if (nmr1 > 0) { 
       for (k in - (nmr1 - 1):(nmr1 - 1)) {
         # Second, adding the equally-weighted values around the centered
         u[[numdimt]] <- jtime + k
@@ -58,6 +41,8 @@ Smoothing <- function(var, runmeanlen = 12, numdimt = 4) {
                                                u[[10]]] + (mid / (2 * nmr1))
       }
     }
+  }else{
+    smt_enlano <- enlvar
   }
   #
   #  Reduce the number of dimensions to the original one 

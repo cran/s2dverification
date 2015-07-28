@@ -4,44 +4,6 @@ PlotVsLTime <- function(var, toptitle = '', ytitle = '', monini = 1, freq = 12,
                listobs = c('obs1', 'obs2', 'obs3'), biglab = FALSE, hlines = NULL, 
                leg = TRUE, siglev = FALSE, fileout = 'output_plotvsltime.eps', 
                sizetit = 1, show_conf = TRUE) {
-  # Plots mean InterQuartile Range, Maximum-Mininum, Standard Deviation, Median 
-  # Absolute Deviation, the trends, the RMS and correlation between modelled 
-  # and observed data against the forecast time for all input experiments.
-  #
-  # One plot for all experiments
-  # Input var should have dimensions (nexp/nmod, 3 ,nltime)
-  #                               or (nexp/nmod, nobs, 3 ,nltime)
-  #
-  # Args:
-  #   var: Matrix of dimensions:
-  #             (nexp/nmod, 3 ,nltime)
-  #          or (nexp/nmod, nobs, 3 ,nltime)
-  #   toptitle: Main title, optional.
-  #   ytitle: Title of Y-axis, optional.
-  #   monini: Starting month between 1 and 12. Default = 1.
-  #   freq: 1 = yearly, 12 = monthly, 4 = seasonal, ... Default = 12.
-  #   nticks: Number of ticks and labels on the x-axis, optional.
-  #   limits: c(lower limit, upper limit): limits of the Y-axis, optional.
-  #   listexp: List of experiment names, optional.
-  #   listobs: List of observation names, optional.
-  #   biglab: TRUE/FALSE for presentation/paper plot. Default = FALSE.
-  #   hlines: c(a,b, ..) Add horizontal black lines at Y-positions a,b, ...
-  #           Default = NULL.
-  #   leg: TRUE/FALSE if legend should be added or not to the plot. Default = TRUE.
-  #   siglev: TRUE/FALSE if significance level should replace confidence interval.
-  #           Default = FALSE.
-  #   fileout: Name of output ps file.
-  #   sizetit: multiplicative factor to change title size, optional.
-  #   show_conf: TRUE/FALSE to show/not confidence intervals for input variables.
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code
-  #        #  2013-03  (I. Andreu-Burillo,           #  Introduced parameter
-  #        #         isabel.andreu-burillo@ic3.cat)  #  sizetit
-               
   #
   #  Get some arguments
   # ~~~~~~~~~~~~~~~~~~~~

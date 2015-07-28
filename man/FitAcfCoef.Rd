@@ -12,14 +12,14 @@ This function is called in Alpha() to minimize the mean square differences betwe
 }
 \value{Best estimate of the autocorrelation at lag 1}
 \examples{
-  series <- GenSeries(1000, 0.35, 2, 1)
-  estacf <- acf(series[951:1000], plot = FALSE)$acf
-  alpha <- FitAcfCoef(max(estacf[2], 0), max(estacf[3], 0))
-  print(alpha)
+series <- GenSeries(1000, 0.35, 2, 1)
+estacf <- acf(series[951:1000], plot = FALSE)$acf
+alpha <- FitAcfCoef(max(estacf[2], 0), max(estacf[3], 0))
+print(alpha)
 }
 \author{
 History:\cr
-0.1  -  2012-06  (L. Auger, \email{ludovic.auger@meteo.fr})  -  Original code
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+0.1  -  2012-06  (L. Auger, \email{ludovic.auger@meteo.fr})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN
 }
 \keyword{datagen}

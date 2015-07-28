@@ -1,45 +1,9 @@
 Plot2VarsVsLTime <- function(var1, var2, toptitle = '', ytitle = '', monini = 1,
-                              freq = 12, nticks = NULL, limits = NULL, listexp =
-                              c('exp1', 'exp2', 'exp3'), listvars = c('var1',
+                             freq = 12, nticks = NULL, limits = NULL, listexp =
+                             c('exp1', 'exp2', 'exp3'), listvars = c('var1',
                              'var2'), biglab = FALSE, hlines = NULL, leg = TRUE,
                              siglev = FALSE, sizetit = 1, fileout = 
                              'output_plot2varsvsltime.eps', show_conf = TRUE) {
-  # Plots two input variables havind the same dimensions in a common plot.
-  # One plot for all experiments.
-  # Input variables should have dimensions (nexp/nmod, nltime).
-  #
-  # Args:
-  #   var1: Matrix of dimensions (nexp/nmod, nltime).
-  #   var2: Matrix of dimensions (nexp/nmod, nltime).
-  #   toptitle: Main title, optional.
-  #   ytitle: Title of Y-axis, optional.
-  #   monini: Starting month between 1 and 12. Default = 1.
-  #   freq: 1 = yearly, 12 = monthly, 4 = seasonal, ... Default = 12.
-  #   nticks: Number of ticks and labels on the x-axis, optional.
-  #   limits: c(lower limit, upper limit): limits of the Y-axis, optional.
-  #   listexp: List of experiment names, up to three, optional.
-  #   listvars: List of names of input variables, optional.
-  #   biglab: TRUE/FALSE for presentation/paper plot. Default = FALSE.
-  #   hlines: c(a, b, ...) Add horizontal black lines at Y-positions a, b, ...
-  #           Default: NULL. 
-  #   leg: TRUE/FALSE if legend should be added or not to the plot. Default = TRUE.
-  #   siglev: TRUE/FALSE if significance level should replace confidence interval.
-  #           Default = FALSE.
-  #   sizetit: Multiplicative factor to change title size, optional.
-  #   fileout: Name of output ps file.
-  #   show_conf: TRUE/FALSE to show/not confidence intervals for input variables.
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2013-03  (I. Andreu-Burillo, 
-  #                     isabel.andreu-burillo@ic3.cat)  #  Original code
-         
-  #
-  #  Get some arguments
-  # ~~~~~~~~~~~~~~~~~~~~
-  #
   nvars <- 2
 
   if (length(dim(var1)) != length(dim(var2))) { 
@@ -58,6 +22,7 @@ Plot2VarsVsLTime <- function(var1, var2, toptitle = '', ytitle = '', monini = 1,
     var[jvar, , , ] <- get(varname)
     rm(varname)
   }
+
   if (is.null(limits) == TRUE) {
     ll <- min(var1, na.rm = TRUE)
     ul <- max(var1, na.rm = TRUE)

@@ -1,34 +1,4 @@
 Consist_Trend <- function(var_exp, var_obs, interval = 1) {
-  # Compute trends by least square fitting and the associated error interval  
-  # for both the observational and model data.
-  # Provide also the detrended observational and modelled data.
-  # The trend is computed along the start date dimension.
-  #
-  # Args:
-  #   var_exp: Ensemble mean of model hindcasts with dimensions:
-  #              c(nmod/nexp, nsdates, nltime) up to
-  #              c(nmod/nexp, nsdates, nltime, nlevel, nlat, nlon)
-  #   var_obs: Ensemble mean of observational data with dimensions:
-  #              c(nobs, nsdates, nltime) up to
-  #              c(nobs, nsdates, nltime, nlevel, nlat, nlon)
-  #   interval: Number of months between 2 start dates. Default = 1.
-  #
-  # Returns:
-  #   $trend: Trends of model and observational data same dimensions with 
-  #           dimensions:
-  #             c(nmod/nexp + nobs, 3, nltime) up to
-  #             c(nmod/nexp + nobs, 3, nltime, nlevel, nlat, nlon)
-  #           The length 3 dimension corresponds to the lower limit of the  95% 
-  #           confidence interval, the computed trends and the upper limit of 
-  #           the 95% confidence interval.
-  #   $detrendedmod: Same dimensions as var_exp with linearly detrended var 
-  #                  along the start date dimension.
-  #   $detrendedobs: Same dimensions as var_exp with linearly detrended var 
-  #                  along the start date dimension.
-  #
-  # History:
-  #   1.0  #  2011-11  (V. Guemas, vguemas@ic3.cat)  #  Original code
-  
   #
   #  Enlarge the number of dimensions of var_exp and var_obs to 6 if necessary
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

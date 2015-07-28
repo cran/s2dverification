@@ -3,54 +3,12 @@ PlotEquiMap <- function(var, lon, lat, toptitle = '', sizetit = 1, units = '',
                         filled.continents = TRUE, contours = NULL, 
                         brks2 = NULL, dots = NULL, axelab = TRUE, labW = FALSE, 
                         intylat = 20, intxlon = 20, drawleg = TRUE, 
+                        boxlim = NULL, boxcol = 'purple2', boxlwd = 10,
                         subsampleg = 1, numbfig = 1, colNA = 'white') {
-  # Map two dimensional matrix with (longitude, latitude) dimensions in
-  # cylindrical equidistant latitude and longitude projection.
-  #
-  # Args:
-  #   var: Matrix to plot with (longitude, latitude) dimensions.
-  #   lon: Array of longitudes.
-  #   lat: Array of latitudes.
-  #   toptitle: Title, optional.
-  #   sizetit: Multiplicative factor to increase title size, optional.
-  #   units: Units, optional.
-  #   brks: Colour levels, optional.
-  #   cols: List of colours, optional.
-  #   square: Map with squares (TRUE) for each grid points or smoothing 
-  #           (FALSE). Default: TRUE.
-  #   filled.continents: Continents filled in grey (TRUE) or represented by a 
-  #                      black line (FALSE). Default = TRUE.
-  #                      Filling unavailable if crossing Greenwich.
-  #                      Filling unavailable if square.
-  #   contours: Matrix to add to the plot with contours. Default = NULL.
-  #   brks2: Contour levels, optional.
-  #   dots: Matrix with TRUE / FALSE flags to add black dots option only 
-  #         available if square = TRUE.
-  #   axelab: TRUE/FALSE, label the axis. Default = TRUE.
-  #   labW: 
-  #   initylat: Interval between latitude ticks on y-axis. Default: 20deg.
-  #   initxlon: Interval between longitude ticks on x-axis. Default: 20deg.
-  #   drawleg: Draw colorbar. Can be FALSE only if square = FALSE.
-  #            Must be FALSE if numbfig > 1. Default: T.
-  #   subsampleg: Supsampling factor of the interval between ticks on colorbar.
-  #               Default: 1 = every colour level.
-  #   numbfig: Number of figures in the final multipanel.
-  #   colNA:
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2011-11  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-  
-  #
-  #  Some required packages 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~
-  #
   #library(GEOmap)
   #library(geomapdata)
   #library(maps)
-  data(coastmap, envir = environment())
+  data(coastmap, package = 'GEOmap', envir = environment())
   #
   #  Input arguments 
   # ~~~~~~~~~~~~~~~~~
@@ -78,19 +36,22 @@ PlotEquiMap <- function(var, lon, lat, toptitle = '', sizetit = 1, units = '',
   latmax <- ceiling(max(lat) / 10) * 10
   lonmin <- floor(min(lon) / 10) * 10
   lonmax <- ceiling(max(lon) / 10) * 10
+
+  colorbar <- colorRampPalette(c("dodgerblue4", "dodgerblue1",
+              "forestgreen", "yellowgreen", "white", "white",
+              "yellow", "orange", "red", "saddlebrown"))
   if (is.null(brks) == TRUE) {
     ll <- signif(min(var, na.rm = TRUE), 4)
     ul <- signif(max(var, na.rm = TRUE), 4)
     if (is.null(cols) == TRUE) {
-      cols <- c("dodgerblue4", "dodgerblue1", "forestgreen", "yellowgreen",
-                "white", "white", "yellow", "orange", "red", "saddlebrown")
+      cols <- colorbar(10)
     }
     nlev <- length(cols)
-    brks <- signif(seq(ll, ul, (ul - ll) / nlev), 4)
+    brks <- signif(seq(ll, ul, length.out = 1 + nlev), 4)
   } else {
     if (is.null(cols) == TRUE) {
       nlev <- length(brks) - 1
-      cols <- rainbow(nlev)
+      cols <- colorbar(nlev)
     } else {
       if (length(cols) != (length(brks) - 1)) {
         stop("Inconsistent colour levels / list of colours")
@@ -107,7 +68,7 @@ PlotEquiMap <- function(var, lon, lat, toptitle = '', sizetit = 1, units = '',
     } else {
       ll <- signif(min(contours, na.rm = TRUE), 2)
       ul <- signif(max(contours, na.rm = TRUE), 2)
-      brks2 <- signif(seq(ll, ul, (ul - ll) / (length(brks) - 1)), 2)
+      brks2 <- signif(seq(ll, ul, length.out = length(brks)), 2)
     }
   }
   #
@@ -260,6 +221,31 @@ PlotEquiMap <- function(var, lon, lat, toptitle = '', sizetit = 1, units = '',
     } else {
       map(continents, interior = FALSE, wrap = TRUE, lwd = 0.7, col = gray(0.5),
           fill = TRUE, add = TRUE, border = gray(0.5))
+    }
+  }
+  # Draw rectangle on the map
+  if (is.null(boxlim) == FALSE) {
+    boxlimaux <- boxlim
+    if(boxlim[1]>boxlim[3]){
+      boxlimaux[1] <- boxlim[1]-360
+    }
+    if (length(boxlimaux)!=4){
+      stop('Region to be highlighted is ill defined')
+    } else if(boxlimaux[2] < latmin | boxlimaux[4] > latmax | boxlimaux[1]<lonmin | boxlimaux[3]>lonmax){
+      stop('Invalid boundaries')
+    } else if(boxlimaux[1]<0 && boxlimaux[3]>0){
+      #segments south
+      segments(boxlimaux[1], boxlimaux[2],0, boxlimaux[2], col=boxcol, lwd=boxlwd)
+      segments(0,boxlimaux[2], boxlimaux[3], boxlimaux[2], col=boxcol, lwd=boxlwd) 
+      #segments north
+      segments(boxlimaux[1], boxlimaux[4],0, boxlimaux[4], col=boxcol, lwd=boxlwd)
+      segments(0,boxlimaux[4], boxlimaux[3], boxlimaux[4], col=boxcol, lwd=boxlwd) 
+      #segments west
+      segments(boxlimaux[1], boxlimaux[2], boxlimaux[1],boxlimaux[4], col=boxcol, lwd=boxlwd )  
+      #segments est
+      segments(boxlimaux[3], boxlimaux[2], boxlimaux[3],boxlimaux[4], col=boxcol, lwd=boxlwd )          
+    } else {
+      rect(boxlimaux[1], boxlimaux[2], boxlimaux[3], boxlimaux[4], border=boxcol, col=NULL, lwd=boxlwd, lty='solid')              
     }
   }
   #

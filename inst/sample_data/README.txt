@@ -1,0 +1,3 @@
+These data sets provide data in function of longitudes and latitudes for the variable 'tos', i.e. sea surface temperature, over the world from the decadal climate prediction experiment run at IC3 in the context of the CMIP5 project. The experimental data belongs to an experiment named 'i00k' in the IC3 local database. 
+The observational data used for verification is the 'ERSST' observational dataset, in this example.
+The resolutions of the experimental and observational datasets have been drastically reduced so as to make it on CRAN. The original resolution names (under CDO conventions) were t106grid and r180x89 respectively. The final reduced resolutions are r20x10 and 16x18 respectively.

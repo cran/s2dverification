@@ -1,25 +1,4 @@
 Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
-  # This function computes per-pair climatologies from experimental and 
-  # observational matrix output from load.
-  #
-  # Args:
-  #   var_exp: Model data:
-  #            c(nmod/nexp, nmemb/nparam, nsdates, nltime) up to
-  #            c(nmod/nexp, nmemb/nparam, nsdates, nltime, nlevel, nlat, nlon)
-  #   var_obs: Observational data: 
-  #            c(nobs, nmemb, nsdates, nltime) up to
-  #            c(nobs, nmemb, nsdates, nltime, nlevel, nlat, nlon)
-  #   memb: TRUE/FALSE (1 climatology for each member). Default = TRUE.
-  #   kharin: TRUE/FALSE (if Kharin method is applied or not). Default = FALSE.
-  #   NDV: 
-  #
-  # Returns:
-  #   $clim_exp: Matrix with same dimensions as var_exp
-  #   $clim_obs: Matrix with same dimensions as var_obs
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code
-
   #
   #  Enlarge the number of dimensions of var_exp and var_obs to 7 if necessary
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

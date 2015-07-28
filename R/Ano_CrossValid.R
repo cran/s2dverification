@@ -1,24 +1,4 @@
 Ano_CrossValid <- function(var_exp, var_obs, memb = TRUE) {
-  # This function computes raw anomalies from experimental and observational 
-  # matrix output from load() by subtracting the climatologies computed in a 
-  # cross-validation mode and with a per-pair method.
-  #
-  # Args:
-  #   var_exp: Model data:
-  #            c(nmod/nexp, nmemb/nparam, nsdates, nltime) up to
-  #            c(nmod/nexp, nmemb/nparam, nsdates, nltime, nlevel, nlat, nlon)
-  #   var_obs: Observational data:
-  #            c(nobs, nmemb, nsdates, nltime) up to
-  #            c(nobs, nmemb, nsdates, nltime, nlevel, nlat, nlon)
-  #   memb: TRUE/FALSE (1 climatology for each member). Default = TRUE.
-  #
-  # Returns:
-  #   $ano_exp: Matrix with same dimensions as var_exp
-  #   $ano_obs: Matrix with same dimensions as var_obs
-  #
-  # History:
-  #   1.0  #  2011-12  (V. Guemas, vguemas@ic3.cat)  #  Original code
-
   #
   #  Enlarge the number of dimensions of var_exp and var_obs to 7 if necessary
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

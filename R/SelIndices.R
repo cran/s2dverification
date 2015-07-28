@@ -1,20 +1,4 @@
 SelIndices <- function(var, posdim, limits) {
-  # This function allows to select a subensemble from a matrix of any 
-  # dimensions, providing the dimension along which the user aims at cutting 
-  # the matrix and between which indices.
-  #
-  # Args:
-  #   var: A matrix of any rank and any dimensions.
-  #   posdim: The dimension along which a submatrice should be selected.
-  #   limits: The lower and upper indice of the selection along the (posdim)th 
-  #           dimension.
-  #
-  # Returns:
-  #   The sliced matrix.
-  #
-  # History:
-  #   1.0  #  2011-04  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  A few security checks
   # ~~~~~~~~~~~~~~~~~~~~~~~

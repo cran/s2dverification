@@ -1,19 +1,4 @@
 Mean1Dim <- function(var, posdim, narm = TRUE, limits = NULL) {
-  # Averages the matrix var along the posdim dimension between limits [1] and 
-  # limits [2] if limits argument is given.
-  #
-  # Args:
-  #   var: Matrix to average.
-  #   posdim: Position of the dimension to average along.
-  #   narm: Ignore NA values or not.
-  #   limits: Limits to average between.
-  #
-  # Returns:
-  #   Matrix with one dimension less containing the average.
-  #
-  # History:
-  #   1.0  #  2011-04  (V. Guemas, vguemas@ic3.cat)  #  Original code           
-
   if (is.null(limits)) {
     limits <- c(1, dim(var)[posdim])
   }

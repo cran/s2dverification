@@ -1,21 +1,4 @@
 Alpha <- function(xdata, detrend = FALSE, filter = FALSE) {
-  # This function, based on the fit_acfcoef function, estimates the 
-  # autocorrelation at lag 1 in the xdata array following the method described 
-  # in Guemas V., Auger L., Doblas-Reyes F., JAMC, 2013.
-  #
-  # Args:
-  #   xdata: Array of data to estimate the autocorrelation from.
-  #   detrend: T applies a linear detrending to xdata prior to the estimation 
-  #            of the autocorrelation at lag 1. 
-  #   filter: T applies a filtering of any cycle prior to the estimation of the 
-  #           autocorrelation at lag 1.
-  #
-  # Returns:
-  #   alpha: Correlation at lag 1.
-  #
-  # History:
-  #   1.0  #  2012-06  (V. Guemas, vguemas@ic3.cat)  #  Original code
-
   tmp <- xdata
 
   if (detrend == TRUE) {

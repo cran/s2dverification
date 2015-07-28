@@ -3,36 +3,6 @@ PlotClim <- function(exp_clim, obs_clim = NULL, toptitle = '', ytitle = '',
                      listexp = c('exp1', 'exp2', 'exp3'), 
                      listobs = c('obs1', 'obs2', 'obs3'), biglab = FALSE, leg = TRUE, 
                      fileout = 'output_plotclim.eps', sizetit = 1) {
-  # Plots time-series of climatologies of any index output from clim and 
-  # organized in matrix with dimensions:
-  #   c(nmod/nexp, nmemb/nparam, nltime)
-  #   c(nobs, nmemb, nltime)
-  #
-  # One plot for all experiments.
-  #
-  # Args:
-  #   exp_clim: Matrix with experimental data:
-  #               c(nmod/nexp, nmemb/nparam, nltime)
-  #   obs_clim: Matrix with observational data, optional:
-  #               c(nobs, nmemb, nltime)
-  #   toptitle: Main title, optional.
-  #   ytitle: Title of Y-axis, optional.
-  #   monini: Starting month between 1 and 12. Default = 1.
-  #   freq: 1 = yearly, 12 = monthly, 4 = seasonal, ... Default = 12.
-  #   limits: c(lower limit, upper limit): limits of the Y-axis, optional.
-  #   listexp: List of experiment names, optional.
-  #   listobs: List of observational dataset names, optional.
-  #   biglab: TRUE/FALSE for presentation/paper plot. Default = FALSE.
-  #   leg: Whether to plot legend or not.
-  #   fileout: Name of output ps file.
-  #   sizetit: Multiplicative factor to scale title size, optional.
-  #
-  # Returns:
-  #   This function returns nothing.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-  
   #
   #  Get some arguments
   # ~~~~~~~~~~~~~~~~~~~~

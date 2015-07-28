@@ -1,20 +1,4 @@
 Eno <- function(obs, posdim) {
-  # Compute the effective number of independant observations along the 
-  # (posdim)th dimension of an observational matrix. This effective number of 
-  # independant observations may be required to perform statistical tests.
-  # Based on eno function from Caio Coelho.
-  #
-  # Args:
-  #   obs: Observational matrix of any number of dimensions up to 10.
-  #   posdim: Position along which to compute the effective number of 
-  #           observations.
-  #
-  # Returns:
-  #   Same dimensions as var except without posdim dimension.
-  #
-  # History:
-  #   1.0  #  2011-05  (V. Guemas, vguemas@ic3.cat)  #  Original code
-  
   dimsvar <- dim(obs)
   if (is.null(dimsvar)) {
     dimsvar <- length(obs)

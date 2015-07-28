@@ -1,18 +1,4 @@
 InsertDim <- function(var, posdim, lendim) {
-  # Add one dimension to matrix var in position posdim with length lendim and
-  # which correspond to (lendim x var matrix).
-  #
-  # Args:
-  #   var: Matrix to be add a dimension to.
-  #   posdim: Position of the new dimension.
-  #   lendim: Length of the new dimension.
-  #
-  # Returns:
-  #   Matrix with the added dimension.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code         
-
   #
   #  Initialisation of the output var with the required dimension length 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

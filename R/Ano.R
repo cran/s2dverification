@@ -1,24 +1,4 @@
 Ano <- function(var, clim) {
-  # This function computes raw anomalies from experimental or observational 
-  # matrix output from load() and their climatologies output from clim()
-  #
-  # Args:
-  #   var: Model or observational data:
-  #        c(nmod/nexp/nobs, nmemb/nparam, nsdates, nltime) up to
-  #        c(nmod/nexp/nobs, nmemb/nparam, nsdates, nltime, nlevel, nlat, nlon)
-  #   clim: Climatologies from clim:
-  #         c(nmod/nexp/nobs, nmemb/nparam, nltime) up to
-  #         c(nmod/nexp/nobs, nmemb/nparam, nltime, nlevel, nlat, nlon)
-  #         or
-  #         c(nmod/nexp/nobs, nltime) up to
-  #         c(nmod/nexp/nobs, nltime, nlevel, nlat, nlon)
-  #
-  # Returns:
-  #   Matrix with same dimensions as var
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code
-  
   #
   #  Duplicate clim dimensions to heve same dimensions as var
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

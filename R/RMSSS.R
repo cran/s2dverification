@@ -1,28 +1,4 @@
 RMSSS <- function(var_exp, var_obs, posloop = 1, posRMS = 2) {
-  # Matrix var_exp & var_obs should have the same dimensions except along 
-  # posloop where the length can be different (nexp & nobs).
-  # RMSSS compute for each grid point the Root Mean Square Skill Score along 
-  # the posRMS dimension for each model in 1:nexp against each observational 
-  # data in 1:nobs which gives nexp x nobs RMSSS for each other grid point of 
-  # the matrix.
-  # The p-value is provided by a one-sided Fisher test.
-  #        
-  # Args:
-  #   var_exp: Matrix of experimental data.
-  #   var_obs: Matrix of observational data, same dimensions as var_exp except 
-  #            along posloop.
-  #   posloop: Dimension nobs and nexp.
-  #   posRMS: Dimension along which RMSE are to be computed.
-  #
-  # Returns:
-  #   Matrix with c(length(posloop) in var_exp, length(posloop) in var_obs, 2, 
-  #   all other dimensions of var_exp & var_obs except posRMS).
-  #   The dimension 2 corresponds to the RMSSS and the p.value of the one-sided 
-  #   Fisher test with Ho: RMSSS = 0.
-  #
-  # History:
-  #   1.0  #  2012-04  (V. Guemas, vguemas@ic3.cat)  #  Original code   
-
   #
   #  Enlarge var_exp & var_obs & clim to 10 dim + move posloop & posRMS  
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

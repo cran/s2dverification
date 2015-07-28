@@ -1,17 +1,4 @@
 Enlarge <- function(var, numdims) {
-  # Extends the number of dimensions of var to numdims (the added dimensions 
-  # have length 1).
-  #
-  # Args:
-  #   var: Array to extend.
-  #   numdims: Desired number of dimensions.
-  #
-  # Returns:
-  #   Extended array.
-  #
-  # History:
-  #   1.0  #  2011-03  (V. Guemas, vguemas@ic3.cat)  #  Original code
-
   #
   #  Enlarge the number of dimensions to 20 --> enlvar
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
