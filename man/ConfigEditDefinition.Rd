@@ -29,7 +29,7 @@ Flag to stipulate whether to ask for confirmation if the variable is being modif
 \value{
 A modified configuration object is returned.
 }
-\seealso{ConfigAddVar, ConfigApplyMatchingEntries, ConfigEditDefinition, ConfigEditEntry, ConfigFileOpen, ConfigMatchingVars, ConfigShowSimilarEntries, ConfigShowTable}
+\seealso{ConfigApplyMatchingEntries, ConfigEditDefinition, ConfigEditEntry, ConfigFileOpen, ConfigShowSimilarEntries, ConfigShowTable}
 \author{
 History:\cr
 0.1  -  2015-05  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  First version
@@ -44,19 +44,13 @@ configuration <- ConfigFileOpen(config_file)
 # table which will associate the experiment "ExampleExperiment2" and variable 
 # "ExampleVariable" to some information about its location.
 configuration <- ConfigAddEntry(configuration, "experiments", 
-                 "file-per-startdate", "last", "ExampleExperiment2", 
-                 "ExampleVariable", "/path/to/ExampleExperiment2", 
+                 "last", "ExampleExperiment2", "ExampleVariable", 
+                 "/path/to/ExampleExperiment2/", 
                  "ExampleVariable/ExampleVariable_$START_DATE$.nc")
 # Edit entry to generalize for any variable. Changing variable needs .
-configuration <- ConfigEditEntry(configuration, "experiments", 
-                 "file-per-startdate", 1, var_name = ".*", 
+configuration <- ConfigEditEntry(configuration, "experiments", 1, 
+                 var_name = ".*", 
                  file_path = "$VAR_NAME$/$VAR_NAME$_$START_DATE$.nc")
-# Now put variable in list of supported variables. In this example will be a 
-# two-dimensional variable.
-configuration <- ConfigAddVar(configuration, "2d", "ExampleVariable")
-# Change the default grid
-configuration <- ConfigEditDefinition(configuration, "DEFAULT_GRID", 
-                                      "r256x128", confirm = FALSE)
 # Now apply matching entries for variable and experiment name and show the 
 # result
 match_info <- ConfigApplyMatchingEntries(configuration, 'tas', 

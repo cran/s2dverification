@@ -1,5 +1,5 @@
-ConfigRemoveEntry <- function(configuration, dataset_type, store_format, dataset_name = NULL, var_name = NULL, position = NULL) {
-  table_name <- paste0(gsub("-", "_", store_format), "_", dataset_type)
+ConfigRemoveEntry <- function(configuration, dataset_type, dataset_name = NULL, var_name = NULL, position = NULL) {
+  table_name <- dataset_type
   if (!is.null(dataset_name) && !is.null(var_name)) {
     if (dataset_name == ".*") {
       if (var_name == ".*") {

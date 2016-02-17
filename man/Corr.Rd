@@ -13,8 +13,8 @@ The significance level relies on a one-sided student-T distribution.\cr
 We can modifiy the treshold of the test modifying siglev (default value=0.95).
 }
 \usage{
-Corr(var_exp, var_obs, posloop = 1, poscor = 2, compROW = NULL, limits = NULL, 
-     siglev = 0.95, method = 'pearson')
+Corr(var_exp, var_obs, posloop = 1, poscor = 2, compROW = NULL, 
+     limits = NULL, siglev = 0.95, method = 'pearson')
 }
 \arguments{
   \item{var_exp}{
@@ -72,17 +72,10 @@ PlotVsLTime(corr, toptitle = "correlations", ytitle = "correlation",
             fileout = 'tos_cor.eps')
 }
 \author{
-<<<<<<< HEAD
-  History:
-  0.1  -  2011-04  (V. Guemas, \email{vguemas at ic3.cat})  -  Original code
-  1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
-  1.1  -  2014-10  (M. Menegoz, \email{martin.menegoz at ic3.cat})  -  Adding siglev argument
-  1.2  -  2015-03  (L.P. Caron, \email{louis-philippe.caron at ic3.cat})  - Adding method argument
-=======
 History:\cr
 0.1  -  2011-04  (V. Guemas, \email{vguemas at ic3.cat})  -  Original code\cr
 1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN\cr
-1.1  -  2014-10  (M. Menegoz, \email{martin.menegoz at ic3.cat})  -  Adding siglev argument
->>>>>>> develop-cran-2.3.2
+1.1  -  2014-10  (M. Menegoz, \email{martin.menegoz at ic3.cat})  -  Adding siglev argument\cr
+1.2  -  2015-03  (L.P. Caron, \email{louis-philippe.caron at ic3.cat})  - Adding method argument
 }
 \keyword{datagen}

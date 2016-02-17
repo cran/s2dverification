@@ -35,18 +35,16 @@ The dimension 2 corresponds to the ratio between the RMSE (RMSE1/RMSE2) and the 
 configfile <- paste0(tempdir(), '/sample.conf')
 ConfigFileCreate(configfile, confirm = FALSE)
 c <- ConfigFileOpen(configfile)
-c <- ConfigEditDefinition(c, 'DEFAULT_GRID', 'r20x10', confirm = FALSE)
 c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)
 c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)
-c <- ConfigAddVar(c, '2d', 'tos')
 data_path <- system.file('sample_data', package = 's2dverification')
-exp_data_path <- paste0(data_path, '/model/$EXP_NAME$')
-obs_data_path <- paste0(data_path, '/$OBS_NAME$')
-c <- ConfigAddEntry(c, 'experiments', 'file-per-startdate',
-     dataset_name = 'experiment', var_name = 'tos', main_path = exp_data_path,
+exp_data_path <- paste0(data_path, '/model/$EXP_NAME$/')
+obs_data_path <- paste0(data_path, '/$OBS_NAME$/')
+c <- ConfigAddEntry(c, 'experiments', dataset_name = 'experiment', 
+     var_name = 'tos', main_path = exp_data_path,
      file_path = '$STORE_FREQ$_mean/$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
-c <- ConfigAddEntry(c, 'observations', 'file-per-month',
-     dataset_name = 'observation', var_name = 'tos', main_path = obs_data_path,
+c <- ConfigAddEntry(c, 'observations', dataset_name = 'observation', 
+     var_name = 'tos', main_path = obs_data_path,
      file_path = '$STORE_FREQ$_mean/$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
 ConfigFileSave(c, configfile, confirm = FALSE)
 

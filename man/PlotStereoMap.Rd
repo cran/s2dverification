@@ -63,6 +63,17 @@ Default = 1 = every colour level.
 Color used to represent NA. Default = 'white'
   }
 }
+\examples{
+data <- matrix(rnorm(100 * 50), 100, 50)
+x <- seq(from = 0, to = 360, length.out = 100)
+y <- seq(from = -90, to = 90, length.out = 50)
+breaks <- seq(from = min(data, na.rm = TRUE), to = max(data, na.rm = TRUE), 
+              length.out = 21)
+colors <- colorRampPalette(c("blue", "lightblue", "white", "yellow", "red"))
+colors <- colors(20)
+PlotStereoMap(var = data, lon = x, lat = y, latlims = c(60, 90), brks = breaks,
+              cols = colors, toptitle = "This is the title", sizetit = 0.8)
+}
 \author{
 History:\cr
 1.0  -  2014-07  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code

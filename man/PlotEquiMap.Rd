@@ -10,9 +10,10 @@ Map a two dimensional matrix with (longitude, latitude) dimensions on a cylindri
 PlotEquiMap(var, lon, lat, toptitle = "", sizetit = 1, units = "", 
             brks = NULL, cols = NULL, square = TRUE, 
             filled.continents = TRUE, contours = NULL, brks2 = NULL, 
-            dots = NULL, axelab = TRUE, labW = FALSE, intylat = 20, intxlon = 20, 
-            drawleg = TRUE, boxlim = NULL, boxcol = 'purple2', boxlwd= 10,
-            subsampleg = 1, numbfig = 1, colNA = "white")
+            dots = NULL, axelab = TRUE, labW = FALSE, intylat = 20, 
+            intxlon = 20, drawleg = TRUE, boxlim = NULL, 
+            boxcol = 'purple2', boxlwd= 10, subsampleg = 1, 
+            numbfig = 1, colNA = "white")
 }
 \arguments{
   \item{var}{
@@ -101,18 +102,16 @@ Thickness of the rectangle side. Default: 10.
 configfile <- paste0(tempdir(), '/sample.conf')
 ConfigFileCreate(configfile, confirm = FALSE)
 c <- ConfigFileOpen(configfile)
-c <- ConfigEditDefinition(c, 'DEFAULT_GRID', 'r20x10', confirm = FALSE)
 c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)
 c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)
-c <- ConfigAddVar(c, '2d', 'tos')
 data_path <- system.file('sample_data', package = 's2dverification')
-exp_data_path <- paste0(data_path, '/model/$EXP_NAME$')
-obs_data_path <- paste0(data_path, '/$OBS_NAME$')
-c <- ConfigAddEntry(c, 'experiments', 'file-per-startdate',
-     dataset_name = 'experiment', var_name = 'tos', main_path = exp_data_path,
+exp_data_path <- paste0(data_path, '/model/$EXP_NAME$/')
+obs_data_path <- paste0(data_path, '/$OBS_NAME$/')
+c <- ConfigAddEntry(c, 'experiments', dataset_name = 'experiment', 
+     var_name = 'tos', main_path = exp_data_path,
      file_path = '$STORE_FREQ$_mean/$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
-c <- ConfigAddEntry(c, 'observations', 'file-per-month',
-     dataset_name = 'observation', var_name = 'tos', main_path = obs_data_path,
+c <- ConfigAddEntry(c, 'observations', dataset_name = 'observation', 
+     var_name = 'tos', main_path = obs_data_path,
      file_path = '$STORE_FREQ$_mean/$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
 ConfigFileSave(c, configfile, confirm = FALSE)
 

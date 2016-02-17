@@ -4,31 +4,32 @@
 \title{Sample Of Observational And Experimental Data For Forecast Verification As Area Averages}
 \description{
 This data set provides area averaged data for the variable 'tos', i.e. sea surface temperature, over the mediterranean zone from the example datasets attached to the package. See examples on Load() for more details.\cr\cr
-
 The data is provided through a variable named 'sampleTimeSeries' and is structured as expected from the 'Load()' function in the 's2dverification' package if was called as follows:\cr\cr
-configfile <- paste0(tempdir(), '/sample.conf')\cr
-ConfigFileCreate(configfile, confirm = FALSE)\cr
-c <- ConfigFileOpen(configfile)\cr
-c <- ConfigEditDefinition(c, 'DEFAULT_GRID', 'r20x10', confirm = FALSE)\cr
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)\cr
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)\cr
-c <- ConfigAddVar(c, '2d', 'tos')\cr
-data_path <- system.file('sample_data', package = 's2dverification')\cr
-exp_data_path <- paste0(data_path, '/model/$EXP_NAME$')\cr
-obs_data_path <- paste0(data_path, '/$OBS_NAME$')\cr
-c <- ConfigAddEntry(c, 'experiments', 'file-per-startdate',
-     dataset_name = 'experiment', var_name = 'tos', main_path = exp_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
-c <- ConfigAddEntry(c, 'observations', 'file-per-month',
-     dataset_name = 'observation', var_name = 'tos', main_path = obs_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
-ConfigFileSave(c, configfile, confirm = FALSE)\cr\cr
+  \preformatted{
+configfile <- paste0(tempdir(), '/sample.conf')
+ConfigFileCreate(configfile, confirm = FALSE)
+c <- ConfigFileOpen(configfile)
+c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)
+c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)
+data_path <- system.file('sample_data', package = 's2dverification')
+exp_data_path <- paste0(data_path, '/model/$EXP_NAME$/')
+obs_data_path <- paste0(data_path, '/$OBS_NAME$/')
+c <- ConfigAddEntry(c, 'experiments', dataset_name = 'experiment', 
+                    var_name = 'tos', main_path = exp_data_path,
+                    file_path = file.path('$STORE_FREQ$_mean', 
+                      '$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
+c <- ConfigAddEntry(c, 'observations', dataset_name = 'observation', 
+                    var_name = 'tos', main_path = obs_data_path,
+                    file_path = file.path('$STORE_FREQ$_mean/$VAR_NAME$',
+                                  '$VAR_NAME$_$YEAR$$MONTH$.nc')
+ConfigFileSave(c, configfile, confirm = FALSE)
 
-# Now we are ready to use Load().\cr
-startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')\cr
-sampleData <- Load('tos', c('experiment'), c('observation'), startDates, \cr
-                   output = 'areave', latmin = 27, latmax = 48, lonmin = -12,\cr
-                   lonmax = 40, configfile = configfile)\cr\cr
+# Now we are ready to use Load().
+startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+sampleData <- Load('tos', c('experiment'), c('observation'), startDates, 
+                   output = 'areave', latmin = 27, latmax = 48, lonmin = -12,
+                   lonmax = 40, configfile = configfile)
+  }
 Check the documentation on 'Load()' in the package 's2dverification' for more information.
 }
 \usage{

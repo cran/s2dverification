@@ -1,14 +1,10 @@
-ConfigShowTable <- function(configuration, dataset_type, store_format, line_numbers = NULL) {
-  table_name <- paste0(gsub("-", "_", store_format), "_", dataset_type)
+ConfigShowTable <- function(configuration, dataset_type, line_numbers = NULL) {
+  table_name <- dataset_type
   header <- paste("| Matches in", gsub("_", " ", table_name), "|\n")
   cat(paste0(paste(rep("-", nchar(header) - 1), collapse = ''), "\n"))
   cat(header)
   cat(paste0(paste(rep("-", nchar(header) - 1), collapse = ''), "\n"))
-  if (dataset_type == 'experiments') {
-    cat("#exp_name, var_name[, exp_main_path[, exp_file_path[, grid[, nc_var_name[, suffix[, var_min[, var_max]]]]]]]\n")
-  } else {
-    cat("#obs_name, var_name[, obs_main_path[, obs_file_path[, nc_var_name[, suffix[, var_min[, var_max]]]]]]\n")
-  }
+  cat("#dataset_name, var_name[, main_path[, file_path[, nc_var_name[, suffix[, var_min[, var_max]]]]]]\n")
 
   if (is.null(line_numbers)) {
     line_numbers <- 1:length(unlist(configuration[[table_name]], recursive = FALSE))

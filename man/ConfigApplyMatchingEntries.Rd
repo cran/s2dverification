@@ -4,7 +4,7 @@
 Apply Matching Entries To Dataset Name And Variable Name To Find Related Info
 }
 \description{
-Given a pair of dataset name and variable name, this function determines, by reading the configuration lists and tables, what kind of dataset it is and in what format it is stored (file-per-dataset, file-per-member, ...). Then it applies all the matching entries found in the corresponding configuration table to work out the dataset main path, file path, actual name of variable inside NetCDF files, ...
+Given a pair of dataset name and variable name, this function determines applies all the matching entries found in the corresponding configuration table to work out the dataset main path, file path, actual name of variable inside NetCDF files, ...
 }
 \usage{
 ConfigApplyMatchingEntries(configuration, var, exp = NULL, obs = NULL, 
@@ -36,12 +36,13 @@ Flag to stipulate whether to show the result of applying all the matching entrie
   }
 }
 \value{
-A modified configuration object is returned.
+A list with the information resulting of applying the matching entries is returned.
 }
-\seealso{ConfigAddVar, ConfigApplyMatchingEntries, ConfigEditDefinition, ConfigEditEntry, ConfigFileOpen, ConfigMatchingVars, ConfigShowSimilarEntries, ConfigShowTable}
+\seealso{ConfigApplyMatchingEntries, ConfigEditDefinition, ConfigEditEntry, ConfigFileOpen, ConfigShowSimilarEntries, ConfigShowTable}
 \author{
 History:\cr
 0.1  -  2015-05  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  First version
+1.0  -  2015-11  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Removed grid column and storage types
 }
 \examples{
 # Create an empty configuration file
@@ -53,19 +54,13 @@ configuration <- ConfigFileOpen(config_file)
 # table which will associate the experiment "ExampleExperiment2" and variable 
 # "ExampleVariable" to some information about its location.
 configuration <- ConfigAddEntry(configuration, "experiments", 
-                 "file-per-startdate", "last", "ExampleExperiment2", 
-                 "ExampleVariable", "/path/to/ExampleExperiment2", 
+                 "last", "ExampleExperiment2", "ExampleVariable", 
+                 "/path/to/ExampleExperiment2/", 
                  "ExampleVariable/ExampleVariable_$START_DATE$.nc")
 # Edit entry to generalize for any variable. Changing variable needs .
-configuration <- ConfigEditEntry(configuration, "experiments", 
-                 "file-per-startdate", 1, var_name = ".*", 
+configuration <- ConfigEditEntry(configuration, "experiments", 1, 
+                 var_name = ".*", 
                  file_path = "$VAR_NAME$/$VAR_NAME$_$START_DATE$.nc")
-# Now put variable in list of supported variables. In this example will be a 
-# two-dimensional variable.
-configuration <- ConfigAddVar(configuration, "2d", "ExampleVariable")
-# Change the default grid
-configuration <- ConfigEditDefinition(configuration, "DEFAULT_GRID", 
-                                      "r256x128", confirm = FALSE)
 # Now apply matching entries for variable and experiment name and show the 
 # result
 match_info <- ConfigApplyMatchingEntries(configuration, 'tas', 

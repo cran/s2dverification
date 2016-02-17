@@ -1,24 +1,27 @@
 #!/usr/bin/env Rscript
 
 library(s2dverification)
+library(ncdf4)
 args <- commandArgs(TRUE)
 
-comptrend <- T
-compcor <- T
-comprms <- T
-compspread <- T
-plotano <- T
+comptrend <- TRUE
+compcor <- TRUE
+comprms <- TRUE
+compspread <- TRUE
+plotano <- TRUE
 
-var <- args[1]   # sie/sia/siv/tos/tas/prlr/ohc/lohc/mohc/uohc/amoc
-pole <- args[2]  # N/S only for sia/sie
-nltimemax <- 124 # number of leadtimes max in the experiments (in months)
-nltimeout <- 60  # number of leadtimes to postprocess(in months)
+var <- args[1]    # sie/sia/siv/tos/tas/prlr/ohc/lohc/mohc/uohc/amoc
+pole <- args[2]   # N/S only for sia/sie
+nltimemax <- 124  # number of leadtimes max in the experiments (in months)
+nltimeout <- 60   # number of leadtimes to postprocess(in months)
 lstexpid <- c('i00k', 'b02p') # list of ids
-mon0 <- 11       # initial month
-year0 <- 1960    # first start date
-yearf <- 2005    # last start date
-intsdate <- 5    # interval between start dates
-runmeanlen <- 12 # length of the window for running mean (in months)
+grid <- '320x160' # atmospheric grid for tos/prlr (ocean/land only)
+vertnem <- 'L42'  # Number of vertical levels in nemo
+mon0 <- 11        # initial month
+year0 <- 1960     # first start date
+yearf <- 2005     # last start date
+intsdate <- 5     # interval between start dates
+runmeanlen <- 12  # length of the window for running mean (in months)
 
 obs <- switch(var, 'sia' = c('HadISST'), 'sie' = c('HadISST'), 
               'tas' = c('NCEP', 'ERA40'), 'tos' = c('ERSST', 'HadISST'),
@@ -58,22 +61,23 @@ if (file.exists(paste(savename, '.sav', sep = ''))) {
   load(paste(savename, '.sav', sep = ''))
 } else {
   if (var == 'prlr' | var == 'tos' ) {
-    fnc <- nc_open(system.file("doc/masks", "ecearth_mm_lsm.nc", package = "s2dverification"))
+    fnc <- nc_open(paste('/esnas/exp/ecearth/land_sea_mask_', grid, '.nc',
+                     sep = ''))
     mask <- ncvar_get(fnc, 'LSM')
-    close.ncdf(fnc)
+    nc_close(fnc)
     if (var == 'prlr') {
-      fnc <- nc_open(system.file("doc/masks", "gpcc_v6_land_sea_mask.nc", package = "s2dverification"))
+      fnc <- nc_open('/esnas/obs/dwd/gpcc_combined1x1_v6/constant_fields/land_sea_mask.nc'
+                       )
       mask_gpcc <- ncvar_get(fnc, 'lsm')
-      close.ncdf(fnc)
-      # Contact mantainer if need this mask
-      #fnc <- nc_open(system.file("doc/masks", "mask_cru_land.nc", package = "s2dverification"))
-      #mask_cru <- get.var.ncdf(fnc, 'pre')
-      #close.ncdf(fnc)
-      fnc <- nc_open(system.file("doc/masks", "gpcp_v2.2_land_sea_mask.nc", package = "s2dverification"))
-      mask_gpcp <- get.var.ncdf(fnc, 'LSM')
-      close.ncdf(fnc)
-      #lstmaskobs <- list(mask_cru, mask_gpcc)
-      lstmaskobs <- list(NULL, mask_gpcc)
+      nc_close(fnc)
+      fnc <- nc_open('/esnas/obs/cru/mask_cru_land.nc')
+      mask_cru <- ncvar_get(fnc, 'pre')
+      nc_close(fnc)
+      #fnc <- nc_open('/esnas/obs/noaa/gpcp_v2.2/constant_fields/land_sea_mask.nc'
+      #                 )
+      #mask_gpcp <- ncvar_get(fnc, 'LSM')
+      #nc_close(fnc)
+      lstmaskobs <- list(mask_cru, mask_gpcc)
     } else {
       mask <- 1 - mask
       lstmaskobs <- list(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
@@ -92,8 +96,16 @@ if (file.exists(paste(savename, '.sav', sep = ''))) {
   latbnd <- switch(var, 'tos' = c(-60, 65), 'prlr' = c(-60, 65), c(-90, 90))
   varname <- switch(var, 'sia' = paste(var, pole, sep = ''), 'sie' = paste(var, 
              pole, sep = ''), 'siv' = paste(var, pole, sep = ''), 
-             'ohc' = 'heatc', 'uohc' = '0-315_heatc', 'mohc' = '373-657_heatc',
-             'lohc' = '800-5350_heatc', 'amoc' = 'moc_40N55N_1-2km', var)
+             'ohc' = 'heatc', 'uohc' = switch(vertnem, 'L42' = '0-315_heatc', 
+                                                       'L46' = '0-322_heatc',
+                                                       'L75' = '0-271_heatc'),
+                              'mohc' = switch(vertnem, 'L42' = '373-657_heatc',
+                                                       'L46' = '382-735_heatc',
+                                                       'L75' = '301-773_heatc'),
+                              'lohc' = switch(vertnem, 'L42' = '800-5350_heatc',
+                                                       'L46' = '855-5875_heatc',
+                                                       'L75' = '857-5902_heatc'),
+              'amoc' = 'moc_40N55N_1-2km', var)
   if (is.na(match('b02p', lstexpid)) == TRUE) { 
     lstload <- lstexpid
   } else {
@@ -135,9 +147,11 @@ if (file.exists(paste(savename, '.sav', sep = ''))) {
   save(toto1, file = paste(savename, '.sav', sep = ''))
 }
 
-toto2a <- Clim(toto1$mod, toto1$obs, memb = F)
-toto2b_ano_exp <- Ano(toto1$mod, toto2a$clim_exp)
-toto2b_ano_obs <- Ano(toto1$obs, toto2a$clim_obs)
+toto2a <- Clim(toto1$mod, toto1$obs, memb = TRUE)
+toto2b_ano_exp <- Ano(toto1$mod, InsertDim(toto2a$clim_exp, 
+                                           3, dim(toto1$mod)[3]) )
+toto2b_ano_obs <- Ano(toto1$obs, InsertDim(toto2a$clim_obs,
+                                           3, dim(toto1$obs)[3]) )
 toto3 <- Smoothing(toto2b_ano_exp, runmeanlen, 4)
 toto4 <- Smoothing(toto2b_ano_obs, runmeanlen, 4)
 suf <- switch(pole, 'N' = paste('_', pole, sep = ''), 'S' = paste('_', pole,

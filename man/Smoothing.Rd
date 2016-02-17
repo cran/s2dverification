@@ -11,11 +11,7 @@ Smoothing(var, runmeanlen = 12, numdimt = 4)
 }
 \arguments{
   \item{var}{
-<<<<<<< HEAD
 Array to be smoothed along one of its dimension (typically the forecast time dimension).
-=======
-Matrix to be smoothed along one of its dimension (typically the forecast time dimension).
->>>>>>> master
   }
   \item{runmeanlen}{
 Running mean length in number of sampling units (typically months).

@@ -1,5 +1,5 @@
-ConfigAddEntry <- function(configuration, dataset_type, store_format, position = 'last', dataset_name = ".*", var_name = ".*", main_path = "*", file_path = "*", nc_var_name = "*", grid = "*", suffix = "*", varmin = "*", varmax = "*") {
-  table_name <- paste0(gsub("-", "_", store_format), "_", dataset_type)
+ConfigAddEntry <- function(configuration, dataset_type, position = 'last', dataset_name = ".*", var_name = ".*", main_path = "*", file_path = "*", nc_var_name = "*", suffix = "*", varmin = "*", varmax = "*") {
+  table_name <- dataset_type
   if (dataset_name == ".*") {
     if (var_name == ".*") {
       level <- 1
@@ -32,9 +32,7 @@ ConfigAddEntry <- function(configuration, dataset_type, store_format, position =
     position <- position - index_of_first + 1
   }
 
-  if (dataset_type == 'experiments') {
-    configuration[[table_name]][[level]] <- append(configuration[[table_name]][[level]], list(c(dataset_name, var_name, main_path, file_path, grid, nc_var_name, suffix, varmin, varmax)), after = position - 1)
-  } else if (dataset_type == 'observations') {
+  if (dataset_type == 'experiments' || dataset_type == 'observations') {
     configuration[[table_name]][[level]] <- append(configuration[[table_name]][[level]], list(c(dataset_name, var_name, main_path, file_path, nc_var_name, suffix, varmin, varmax)), after = position - 1)
   } else {
     stop("'dataset_type' must be one of 'experiments' or 'observations'")

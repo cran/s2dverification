@@ -1,4 +1,4 @@
-ConfigShowSimilarEntries <- function(configuration, dataset_name = NULL, var_name = NULL, main_path = NULL, file_path = NULL, nc_var_name = NULL, grid = NULL, suffix = NULL, varmin = NULL, varmax = NULL, n_results = 10) {
+ConfigShowSimilarEntries <- function(configuration, dataset_name = NULL, var_name = NULL, main_path = NULL, file_path = NULL, nc_var_name = NULL, suffix = NULL, varmin = NULL, varmax = NULL, n_results = 10) {
   ## Simon White: http://www.catalysoft.com/articles/StrikeAMatch.html
   getBigrams <- function(str) {
     bigramlst <- list()
@@ -48,22 +48,17 @@ ConfigShowSimilarEntries <- function(configuration, dataset_name = NULL, var_nam
   
   strSimilarityVec <- Vectorize(strSimilarity, c('str1', 'str2'), USE.NAMES = FALSE)
 
-  all_tables <- c('file_per_startdate_experiments', 'file_per_member_experiments', 'file_per_month_observations', 'file_per_member_observations', 'file_per_dataset_observations')
-  all_fields <- c('dataset_name', 'var_name', 'main_path', 'file_path', 'grid', 'nc_var_name', 'suffix', 'varmin', 'varmax')
+  all_tables <- c('experiments', 'observations')
+  all_fields <- c('dataset_name', 'var_name', 'main_path', 'file_path', 'nc_var_name', 'suffix', 'varmin', 'varmax')
   selected_fields <- which(unlist(lapply(as.list(match.call())[all_fields], function (x) !is.null(x))))
   values <- unlist(as.list(match.call())[all_fields[selected_fields]], use.names = FALSE)
 
   if (length(selected_fields) < 1) {
-    stop("There must be at least one selected field ('dataset_name', 'var_name', 'main_path', 'file_path', 'nc_var_name', 'grid', 'suffix', 'varmin' or 'varmax').")
+    stop("There must be at least one selected field ('dataset_name', 'var_name', 'main_path', 'file_path', 'nc_var_name', 'suffix', 'varmin' or 'varmax').")
   }
 
   similarities <- list()
   for (table in all_tables) {
-    if (grepl('observations', table) && ('grid' %in% all_fields)) {
-      all_fields <- all_fields[- match('grid', all_fields)]
-      selected_fields <- which(unlist(lapply(as.list(match.call())[all_fields], function (x) !is.null(x))))
-      values <- unlist(as.list(match.call())[all_fields[selected_fields]], use.names = FALSE)
-    }
     similarities[[table]] <- vector("list", 4)
     for (level in 1:4) {
       if (length(configuration[[table]][[level]]) > 0) {
@@ -97,8 +92,7 @@ ConfigShowSimilarEntries <- function(configuration, dataset_name = NULL, var_nam
       matches[[table]][[level]] <- configuration[[table]][[level]][matches_to_pick]
     }
     dataset_type <- ifelse(grepl('experiments', table), 'experiments', 'observations')
-    store_format <- gsub(paste0("_", dataset_type), "", table)
-    ConfigShowTable(matches, dataset_type, store_format, line_numbers)
+    ConfigShowTable(matches, dataset_type, line_numbers)
   }
   
   invisible(matches)
