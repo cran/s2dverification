@@ -1,17 +1,17 @@
 \name{MeanListDim}
 \alias{MeanListDim}
 \title{
-Averages A Matrix Along Various Dimensions
+Averages An Array Along Multiple Dimensions
 }
 \description{
-Averages the matrix var along a set of dimensions given by the argument dims.
+Averages an array along a set of dimensions given by the argument dims.
 }
 \usage{
 MeanListDim(var, dims, narm = TRUE)
 }
 \arguments{
   \item{var}{
-Matrix to average.
+Input array.
   }
   \item{dims}{
 List of dimensions to average along.
@@ -21,7 +21,7 @@ Ignore NA (TRUE) values or not (FALSE).
   }
 }
 \value{
-Matrix with as many dimensions less than the input matrix as provided by the list dims and containing the average along this list of dimensions.
+The averaged array, with the dimensions specified in \code{dims} removed.
 }
 \examples{
 a <- array(rnorm(24), dim = c(2, 3, 4))
@@ -31,7 +31,8 @@ print(MeanListDim(a, c(2, 3)))
 }
 \author{
 History:\cr
-0.1  -  2011-04  (V. Guemas, \email{vguemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+0.1  -  2011-04  (V. Guemas, \email{vguemas@ic3.cat})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to R CRAN\cr
+1.1  -  2015-03  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Improved memory usage
 }
 \keyword{datagen}

@@ -30,6 +30,52 @@
   }
 }
 
+.KnownLonNames <- function() {
+  known_lon_names <- c('lon', 'longitude', 'x', 'i', 'nav_lon')
+}
+
+.KnownLatNames <- function() {
+  known_lat_names <- c('lat', 'latitude', 'y', 'j', 'nav_lat')
+}
+
+.t2nlatlon <- function(t) {
+  ## As seen in cdo's griddes.c: ntr2nlat()
+  nlats <- (t * 3 + 1) / 2
+  if ((nlats > 0) && (nlats - trunc(nlats) >= 0.5)) {
+    nlats <- ceiling(nlats)
+  } else {
+    nlats <- round(nlats)
+  }
+  if (nlats %% 2 > 0) {
+    nlats <- nlats + 1
+  }
+  ## As seen in cdo's griddes.c: compNlon(), and as specified in ECMWF
+  nlons <- 2 * nlats
+  keep_going <- TRUE
+  while (keep_going) {
+    n <- nlons
+    if (n %% 8 == 0) n <- trunc(n / 8)
+    while (n %% 6 == 0) n <- trunc(n / 6)
+    while (n %% 5 == 0) n <- trunc(n / 5)
+    while (n %% 4 == 0) n <- trunc(n / 4)
+    while (n %% 3 == 0) n <- trunc(n / 3)
+    if (n %% 2 == 0) n <- trunc(n / 2)
+    if (n <= 8) {
+      keep_going <- FALSE
+    } else {
+      nlons <- nlons + 2
+      if (nlons > 9999) {
+        stop("Error: pick another gaussian grid truncation. It doesn't fulfill the standards to apply FFT.")
+      }
+    }
+  }
+  c(nlats, nlons)
+}
+
+.nlat2t <- function(nlats) {
+  trunc((nlats * 2 - 1) / 3)
+}
+
 .LoadDataFile <- function(work_piece, explore_dims = FALSE, silent = FALSE) {
   # The purpose, working modes, inputs and outputs of this function are
   # explained in ?LoadDataFile
@@ -89,7 +135,9 @@
 
   found_file <- NULL
   dims <- NULL
-  grid_name <- units <- var_long_name <- is_2d_var <- NULL
+  grid_name <- units <- var_long_name <- NULL
+  is_2d_var <- array_across_gw <- NULL
+  data_across_gw <- NULL
 
   filename <- work_piece[['filename']]
   namevar <- work_piece[['namevar']]
@@ -108,14 +156,14 @@
   # If we don't find any, we leave the flag 'found_file' with a NULL value.
   if (length(files) > 0) {
     # The first file that matches the pattern is chosen and read.
-    filename <- files[length(files)]
+    filename <- head(files, 1)
     filein <- filename
     found_file <- filename
     mask <- work_piece[['mask']]
 
     if (!silent) {
       if (explore_dims) {
-        cat(paste("* Exploring dimensions...", filename, '\n'))
+        .message(paste("Exploring dimensions...", filename))
       }
       ##} else {
       ##  cat(paste("* Reading & processing data...", filename, '\n'))
@@ -133,6 +181,19 @@
     }
     var_long_name <- fnc$var[[namevar]]$longname
     units <- fnc$var[[namevar]]$units
+    file_dimnames <- unlist(lapply(fnc$var[[namevar]][['dim']], '[[', 'name'))
+    # The following two 'ifs' are to allow for 'lon'/'lat' by default, instead of 
+    # 'longitude'/'latitude'.
+    if (!(work_piece[['dimnames']][['lon']] %in% file_dimnames) &&
+        (work_piece[['dimnames']][['lon']] == 'longitude') &&
+        ('lon' %in% file_dimnames)) {
+      work_piece[['dimnames']][['lon']] <- 'lon'
+    }
+    if (!(work_piece[['dimnames']][['lat']] %in% file_dimnames) &&
+        (work_piece[['dimnames']][['lat']] == 'latitude') &&
+        ('lat' %in% file_dimnames)) {
+      work_piece[['dimnames']][['lat']] <- 'lat'
+    }
     if (is.null(work_piece[['is_2d_var']])) {
       is_2d_var <- all(c(work_piece[['dimnames']][['lon']], 
                          work_piece[['dimnames']][['lat']]) %in%
@@ -151,6 +212,7 @@
       ## We read the longitudes and latitudes from the file.
       lon <- ncvar_get(fnc, work_piece[['dimnames']][['lon']])
       lat <- ncvar_get(fnc, work_piece[['dimnames']][['lat']])
+      first_lon_in_original_file <- lon[1]
       # If a common grid is requested or we are exploring the file dimensions
       # we need to read the grid type and size of the file to finally work out the 
       # CDO grid name.
@@ -266,14 +328,25 @@
         if (!is.null(work_piece[['progress_amount']])) {
           cat("\n")
         }
-        cat(paste0("! Warning: The dataset with index ", 
+        cat(paste0("! Warning: the dataset with index ", 
             tail(work_piece[['indices']], 1), " in '", 
             work_piece[['dataset_type']], "' doesn't start at longitude 0 and will be re-interpolated in order to align its longitudes with the standard CDO grids definable with the names 't<RES>grid' or 'r<NX>x<NY>', which are by definition starting at the longitude 0.\n"))
         if (!is.null(mask)) {
-          cat(paste0("! Warning: A mask was provided for the dataset with index ",    
+          cat(paste0("! Warning: a mask was provided for the dataset with index ",    
               tail(work_piece[['indices']], 1), " in '",
               work_piece[['dataset_type']], "'. This dataset has been re-interpolated to align its longitudes to start at 0. You must re-interpolate the corresponding mask to align its longitudes to start at 0 as well, if you haven't done so yet. Running cdo remapcon,", common_grid_name, " original_mask_file.nc new_mask_file.nc will fix it.\n"))
         }
+      }
+      if (remap_needed && (grid_lons < common_grid_lons || grid_lats < common_grid_lats)) {
+        if (!is.null(work_piece[['progress_amount']])) {
+          cat("\n")
+        }
+        cat(paste0("! Warning: the dataset with index ", tail(work_piece[['indices']], 1), 
+                   " in '", work_piece[['dataset_type']], "' is originally on ",
+                   "a grid coarser than the common grid and it has been ",
+                   "extrapolated. Check the results carefully. It is ",
+                   "recommended to specify as common grid the coarsest grid ",
+                   "among all requested datasets via the parameter 'grid'.\n"))
       }
       # Now calculate if the user requests for a lonlat subset or for the 
       # entire field
@@ -281,27 +354,36 @@
       lonmax <- work_piece[['lon_limits']][2]
       latmin <- work_piece[['lat_limits']][1]
       latmax <- work_piece[['lat_limits']][2]
+      lon_subsetting_requested <- FALSE
       lonlat_subsetting_requested <- FALSE
       if (lonmin <= lonmax) {
         if ((lonmin > first_common_grid_lon) || (lonmax < last_common_grid_lon)) {
-          lonlat_subsetting_requested <- TRUE
+          lon_subsetting_requested <- TRUE
         }
       } else {
         if ((lonmin - lonmax) > 360/common_grid_lons) {
-          lonlat_subsetting_requested <- TRUE
+          lon_subsetting_requested <- TRUE
         } else {
           gap_width <- floor(lonmin / (360/common_grid_lons)) - 
                        floor(lonmax / (360/common_grid_lons))
           if (gap_width > 0) { 
             if (!(gap_width == 1 && (lonmin %% (360/common_grid_lons) == 0) && 
                   (lonmax %% (360/common_grid_lons) == 0))) {
-              lonlat_subsetting_requested <- TRUE
+              lon_subsetting_requested <- TRUE
             }
           }
         }
       }
-      if ((latmin > first_common_grid_lat) || (latmax < last_common_grid_lat)) {
+      if ((latmin > first_common_grid_lat) || (latmax < last_common_grid_lat)
+          || (lon_subsetting_requested)) {
         lonlat_subsetting_requested <- TRUE
+      }
+      # Now that we know if subsetting was requested, we can say if final data
+      # will go across greenwich
+      if (lonmax < lonmin) {
+        data_across_gw <- TRUE
+      } else {
+        data_across_gw <- !lon_subsetting_requested
       }
 
       # When remap is needed but no subsetting, the file is copied locally
@@ -500,7 +582,7 @@
         stop(paste("Error: the variable", namevar, 
                    "is defined over more dimensions than the expected (", 
                    paste(c(expected_dims, 'time'), collapse = ', '), 
-                   "). It could also be that the members dimension in 'dimnames' or in the configuration file is incorrect. If not, it could also be that the members dimension is named incorrectly. In that case, either rename the dimension in the file or adjust Load() to recognize this name with the parameter 'dimnames'. See file", filename))
+                   "). It could also be that the members, longitude or latitude dimensions are named incorrectly. In that case, either rename the dimensions in the file or adjust Load() to recognize the actual name with the parameter 'dimnames'. See file", filename))
       }
     } else {
       nltime <- 1
@@ -630,9 +712,20 @@
                                          } else {
                                            fnc$var[[namevar]]$prec
                                          })
+            scale_factor <- ifelse(fnc$var[[namevar]]$hasScaleFact, fnc$var[[namevar]]$scaleFact, 1)
+            add_offset <- ifelse(fnc$var[[namevar]]$hasAddOffset, fnc$var[[namevar]]$addOffset, 0)
+            if (fnc$var[[namevar]]$hasScaleFact || fnc$var[[namevar]]$hasAddOffset) {
+              tmp <- (tmp - add_offset) / scale_factor
+            }
             nc_close(fnc)
             fnc <- nc_create(filein2, list(ncdf_var))
             ncvar_put(fnc, ncdf_var, tmp)
+            if (add_offset != 0) {
+              ncatt_put(fnc, ncdf_var, 'add_offset', add_offset)
+            }
+            if (scale_factor != 1) {
+              ncatt_put(fnc, ncdf_var, 'scale_factor', scale_factor)
+            }
             nc_close(fnc)
             system(paste0("cdo -s -sellonlatbox,", if (lonmin > lonmax) {
                                                      "0,360,"
@@ -737,7 +830,7 @@
               nmemb <- length(files)
             }
           }
-          dims <- list(member = nmemb, time = nltime, lon = lon, lat = lat)
+          dims <- list(member = nmemb, ftime = nltime, lon = lon, lat = lat)
         } else {
         # If we are not exploring, then we have to process the retrieved data
           if (is_2d_var) {
@@ -781,8 +874,8 @@
           }
           var_data <- attach.big.matrix(work_piece[['out_pointer']])
           if (work_piece[['dims']][['member']] > 1 && nmemb > 1 && 
-              work_piece[['dims']][['time']] > 1 && 
-              nltime < work_piece[['dims']][['time']]) {
+              work_piece[['dims']][['ftime']] > 1 && 
+              nltime < work_piece[['dims']][['ftime']]) {
             work_piece[['indices']][2] <- work_piece[['indices']][2] - 1
             for (jmemb in members) {
               work_piece[['indices']][2] <- work_piece[['indices']][2] + 1
@@ -803,23 +896,32 @@
       }
     }
     nc_close(fnc)    
-    if (is_2d_var && remap_needed) {
-      file.remove(filein)
-      ###if (!is.null(mask) && lonlat_subsetting_requested) {
-      ###  file.remove(mask_file)
-      ###}
-    }
-    
+    if (is_2d_var) {
+      if (remap_needed) {
+        array_across_gw <- FALSE
+        file.remove(filein)
+        ###if (!is.null(mask) && lonlat_subsetting_requested) {
+        ###  file.remove(mask_file)
+        ###}
+      } else {
+        if (first_lon_in_original_file < 0) {
+          array_across_gw <- data_across_gw
+        } else {
+          array_across_gw <- FALSE
+        }
+      }
+    }    
   }
   if (explore_dims) {
-    list(dims = dims, is_2d_var = is_2d_var, grid = grid_name, units = units, 
-         var_long_name = var_long_name)
+    list(dims = dims, is_2d_var = is_2d_var, grid = grid_name, 
+         units = units, var_long_name = var_long_name, 
+         data_across_gw = data_across_gw, array_across_gw = array_across_gw)
   } else {
     ###if (!silent && !is.null(progress_connection) && !is.null(work_piece[['progress_amount']])) {
     ###  foobar <- writeBin(work_piece[['progress_amount']], progress_connection)
     ###}
     if (!silent && !is.null(work_piece[['progress_amount']])) {
-      cat(paste0(work_piece[['progress_amount']]))
+      message(paste0(work_piece[['progress_amount']]), appendLF = FALSE)
     }
     found_file
   }
@@ -906,4 +1008,433 @@
   info <- as.list(info)
   names(info) <- c('main_path', 'file_path', 'nc_var_name', 'suffix', 'var_min', 'var_max')  
   info
+}
+
+.ReplaceGlobExpressions <- function(path_with_globs, actual_path, 
+                                    replace_values, tags_to_keep, 
+                                    dataset_name, permissive) {
+  # The goal of this function is to replace the shell globbing expressions in
+  # a path pattern (that may contain shell globbing expressions and Load() 
+  # tags) by the corresponding part of the real existing path.
+  # What is done actually is to replace all the values of the tags in the 
+  # actual path by the corresponding $TAG$
+  #
+  # It takes mainly two inputs. The path with expressions and tags, e.g.:
+  #   /data/experiments/*/$EXP_NAME$/$VAR_NAME$/$VAR_NAME$_*$START_DATE$*.nc
+  # and a complete known path to one of the matching files, e.g.:
+  #   /data/experiments/ecearth/i00k/tos/tos_fc0-1_19901101_199011-199110.nc
+  # and it returns the path pattern but without shell globbing expressions:
+  #   /data/experiments/ecearth/$EXP_NAME$/$VAR_NAME$/$VAR_NAME$_fc0-1_$START_DATE$_199011-199110.nc
+  #
+  # To do that, it needs also as inputs the list of replace values (the 
+  # association of each tag to their value).
+  #
+  # All the tags not present in the parameter tags_to_keep will be repalced.
+  #
+  # Not all cases can be resolved with the implemented algorithm. In an
+  # unsolvable case a warning is given and one possible guess is returned.
+  #
+  # In some cases it is interesting to replace only the expressions in the
+  # path to the file, but not the ones in the file name itself. To keep the
+  # expressions in the file name, the parameter permissive can be set to 
+  # TRUE. To replace all the expressions it can be set to FALSE.
+  clean <- function(x) {
+    if (nchar(x) > 0) {
+      x <- gsub('\\\\', '', x)
+      x <- gsub('\\^', '', x)
+      x <- gsub('\\$', '', x)
+      x <- unname(sapply(strsplit(x, '[',fixed = TRUE)[[1]], function(y) gsub('.*]', '.', y)))
+      do.call(paste0, as.list(x))
+    } else {
+      x
+    }
+  }
+
+  strReverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste, collapse = "")
+
+  if (permissive) {
+    actual_path_chunks <- strsplit(actual_path, '/')[[1]]
+    actual_path <- paste(actual_path_chunks[-length(actual_path_chunks)], collapse = '/')
+    file_name <- tail(actual_path_chunks, 1)
+    if (length(actual_path_chunks) > 1) {
+      file_name <- paste0('/', file_name)
+    }
+    path_with_globs_chunks <- strsplit(path_with_globs, '/')[[1]]
+    path_with_globs <- paste(path_with_globs_chunks[-length(path_with_globs_chunks)], 
+                             collapse = '/')
+    path_with_globs <- .ConfigReplaceVariablesInString(path_with_globs, replace_values)
+    file_name_with_globs <- tail(path_with_globs_chunks, 1)
+    if (length(path_with_globs_chunks) > 1) {
+      file_name_with_globs <- paste0('/', file_name_with_globs)
+    }
+    right_known <- head(strsplit(file_name_with_globs, '*', fixed = TRUE)[[1]], 1)
+    right_known_no_tags <- .ConfigReplaceVariablesInString(right_known, replace_values)
+    path_with_globs_rx <- utils::glob2rx(paste0(path_with_globs, right_known_no_tags))
+    match <- regexpr(gsub('$', '', path_with_globs_rx, fixed = TRUE), paste0(actual_path, file_name))
+    if (match != 1) {
+      stop("Incorrect parameters to replace glob expressions. The path with expressions does not match the actual path.")
+    }
+    if (attr(match, 'match.length') - nchar(right_known_no_tags) < nchar(actual_path)) {
+      path_with_globs <- paste0(path_with_globs, right_known_no_tags, '*')
+      file_name_with_globs <- sub(right_known, '/*', file_name_with_globs)
+    } 
+  }
+  path_with_globs_rx <- utils::glob2rx(path_with_globs)
+  values_to_replace <- c()
+  tags_to_replace_starts <- c()
+  tags_to_replace_ends <- c()
+  give_warning <- FALSE
+  for (tag in tags_to_keep) {
+    matches <- gregexpr(paste0('$', tag, '$'), path_with_globs_rx, fixed = TRUE)[[1]]
+    lengths <- attr(matches, 'match.length')
+    if (!(length(matches) == 1 && matches[1] == -1)) {
+      for (i in 1:length(matches)) {
+        left <- NULL
+        if (matches[i] > 1) {
+          left <- .ConfigReplaceVariablesInString(substr(path_with_globs_rx, 1, matches[i] - 1), replace_values)
+          left_known <- strReverse(head(strsplit(strReverse(left), strReverse('.*'), fixed = TRUE)[[1]], 1))
+        }
+        right <- NULL
+        if ((matches[i] + lengths[i] - 1) < nchar(path_with_globs_rx)) {
+          right <- .ConfigReplaceVariablesInString(substr(path_with_globs_rx, matches[i] + lengths[i], nchar(path_with_globs_rx)), replace_values)
+          right_known <- head(strsplit(right, '.*', fixed = TRUE)[[1]], 1)
+        }
+        final_match <- NULL
+        match_limits <- NULL
+        if (!is.null(left)) {
+          left_match <- regexpr(paste0(left, replace_values[[tag]], right_known), actual_path)
+          match_len <- attr(left_match, 'match.length')
+          left_match_limits <- c(left_match + match_len - 1 - nchar(clean(right_known)) - nchar(replace_values[[tag]]) + 1, 
+                                 left_match + match_len - 1 - nchar(clean(right_known)))
+          if (!(left_match < 1)) {
+            match_limits <- left_match_limits
+          }
+        }
+        right_match <- NULL
+        if (!is.null(right)) {
+          right_match <- regexpr(paste0(left_known, replace_values[[tag]], right), actual_path)
+          match_len <- attr(right_match, 'match.length')
+          right_match_limits <- c(right_match + nchar(clean(left_known)),  
+                                  right_match + nchar(clean(left_known)) + nchar(replace_values[[tag]]) - 1)
+          if (is.null(match_limits) && !(right_match < 1)) {
+            match_limits <- right_match_limits
+          }
+        }
+        if (!is.null(right_match) && !is.null(left_match)) {
+          if (!identical(right_match_limits, left_match_limits)) {
+            give_warning <- TRUE
+          }
+        }
+        if (is.null(match_limits)) {
+          stop("Too complex path pattern specified for ", dataset_name,
+               ". Specify a simpler path pattern for this dataset.")
+        }
+        values_to_replace <- c(values_to_replace, tag)
+        tags_to_replace_starts <- c(tags_to_replace_starts, match_limits[1])
+        tags_to_replace_ends <- c(tags_to_replace_ends, match_limits[2])
+      }
+    }
+  }
+
+  if (length(tags_to_replace_starts) > 0) {
+    reorder <- sort(tags_to_replace_starts, index.return = TRUE)
+    tags_to_replace_starts <- reorder$x
+    values_to_replace <- values_to_replace[reorder$ix]
+    tags_to_replace_ends <- tags_to_replace_ends[reorder$ix]
+    while (length(values_to_replace) > 0) {
+      actual_path <- paste0(substr(actual_path, 1, head(tags_to_replace_starts, 1) - 1),
+                           '$', head(values_to_replace, 1), '$',
+                           substr(actual_path, head(tags_to_replace_ends, 1) + 1, nchar(actual_path)))
+      extra_chars <- nchar(head(values_to_replace, 1)) + 2 - (head(tags_to_replace_ends, 1) - head(tags_to_replace_starts, 1) + 1)
+      values_to_replace <- values_to_replace[-1]
+      tags_to_replace_starts <- tags_to_replace_starts[-1]
+      tags_to_replace_ends <- tags_to_replace_ends[-1]
+      tags_to_replace_starts <- tags_to_replace_starts + extra_chars
+      tags_to_replace_ends <- tags_to_replace_ends + extra_chars
+    }
+  }
+
+  if (give_warning) {
+    .warning(paste0("Too complex path pattern specified for ", dataset_name, 
+                    ". Double check carefully the 'source_files' fetched for this dataset or specify a simpler path pattern."))
+  }
+
+  if (permissive) {
+    paste0(actual_path, file_name_with_globs)
+  } else {
+    actual_path
+  }
+}
+
+.FilterUserGraphicArgs <- function(excludedArgs, ...) {
+  # This function filter the extra graphical parameters passed by the user in
+  # a plot function, excluding the ones that the plot function uses by default.
+  # Each plot function has a different set of arguments that are not allowed to
+  # be modified.
+  args <- list(...)
+  userArgs <- list()
+  for (name in names(args)) {
+      if ((name != "") & !is.element(name, excludedArgs)) {
+          # If the argument has a name and it is not in the list of excluded
+          # arguments, then it is added to the list that will be used
+          userArgs[[name]] <- args[[name]]
+      } else {
+        .warning(paste0("the argument '", name, "' can not be 
+        modified and the new value will be ignored"))
+      }
+  }
+  userArgs
+}
+
+.SelectDevice <- function(fileout, width, height, units, res) {
+  # This function is used in the plot functions to check the extension of the 
+  # files where the graphics will be stored and select the right R device to 
+  # save them.
+  # If the vector of filenames ('fileout') has files with different 
+  # extensions, then it will only accept the first one, changing all the rest 
+  # of the filenames to use that extension.
+
+  # We extract the extension of the filenames: '.png', '.pdf', ...
+  ext <- regmatches(fileout, regexpr("\\.[a-zA-Z0-9]*$", fileout))
+
+  if (length(ext) != 0) {
+    # If there is an extension specified, select the correct device
+    ## units of width and height set to accept inches
+    if (ext[1] == ".png") {
+      saveToFile <- function(fileout) {
+        png(filename = fileout, width = width, height = height, res = res, units = units)
+      }
+    } else if (ext[1] == ".jpeg") {
+      saveToFile <- function(fileout) {
+        jpeg(filename = fileout, width = width, height = height, res = res, units = units)
+      }
+    } else if (ext[1] %in% c(".eps", ".ps")) {
+      saveToFile <- function(fileout) {
+        postscript(file = fileout, width = width, height = height)
+      }
+    } else if (ext[1] == ".pdf") {
+      saveToFile <- function(fileout) {
+        pdf(file = fileout, width = width, height = height)
+      }
+    } else if (ext[1] == ".svg") {
+      saveToFile <- function(fileout) {
+        svg(filename = fileout, width = width, height = height)
+      }
+    } else if (ext[1] == ".bmp") {
+      saveToFile <- function(fileout) {
+        bmp(filename = fileout, width = width, height = height, res = res, units = units)
+      }
+    } else if (ext[1] == ".tiff") {
+      saveToFile <- function(fileout) {
+        tiff(filename = fileout, width = width, height = height, res = res, units = units)
+      }
+    } else {
+      .warning("file extension not supported, it will be used '.eps' by default.")
+      ## In case there is only one filename
+      fileout[1] <- sub("\\.[a-zA-Z0-9]*$", ".eps", fileout[1])
+      ext[1] <- ".eps"
+      saveToFile <- function(fileout) {
+        postscript(file = fileout, width = width, height = height)
+      }
+    }
+    # Change filenames when necessary
+    if (any(ext != ext[1])) {
+      .warning(paste0("some extensions of the filenames provided in 'fileout' are not ", ext[1],". The extensions are being converted to ", ext[1], "."))
+      fileout <- sub("\\.[a-zA-Z0-9]*$", ext[1], fileout)
+    }
+  } else {
+    # Default filenames when there is no specification
+    .warning("there are no extensions specified in the filenames, default to '.eps'")
+    fileout <- paste0(fileout, ".eps")
+    saveToFile <- postscript
+  }
+
+  # return the correct function with the graphical device, and the correct 
+  # filenames
+  list(fun = saveToFile, files = fileout)
+}
+
+.message <- function(...) {
+  # Function to use the 'message' R function with our custom settings
+  # Default: new line at end of message, indent to 0, exdent to 3, 
+  #  collapse to \n*
+  args <- list(...)
+
+  ## In case we need to specify message arguments
+  if (!is.null(args[["appendLF"]])) {
+    appendLF <- args[["appendLF"]]
+  } else {
+    ## Default value in message function
+    appendLF <- TRUE
+  } 
+  if (!is.null(args[["domain"]])) {
+    domain <- args[["domain"]]
+  } else {
+    ## Default value in message function
+    domain <- NULL
+  }
+  args[["appendLF"]] <- NULL
+  args[["domain"]] <- NULL
+
+  ## To modify strwrap indent and exdent arguments
+  if (!is.null(args[["indent"]])) {
+    indent <- args[["indent"]]
+  } else {
+    indent <- 0
+  }
+  if (!is.null(args[["exdent"]])) {
+    exdent <- args[["exdent"]]
+  } else {
+    exdent <- 3
+  }
+  args[["indent"]] <- NULL
+  args[["exdent"]] <- NULL
+
+  ## To modify paste collapse argument
+  if (!is.null(args[["collapse"]])) {
+    collapse <- args[["collapse"]]
+  } else {
+    collapse <- "\n*"
+  }
+  args[["collapse"]] <- NULL
+
+  ## Message tag
+  if (!is.null(args[["tag"]])) {
+    tag <- args[["tag"]]
+  } else {
+    tag <- "* "
+  }
+  args[["tag"]] <- NULL
+
+  message(paste0(tag, paste(strwrap(
+    args, indent = indent, exdent = exdent
+    ), collapse = collapse)), appendLF = appendLF, domain = domain)
+}
+
+.warning <- function(...) {
+  # Function to use the 'warning' R function with our custom settings
+  # Default: no call information, indent to 0, exdent to 3, 
+  #  collapse to \n
+  args <- list(...)
+
+  ## In case we need to specify warning arguments
+  if (!is.null(args[["call."]])) {
+    call <- args[["call."]]
+  } else {
+    ## Default: don't show info about the call where the warning came up
+    call <- FALSE
+  }
+  if (!is.null(args[["immediate."]])) {
+    immediate <- args[["immediate."]]
+  } else {
+    ## Default value in warning function
+    immediate <- FALSE
+  }
+  if (!is.null(args[["noBreaks."]])) {
+    noBreaks <- args[["noBreaks."]]
+  } else {
+    ## Default value warning function
+    noBreaks <- FALSE
+  }
+  if (!is.null(args[["domain"]])) {
+    domain <- args[["domain"]]
+  } else {
+    ## Default value warning function
+    domain <- NULL
+  }
+  args[["call."]] <- NULL
+  args[["immediate."]] <- NULL
+  args[["noBreaks."]] <- NULL
+  args[["domain"]] <- NULL
+
+  ## To modify strwrap indent and exdent arguments
+  if (!is.null(args[["indent"]])) {
+    indent <- args[["indent"]]
+  } else {
+    indent <- 0
+  }
+  if (!is.null(args[["exdent"]])) {
+    exdent <- args[["exdent"]]
+  } else {
+    exdent <- 3
+  }
+  args[["indent"]] <- NULL
+  args[["exdent"]] <- NULL
+
+  ## To modify paste collapse argument
+  if (!is.null(args[["collapse"]])) {
+    collapse <- args[["collapse"]]
+  } else {
+    collapse <- "\n!"
+  }
+  args[["collapse"]] <- NULL
+
+  ## Warning tag
+  if (!is.null(args[["tag"]])) {
+    tag <- args[["tag"]]
+  } else {
+    tag <- "! Warning: "
+  }
+  args[["tag"]] <- NULL
+
+  warning(paste0(tag, paste(strwrap(
+    args, indent = indent, exdent = exdent
+    ), collapse = collapse)),  call. = call, immediate. = immediate, 
+    noBreaks. = noBreaks, domain = domain)
+}
+
+.IsColor <- function(x) {
+  res <- try(col2rgb(x), silent = TRUE)
+  return(!"try-error" %in% class(res))
+}
+
+# This function switches to a specified figure at position (row, col) in a layout.
+# This overcomes the bug in par(mfg = ...). However the mode par(new = TRUE) is 
+# activated, i.e., all drawn elements will be superimposed. Additionally, after 
+# using this function, the automatical pointing to the next figure in the layout
+# will be spoiled: once the last figure in the layout is drawn, the pointer won't 
+# move to the first figure in the layout.
+# Only figures with numbers other than 0 (when creating the layout) will be
+# accessible.
+# Inputs: either row and col, or n and mat
+.SwitchToFigure <- function(row = NULL, col = NULL, n = NULL, mat = NULL) {
+  if (!is.null(n) && !is.null(mat)) {
+    if (!is.numeric(n) || length(n) != 1) {
+      stop("Parameter 'n' must be a single numeric value.")
+    }
+    n <- round(n)
+    if (!is.array(mat)) {
+      stop("Parameter 'mat' must be an array.")
+    }
+    target <- which(mat == n, arr.ind = TRUE)[1, ]
+    row <- target[1]
+    col <- target[2]
+  } else if (!is.null(row) && !is.null(col)) {
+    if (!is.numeric(row) || length(row) != 1) {
+      stop("Parameter 'row' must be a single numeric value.")
+    }
+    row <- round(row)
+    if (!is.numeric(col) || length(col) != 1) {
+      stop("Parameter 'col' must be a single numeric value.")
+    }
+    col <- round(col)
+  } else {
+    stop("Either 'row' and 'col' or 'n' and 'mat' must be provided.")
+  }
+  next_attempt <- c(row, col)
+  par(mfg = next_attempt)
+  i <- 1
+  layout_size <- par('mfrow')
+  layout_cells <- matrix(1:prod(layout_size), layout_size[1], layout_size[2], 
+                         byrow = TRUE)
+  while (any((par('mfg')[1:2] != c(row, col)))) {
+    next_attempt <- which(layout_cells == i, arr.ind = TRUE)[1, ]
+    par(mfg = next_attempt)
+    i <- i + 1
+    if (i > prod(layout_size)) {
+      stop("Figure not accessible.")
+    }
+  }
+  plot(0, type = 'n', axes = FALSE, ann = FALSE)
+  par(mfg = next_attempt)
 }

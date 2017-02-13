@@ -2,14 +2,14 @@
 \alias{LeapYear}
 \title{Checks Whether A Year Is Leap Year}
 \description{
-This function tells whether a year is leap year or not.
+This function tells whether a year is a leap year or not.
 }
 \usage{
 LeapYear(year)
 }
 \arguments{
   \item{year}{
-The year to tell whether is leap year or not.
+A numeric value indicating the year in the Gregorian calendar.
   }
 }
 \value{

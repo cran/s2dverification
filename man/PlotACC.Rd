@@ -4,15 +4,16 @@
 Plot Plumes/Timeseries Of Anomaly Correlation Coefficients
 }
 \description{
-Plots plumes/timeseries of ACC from a matrix with dimensions (output from \code{ACC()}): \cr
+Plots plumes/timeseries of ACC from an array with dimensions (output from \code{ACC()}): \cr
   c(nexp, nobs, nsdates, nltime, 4)\cr
-with the fourth dimension of length 4 containing the lower limit of the 95\% confidence interval, the ACC, the upper limit of the 95\% confidence interval and the 95\% significance level given by a one-sided T-test.
+where the fourth dimension is of length 4 and contains the lower limit of the 95\% confidence interval, the ACC, the upper limit of the 95\% confidence interval and the 95\% significance level given by a one-sided T-test.
 }
 \usage{
 PlotACC(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "", limits = NULL, 
         legends = NULL, freq = 12, biglab = FALSE, fill = FALSE, 
         linezero = FALSE, points = TRUE, vlines = NULL, 
-        fileout = "output_PlotACC.eps")
+        fileout = "output_PlotACC.eps", 
+        width = 8, height = 5, size_units = 'in', res = 100, ...)
 }
 \arguments{
   \item{ACC}{
@@ -58,43 +59,57 @@ Must be TRUE if only 1 leadtime.
 List of x location where to add vertical black lines, optional.
   }
   \item{fileout}{
-Name of the output eps file.
+Name of output file. Extensions allowed: eps/ps, jpeg, png, pdf, bmp 
+and tiff. \cr
+Default = 'output_PlotACC.eps'
+  }
+  \item{width}{
+File width, in the units specified in the parameter size_units (inches by default). Takes 8 by default.
+  }
+  \item{height}{
+File height, in the units specified in the parameter size_units (inches by default). Takes 5 by default.
+  }
+  \item{size_units}{
+Units of the size of the device (file or window) to plot in. Inches ('in') by default. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{res}{ 
+Resolution of the device (file or window) to plot in. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{...}{
+    Arguments to be passed to the method. Only accepts the following
+    graphical parameters:
+    
+    adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt csi cxy err family fg fig fin font font.axis font.lab font.main font.sub lend lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page plt smo srt tck tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog
+    
+    For more information about the parameters see `par`
   }
 }
 \examples{
 # See examples on Load() to understand the first lines in this example
   \dontrun{
-configfile <- paste0(tempdir(), '/sample.conf')
-ConfigFileCreate(configfile, confirm = FALSE)
-c <- ConfigFileOpen(configfile)
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)
 data_path <- system.file('sample_data', package = 's2dverification')
-exp_data_path <- paste0(data_path, '/model/$EXP_NAME$/')
-obs_data_path <- paste0(data_path, '/$OBS_NAME$/')
-c <- ConfigAddEntry(c, 'experiments', dataset_name = 'experiment', 
-     var_name = 'tos', main_path = exp_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
-c <- ConfigAddEntry(c, 'observations', dataset_name = 'observation', 
-     var_name = 'tos', main_path = obs_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
-ConfigFileSave(c, configfile, confirm = FALSE)
+expA <- list(name = 'experiment', path = file.path(data_path,
+             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+             '$VAR_NAME$_$START_DATE$.nc'))
+obsX <- list(name = 'observation', path = file.path(data_path,
+             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+
 # Now we are ready to use Load().
 startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
-sampleData <- Load('tos', c('experiment'), c('observation'), startDates, 
-                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat', 
-                   latmin = 27, latmax = 48, lonmin = -12, lonmax = 40, 
-                   configfile = configfile)
+sampleData <- Load('tos', list(expA), list(obsX), startDates,
+                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat',
+                   latmin = 27, latmax = 48, lonmin = -12, lonmax = 40)
   }
   \dontshow{
 startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
-sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'), 
+sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
                                                 c('observation'), startDates,
                                                 leadtimemin = 1,
                                                 leadtimemax = 4,
-                                                output = 'lonlat', 
-                                                latmin = 27, latmax = 48, 
-                                                lonmin = -12, lonmax = 40) 
+                                                output = 'lonlat',
+                                                latmin = 27, latmax = 48,
+                                                lonmin = -12, lonmax = 40)
   }
 sampleData$mod <- Season(sampleData$mod, 4, 11, 12, 2)
 sampleData$obs <- Season(sampleData$obs, 4, 11, 12, 2)

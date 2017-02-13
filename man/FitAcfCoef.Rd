@@ -3,8 +3,8 @@
 \title{Fits an AR1 AutoCorrelation Function Using the Cardano Formula}
 \description{
 This function finds the minimum point of the fourth order polynom (a - x)2 + 0.25(b - x2)2 written to fit the two autoregression coefficients a and b.\cr
-Thanks to the Cardano formula, provided a and b in [0 1], the problem is well posed, delta > 0 and there is only one solution to the minimum.\cr\cr 
-This function is called in Alpha() to minimize the mean square differences between the theoretical autocorrelation function of an AR1 and the first guess of estimated autocorrelation function estacf, using only the first two lags.}
+A consequence of the Cardano formula is that, provided a and b are in [0 1], the problem is well posed, delta > 0 and there is only one minimum.\cr\cr 
+This function is called in Alpha() to minimize the mean square differences between the theoretical autocorrelation function of an AR1 and the first guess of the estimated autocorrelation function estacf, using only the first two lags.}
 \usage{FitAcfCoef(a, b)}
 \arguments{
   \item{a}{Coefficient a : first estimate of the autocorrelation at lag 1}

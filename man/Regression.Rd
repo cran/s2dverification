@@ -1,7 +1,7 @@
 \name{Regression}
 \alias{Regression}
 \title{
-Computes The Regression Of A Matrix On Another Along A Dimension
+Computes The Regression Of An Array On Another Along A Dimension
 }
 \description{
 Computes the regression of the input matrice vary on the input matrice varx along the posREG dimension by least square fitting. Provides the slope of the regression, the associated confidence interval, and the intercept.\cr
@@ -13,10 +13,10 @@ Regression(vary, varx, posREG = 2)
 }
 \arguments{
   \item{vary}{
-Matrix of any number of dimensions up to 10.
+Array of any number of dimensions up to 10.
   }
   \item{varx}{
-Matrix of any number of dimensions up to 10. Same dimensions as vary.
+Array of any number of dimensions up to 10. Same dimensions as vary.
   }
   \item{posREG}{
 Position along which to compute the regression.
@@ -24,7 +24,7 @@ Position along which to compute the regression.
 }
 \value{
   \item{$regression}{
-Matrix with same dimensions as varx and vary except along posREG dimension which is replaced by a length 4 dimension, corresponding to the lower limit of the 95\% confidence interval, the slope, the upper limit of the 95\% confidence interval and the intercept.
+Array with same dimensions as varx and vary except along posREG dimension which is replaced by a length 4 dimension, corresponding to the lower limit of the 95\% confidence interval, the slope, the upper limit of the 95\% confidence interval and the intercept.
   }
   \item{$filtered}{
 Same dimensions as vary filtered out from the regression onto varx along the posREG dimension.
@@ -33,35 +33,27 @@ Same dimensions as vary filtered out from the regression onto varx along the pos
 \examples{
 # See examples on Load() to understand the first lines in this example
   \dontrun{
-configfile <- paste0(tempdir(), '/sample.conf')
-ConfigFileCreate(configfile, confirm = FALSE)
-c <- ConfigFileOpen(configfile)
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MIN', '-1e19', confirm = FALSE)
-c <- ConfigEditDefinition(c, 'DEFAULT_VAR_MAX', '1e19', confirm = FALSE)
 data_path <- system.file('sample_data', package = 's2dverification')
-exp_data_path <- paste0(data_path, '/model/$EXP_NAME$/')
-obs_data_path <- paste0(data_path, '/$OBS_NAME$/')
-c <- ConfigAddEntry(c, 'experiments', dataset_name = 'experiment', 
-     var_name = 'tos', main_path = exp_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATE$.nc')
-c <- ConfigAddEntry(c, 'observations', dataset_name = 'observation', 
-     var_name = 'tos', main_path = obs_data_path,
-     file_path = '$STORE_FREQ$_mean/$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
-ConfigFileSave(c, configfile, confirm = FALSE)
+expA <- list(name = 'experiment', path = file.path(data_path,
+             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+             '$VAR_NAME$_$START_DATE$.nc'))
+obsX <- list(name = 'observation', path = file.path(data_path,
+             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
 
 # Now we are ready to use Load().
 startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
-sampleData <- Load('tos', c('experiment'), c('observation'), startDates, 
-                   output = 'lonlat', latmin = 27, latmax = 48, lonmin = -12,
-                   lonmax = 40, configfile = configfile)
+sampleData <- Load('tos', list(expA), list(obsX), startDates,
+                   output = 'lonlat', latmin = 27, latmax = 48, 
+                   lonmin = -12, lonmax = 40)
   }
   \dontshow{
 startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
-sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'), 
+sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
                                                 c('observation'), startDates,
-                                                output = 'lonlat', 
-                                                latmin = 27, latmax = 48, 
-                                                lonmin = -12, lonmax = 40) 
+                                                output = 'lonlat',
+                                                latmin = 27, latmax = 48,
+                                                lonmin = -12, lonmax = 40)
   }
 sampleData$mod <- Season(sampleData$mod, 4, 11, 12, 2)
 sampleData$obs <- Season(sampleData$obs, 4, 11, 12, 2)

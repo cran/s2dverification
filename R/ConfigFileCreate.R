@@ -9,6 +9,6 @@ ConfigFileCreate <- function(file_path, confirm = TRUE) {
     DEFAULT_DIM_NAME_LONGITUDES = "longitude", DEFAULT_DIM_NAME_LATITUDES = "latitude", 
     DEFAULT_DIM_NAME_MEMBERS = "ensemble")), file_path, confirm = confirm)
   if (success) {
-    cat("WARNING: You have just created an empty configuration file. You can edit it with ConfigAddEntry(). You can edit the defaults according to your needs with the functions ConfigFileOpen(), ConfigEditDefinition() and ConfigFileSave() or edit the file manually as specified in ?ConfigFileOpen.\n")
+    .warning("You have just created an empty configuration file. You can edit it with ConfigAddEntry(). You can edit the defaults according to your needs with the functions ConfigFileOpen(), ConfigEditDefinition() and ConfigFileSave() or edit the file manually as specified in ?ConfigFileOpen.")
   }
 }

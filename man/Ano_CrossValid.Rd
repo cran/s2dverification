@@ -2,7 +2,7 @@
 \alias{Ano_CrossValid}
 \title{Computes Anomalies In Cross-Validation Mode}
 \description{
-This function computes anomalies from experimental and observational matrices output from \code{load()} by subtracting the climatologies computed in a cross-validation mode and with a per-pair method.
+Computes the anomalies from the arrays of the experimental and observational data output from \code{load()} by subtracting the climatologies computed with a cross-validation technique and a per-pair method.
 }
 \usage{
 Ano_CrossValid(var_exp, var_obs, memb = TRUE)

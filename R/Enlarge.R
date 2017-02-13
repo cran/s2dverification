@@ -1,24 +1,15 @@
 Enlarge <- function(var, numdims) {
-  #
-  #  Enlarge the number of dimensions to 20 --> enlvar
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  #
-  dimsvar <- dim(var)
-  if (is.null(dimsvar)) {
-    dimsvar <- length(var)
+  if (is.numeric(var) || is.logical(var)) {
+    if (is.null(dim(var))) {
+      dim(var) <- length(var)
+    }
+    if (numdims >= length(dim(var))) {
+      dim(var) <- c(dim(var), rep(1, numdims - length(dim(var))))
+      var
+    } else {
+      stop("'numdims' must be higher or equal to length(dim(var))")
+    }
+  } else {
+    stop("'var' must be a numeric object")
   }
-  d <- c(dimsvar, array(1, dim = 20))
-  enlvar <- array(dim = d[1:20])
-  enlvar[, , , , , , , , , , , , , , , , , , , ] <- var
-  #
-  #  Reduce the number of dimensions to the required one
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  #
-  outvar <- array(dim = d[1:numdims])
-  outvar[] <- enlvar
-  #
-  #  Outputs
-  # ~~~~~~~~~
-  #
-  outvar
 }

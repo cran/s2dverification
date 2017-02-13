@@ -1,7 +1,7 @@
 \name{GenSeries}
 \alias{GenSeries}
 \title{Generates An AR1 Time Series}
-\description{This functions generates AR1 processes containing n data, with alpha as autocorrelation at lag 1, and mean and standard deviation provided by the mean and std arguments.}
+\description{This function generates AR1 processes containing n data points, where alpha is the autocorrelation at lag 1, and the mean and standard deviation are specified by the mean and std arguments.}
 \usage{
 GenSeries(n, alpha, mean, std)
 }

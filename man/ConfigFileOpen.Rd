@@ -95,22 +95,22 @@ The entries in a table will be grouped in 4 levels of specificity:
   \enumerate{
     \item{
 General entries:\cr
- · the key dataset name and variable name are both a regular expression matching any sequence of characters (.*) that will cause matching for any pair of dataset and variable names\cr
+ - the key dataset name and variable name are both a regular expression matching any sequence of characters (.*) that will cause matching for any pair of dataset and variable names\cr
    Example:  .*, .*, /dataset/main/path/, file/path, nc_var_name, suffix, var_min, var_max
     }
     \item{
 Dataset entries:\cr
- · the key variable name matches any sequence of characters\cr
+ - the key variable name matches any sequence of characters\cr
    Example:  ecmwf, .*, /dataset/main/path/, file/path, nc_var_name, suffix, var_min, var_max
     }
     \item{
 Variable entries:\cr
- · the key dataset name matches any sequence of characters\cr
+ - the key dataset name matches any sequence of characters\cr
    Example:  .*, tos, /dataset/main/path/, file/path, nc_var_name, suffix, var_min, var_max
     }
     \item{
 Specific entries:\cr
- · both key values are specified\cr
+ - both key values are specified\cr
    Example:  ecmwf, tos, /dataset/main/path/, file/path, nc_var_name, suffix, var_min, var_max
     }
   }

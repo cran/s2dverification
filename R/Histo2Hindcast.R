@@ -7,10 +7,10 @@ Histo2Hindcast <- function(varin, sdatesin, sdatesout, nleadtimesout) {
   varin <- Enlarge(varin, 7)
   outvar <- array(dim = c(dim(varin)[1:2], length(sdatesout), nleadtimesout,
                   dim(varin)[5:7]))
-  yearsin <- as.integer(substr(sdatesin, 1, 4))
-  yearsout <- as.integer(substr(sdatesout, 1, 4))
-  monthin <- as.integer(substr(sdatesin, 5, 6))
-  monthout <- as.integer(substr(sdatesout, 5, 6))
+  yearsin <- as.numeric(substr(sdatesin, 1, 4))
+  yearsout <- as.numeric(substr(sdatesout, 1, 4))
+  monthin <- as.numeric(substr(sdatesin, 5, 6))
+  monthout <- as.numeric(substr(sdatesout, 5, 6))
   #
   #  Re-organization
   # ~~~~~~~~~~~~~~~~~

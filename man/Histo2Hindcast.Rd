@@ -11,7 +11,7 @@ Histo2Hindcast(varin, sdatesin, sdatesout, nleadtimesout)
 }
 \arguments{
   \item{varin}{
-Input model or observational data:\cr
+Array of model or observational data with dimensions:\cr
   c(nmod/nexp/nobs, nmemb/nparam, nsdates, nltimes) up to\cr
   c(nmod/nexp/nobs, nmemb/nparam, nsdates, nltimes, nlevel, nlat, nlon)
   }
@@ -26,7 +26,7 @@ Number of leadtimes in the output matrix.
   }
 }
 \value{
-A matrix with the same number of dimensions as the input one, the same dimensions 1 and 2 and potentially the same dimensions 5 to 7. Dimensions 3 and 4 are set by the arguments sdatesout and nleadtimesout.
+An array with the same number of dimensions as varin, the same dimensions 1 and 2 and potentially the same dimensions 5 to 7. Dimensions 3 and 4 are set by the arguments sdatesout and nleadtimesout.
 }
 \examples{
 # See examples on Load() to understand the first lines in this example

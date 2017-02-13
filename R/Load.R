@@ -6,7 +6,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                  maskmod = vector("list", 15), maskobs = vector("list", 15), 
                  configfile = NULL, varmin = NULL, varmax = NULL, 
                  silent = FALSE, nprocs = NULL, dimnames = NULL, 
-                 remapcells = 2) {
+                 remapcells = 2, path_glob_permissive = 'partial') {
   #library(parallel)
   #library(bigmemory)
 
@@ -20,7 +20,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   names(load_parameters) <- parameter_names
   parameters_to_show <- c('var', 'exp', 'obs', 'sdates', 'grid', 'output', 'storefreq')
   load_parameters <- c(load_parameters[parameters_to_show], load_parameters[-match(parameters_to_show, names(load_parameters))])
-  cat(paste("* The load call you issued is:\n*   Load(", 
+  message(paste("* The load call you issued is:\n*   Load(", 
             paste(strwrap(
               paste(unlist(lapply(names(load_parameters[1:length(parameters_to_show)]), 
               function(x) paste(x, '=', 
@@ -31,7 +31,25 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                   paste(deparse(load_parameters[[x]]), collapse = '')
                 }))), 
               collapse = ', '), width = getOption('width') - 9, indent = 0, exdent = 8), collapse = '\n*'),
-            ", ...)\n* See the full call in '$load_parameters' after Load() finishes.\n", sep = ''))
+            ", ...)\n* See the full call in '$load_parameters' after Load() finishes.", sep = ''))
+
+  # .message("* The load call you issued is:")
+  # .message("*   Load(")
+  # .message( 
+  #   strwrap(
+  #     paste(
+  #       unlist(lapply(names(load_parameters[1:length(parameters_to_show)]), 
+  #             function(x) paste(x, '=', 
+  #               if (x == 'sdates' && length(load_parameters[[x]]) > 4) {
+  #                 paste0("c('", load_parameters[[x]][1], "', '", load_parameters[[x]][2], 
+  #                        "', ..., '", tail(load_parameters[[x]], 1), "')")
+  #               } else {
+  #                 paste(deparse(load_parameters[[x]]), collapse = '')
+  #               }))), 
+  #       collapse = ', '), 
+  #     width = getOption('width') - 9, indent = 0, exdent = 8))
+  # .message("*        , ...)")
+  # .message("* See the full call in '$load_parameters' after Load() finishes.")
 
   # Run Load() error-aware, so that it always returns something
   errors <- try({
@@ -56,9 +74,9 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       if (!is.list(exp[[i]])) {
         stop("Error: parameter 'exp' is incorrect. It should be a list of lists.")
       }
-      if (!(all(names(exp[[i]]) %in% exp_info_names))) {
-        stop("Error: parameter 'exp' is incorrect. There are unrecognized components in the information of some of the experiments. Check 'exp' in ?Load for details.")
-      }
+      #if (!(all(names(exp[[i]]) %in% exp_info_names))) {
+      #  stop("Error: parameter 'exp' is incorrect. There are unrecognized components in the information of some of the experiments. Check 'exp' in ?Load for details.")
+      #}
       if (!('name' %in% names(exp[[i]]))) {
         exp[[i]][['name']] <- paste0('exp', i)
         if (!('path' %in% names(exp[[i]]))) {
@@ -83,14 +101,14 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       }
     }
     if ((length(exps_to_fetch) > 0) && (length(exps_to_fetch) < length(exp))) {
-      cat("! Warning: 'path' was provided for some experimental datasets in 'exp'. Any \n*   information in the configuration file related to these will be ignored.\n")
+      .warning("'path' was provided for some experimental datasets in 'exp'. Any information in the configuration file related to these will be ignored.")
     }
   }
 
   # obs
   obs_to_fetch <- c()
   obs_info_names <- c('name', 'path', 'nc_var_name', 'suffix', 
-                      'var_min', 'var_max')
+                      'var_min', 'var_max', 'dimnames')
   if (!is.null(obs) && !(is.character(obs) && all(nchar(obs) > 0)) && !is.list(obs)) {
     stop("Error: parameter 'obs' should be a vector of strings or a list with information of the observational datasets to load. Check 'obs' in ?Load for details.")
   } else if (!is.null(obs)) {
@@ -101,9 +119,9 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       if (!is.list(obs[[i]])) {
         stop("Error: parameter 'obs' is incorrect. It should be a list of lists.")
       }
-      if (!(all(names(obs[[i]]) %in% obs_info_names))) {
-        stop("Error: parameter 'obs' is incorrect. There are unrecognized components in the information of some of the observations. Check 'obs' in ?Load for details.")
-      }
+      #if (!(all(names(obs[[i]]) %in% obs_info_names))) {
+      #  stop("Error: parameter 'obs' is incorrect. There are unrecognized components in the information of some of the observations. Check 'obs' in ?Load for details.")
+      #}
       if (!('name' %in% names(obs[[i]]))) {
         obs[[i]][['name']] <- paste0('obs', i)
         if (!('path' %in% names(obs[[i]]))) {
@@ -128,7 +146,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       }
     }
     if (length(c(obs_to_fetch, exps_to_fetch) > 1) && (length(obs_to_fetch) < length(obs))) {
-      cat("! Warning: 'path' was provided for some observational datasets in 'obs'. Any \n*   information in the configuration file related to these will be ignored.\n")
+      .warning("'path' was provided for some observational datasets in 'obs'. Any information in the configuration file related to these will be ignored.")
     }
   }
 
@@ -146,7 +164,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       stop("Error: parameter 'nmember' is incorrect. It should be numeric.")
     }
     if (length(nmember) == 1) {
-      cat(paste("! Warning: 'nmember' should specify the number of members of each experimental dataset. Forcing to", nmember, "for all experiments.\n"))
+      .warning(paste("'nmember' should specify the number of members of each experimental dataset. Forcing to", nmember, "for all experiments."))
       nmember <- rep(nmember, length(exp))
     }
     if (length(nmember) != length(exp)) {
@@ -162,7 +180,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       stop("Error: parameter 'nmemberobs' is incorrect. It should be numeric.")
     }
     if (length(nmemberobs) == 1) {
-      cat(paste("! Warning: 'nmemberobs' should specify the number of members of each observational dataset. Forcing to", nmemberobs, "for all observations.\n"))
+      .warning(paste("'nmemberobs' should specify the number of members of each observational dataset. Forcing to", nmemberobs, "for all observations."))
       nmemberobs <- rep(nmemberobs, length(obs))
     }
     if (length(nmemberobs) != length(obs)) {
@@ -298,7 +316,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   ## possible.
   if ((output != 'areave' || !is.null(grid)) && length(exp) > 0) {
     if (!all(unlist(lapply(maskobs, is.null)))) {
-      cat("! Warning: 'maskobs' will be ignored. 'maskmod[[1]]' will be applied to observations instead.\n")
+      .warning("'maskobs' will be ignored. 'maskmod[[1]]' will be applied to observations instead.")
     }
     maskobs <- lapply(maskobs, function(x) x <- maskmod[[1]])
   }
@@ -343,9 +361,22 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     stop("Error: 'remapcells' must be an integer >= 0.")
   }
 
+  # path_glob_permissive
+  if (!is.logical(path_glob_permissive) && !(path_glob_permissive %in% c('yes', 'partial', 'no'))) {
+    stop("Error: 'path_glob_permissive' must be one of TRUE, 'yes', 'partial', FALSE or 'no'.")
+  }
+  if (is.logical(path_glob_permissive)) {
+    if (path_glob_permissive) {
+      path_glob_permissive <- 'yes'
+    } else {
+      path_glob_permissive <- 'no'
+    }
+  }
+  replace_globs <- path_glob_permissive %in% c('no', 'partial')
+
   # If not all data has been provided in 'exp' and 'obs', configuration file is read.
   if (length(exps_to_fetch) > 0 || length(obs_to_fetch) > 0) {
-    cat("* Some 'path's not explicitly provided in 'exp' and 'obs', so will now proceed to open the configuration file.\n")
+    .message("Some 'path's not explicitly provided in 'exp' and 'obs', so will now proceed to open the configuration file.")
     data_info <- ConfigFileOpen(configfile, silent, TRUE)
 
     # Check that the var, exp and obs parameters are right and keep the entries
@@ -384,7 +415,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         })
     }
     if (!silent) {
-      cat("* All pairs (var, exp) and (var, obs) have matching entries.\n")
+      .message("All pairs (var, exp) and (var, obs) have matching entries.")
     }
   } else {
     replace_values <- list(DEFAULT_NC_VAR_NAME = '$VAR_NAME$',
@@ -408,30 +439,58 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                    member = ifelse(is.null(dimnames[["member"]]), 
                                    replace_values[["DEFAULT_DIM_NAME_MEMBERS"]],
                                    dimnames[['member']]))
+  mandatory_defaults <- c('DEFAULT_EXP_MAIN_PATH', 'DEFAULT_EXP_FILE_PATH', 
+                          'DEFAULT_OBS_MAIN_PATH', 'DEFAULT_OBS_FILE_PATH',
+                          'DEFAULT_NC_VAR_NAME', 'DEFAULT_SUFFIX', 
+                          'DEFAULT_VAR_MIN', 'DEFAULT_VAR_MAX',
+                          'DEFAULT_DIM_NAME_LONGITUDES', 
+                          'DEFAULT_DIM_NAME_LATITUDES',
+                          'DEFAULT_DIM_NAME_MEMBERS')
+  extra_vars_with_default_ind <- (1:length(replace_values))[grep('^DEFAULT_', names(replace_values))]
+  extra_vars_with_default_ind <- extra_vars_with_default_ind[
+                                   grep(paste0(paste0('^', mandatory_defaults), 
+                                               collapse = '|'),
+                                        names(replace_values)[extra_vars_with_default_ind],
+                                        invert = TRUE)
+                                 ]
+  extra_vars_with_default <- gsub('^DEFAULT_', '', 
+                                  names(replace_values)[extra_vars_with_default_ind])
   if (!is.null(exp)) {
     exp <- lapply(exp, function (x) {
       if (!('dimnames' %in% names(x))) {
         x[['dimnames']] <- dimnames
-        x
       } else {
         dimnames2 <- dimnames
         dimnames2[names(x[['dimnames']])] <- x[['dimnames']]
         x[['dimnames']] <- dimnames2
-        x
       }
+      i <- 1
+      while (i <= length(extra_vars_with_default)) {
+        if (!(extra_vars_with_default[i] %in% names(x))) {
+          x[[extra_vars_with_default[i]]] <- replace_values[[extra_vars_with_default_ind[i]]]
+        }
+        i <- i + 1
+      }
+      x
     })
   }
   if (!is.null(obs)) {
     obs <- lapply(obs, function (x) {
       if (!('dimnames' %in% names(x))) {
         x[['dimnames']] <- dimnames
-        x
       } else {
         dimnames2 <- dimnames
         dimnames2[names(x[['dimnames']])] <- x[['dimnames']]
         x[['dimnames']] <- dimnames2
-        x 
       }
+      i <- 1
+      while (i <= length(extra_vars_with_default)) {
+        if (!(extra_vars_with_default[i] %in% names(x))) {
+          x[[extra_vars_with_default[i]]] <- replace_values[[extra_vars_with_default_ind[i]]]
+        }
+        i <- i + 1
+      }
+      x
     })
   }
   single_dataset <- (length(obs) + length(exp) == 1)
@@ -446,7 +505,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   leadtimes <- NULL
   var_exp <- var_obs <- NULL
   units <- var_long_name <- NULL
-  is_2d_var <- FALSE
+  is_2d_var <- data_across_gw <- array_across_gw <- FALSE
 
   # Start defining the dimensions of the output matrices
   nmod <- length(exp)
@@ -465,7 +524,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   # access and manipulate the data according to the output type and other 
   # parameters. 
   if (!silent) {
-    cat("* Fetching first experimental files to work out 'var_exp' size...\n")
+    .message("Fetching first experimental files to work out 'var_exp' size...")
   }
 
   dataset_type <- 'exp'
@@ -476,7 +535,14 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   exp_work_pieces <- list()
   jmod <- 1
   while (jmod <= nmod) {
-    tags_to_find <- c('MEMBER_NUMBER')
+    first_dataset_file_found <- FALSE
+    replace_values[["EXP_NAME"]] <- exp[[jmod]][['name']]
+    replace_values[["NC_VAR_NAME"]] <- exp[[jmod]][['nc_var_name']]
+    replace_values[["SUFFIX"]] <- exp[[jmod]][['suffix']]
+    extra_vars <- names(exp[[jmod]])[which(!(names(exp[[jmod]]) %in% exp_info_names))]
+    replace_values[extra_vars] <- exp[[jmod]][extra_vars]
+    namevar <- .ConfigReplaceVariablesInString(exp[[jmod]][['nc_var_name']], replace_values)
+    tags_to_find <- c('START_DATE', 'YEAR', 'MONTH', 'DAY', 'MEMBER_NUMBER')
     position_of_tags <- na.omit(match(tags_to_find, names(replace_values)))
     if (length(position_of_tags) > 0) {
       quasi_final_path <- .ConfigReplaceVariablesInString(exp[[jmod]][['path']], 
@@ -485,12 +551,14 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       quasi_final_path <- .ConfigReplaceVariablesInString(exp[[jmod]][['path']], 
                             replace_values, TRUE)
     }
+    if (!grepl('$START_DATE$', quasi_final_path, fixed = TRUE) &&
+        !all(sapply(c('$YEAR$', '$MONTH$'), grepl, quasi_final_path, 
+                    fixed = TRUE))) {
+      stop(paste0("The tag $START_DATE$ or the three tags $YEAR$, $MONTH$, $DAY$ must be somewhere in the path pattern of the experimental dataset '", 
+           exp[[jmod]][['name']], "'."))
+    }
     is_file_per_member_exp[jmod] <- grepl('$MEMBER_NUMBER$', 
                                           quasi_final_path, fixed = TRUE)
-    replace_values[["EXP_NAME"]] <- exp[[jmod]][['name']]
-    replace_values[["NC_VAR_NAME"]] <- exp[[jmod]][['nc_var_name']]
-    namevar <- .ConfigReplaceVariablesInString(exp[[jmod]][['nc_var_name']], replace_values)
-    replace_values[["SUFFIX"]] <- exp[[jmod]][['suffix']]
     if (is.null(varmin)) {
       mod_var_min <- as.numeric(.ConfigReplaceVariablesInString(exp[[jmod]][['var_min']], replace_values))
     } else {
@@ -507,17 +575,17 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       replace_values[["YEAR"]] <- substr(sdates[jsdate], 1, 4)
       replace_values[["MONTH"]] <- substr(sdates[jsdate], 5, 6)
       replace_values[["DAY"]] <- substr(sdates[jsdate], 7, 8)
+      if (is_file_per_member_exp[jmod]) {
+        replace_values[["MEMBER_NUMBER"]] <- '*'
+      }
       # If the dimensions of the output matrices are still to define, we try to read
       # the metadata of the data file that corresponds to the current iteration
       if (dims2define) {
-        if (is_file_per_member_exp[jmod]) {
-          replace_values[["MEMBER_NUMBER"]] <- '*'
-        }
         # We must build a work piece that will be sent to the .LoadDataFile function
         # in 'explore_dims' mode. We will obtain, if success, the dimensions of the
         # data in the file.
         work_piece <- list(dataset_type = dataset_type,
-                           filename = .ConfigReplaceVariablesInString(exp[[jmod]][['path']], replace_values),
+                           filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                            namevar = namevar, grid = grid, remap = remap, remapcells = remapcells,
                            is_file_per_member = is_file_per_member_exp[jmod],
                            is_file_per_dataset = FALSE,
@@ -529,25 +597,29 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         var_long_name <- found_data$var_long_name
         units <- found_data$units
         if (!is.null(found_dims)) {
+          # If a file is found, we can define the dimensions of the output arrays.
           is_2d_var <- found_data$is_2d_var
           if (!is_2d_var && (output != 'areave')) {
-            cat(paste("! Warning: '", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'.\n",
-                sep = ''))
+            .warning(paste0("'", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'."))
             output <- 'areave'
+          }
+          if (output == 'lonlat' || output == 'lon') {
+            data_across_gw <- found_data$data_across_gw
+            array_across_gw <- found_data$array_across_gw
           }
           if (output != 'areave' && is.null(grid)) {
             grid <- found_data$grid
           }
           if (is.null(nmember)) {
             if (is.null(found_dims[['member']])) {
-              cat("! Warning: loading data from a server but 'nmember' not specified. Loading only one member.\n")
+              .warning("loading data from a server but 'nmember' not specified. Loading only one member.")
               nmember <- rep(1, nmod)
             } else {
               nmember <- rep(found_dims[['member']], nmod)
             }
           }
           if (is.null(nleadtime)) {
-            nleadtime <- found_dims[['time']]
+            nleadtime <- found_dims[['ftime']]
           }
           if (is.null(leadtimemax)) {
             leadtimemax <- nleadtime
@@ -564,11 +636,26 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           if (output == 'lat' || output == 'lonlat') {
             dim_exp[['lat']] <- length(latitudes)
           }
-          dim_exp[['time']] <- length(leadtimes)
+          dim_exp[['ftime']] <- length(leadtimes)
           dim_exp[['member']] <- max(nmember)
           dim_exp[['sdate']] <- nsdates
           dim_exp[['dataset']] <- nmod
           dims2define <- FALSE
+        }
+      }
+      # Also, we must get rid of the shell globbing expressions in the 
+      # quasi_final_path, for safety.
+      if (!first_dataset_file_found) {
+        found_path <- Sys.glob(.ConfigReplaceVariablesInString(quasi_final_path, replace_values))
+        if (length(found_path) > 0) {
+          found_path <- head(found_path, 1)
+          if (replace_globs) {
+            quasi_final_path <- .ReplaceGlobExpressions(quasi_final_path, found_path, 
+                                                        replace_values, tags_to_find, 
+                                                        exp[[jmod]][['name']],
+                                                        path_glob_permissive == 'partial')
+          }
+          first_dataset_file_found <- TRUE
         }
       }
       # We keep on iterating through members to build all the work pieces.
@@ -576,7 +663,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         jmember <- 1
         while (jmember <= nmember[jmod]) {
           replace_values[["MEMBER_NUMBER"]] <- sprintf(paste("%.", (nmember[jmod] %/% 10) + 1, "i", sep = ''), jmember - 1)
-          work_piece <- list(filename = .ConfigReplaceVariablesInString(exp[[jmod]][['path']], replace_values),
+          work_piece <- list(filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                              namevar = namevar, indices = c(1, jmember, jsdate, jmod), 
                              nmember = nmember[jmod], leadtimes = leadtimes, mask = maskmod[[jmod]],
                              is_file_per_dataset = FALSE, dimnames = exp[[jmod]][['dimnames']],
@@ -585,7 +672,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           jmember <- jmember + 1
         }
       } else {
-        work_piece <- list(filename = .ConfigReplaceVariablesInString(exp[[jmod]][['path']], replace_values),
+        work_piece <- list(filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                            namevar = namevar, indices = c(1, 1, jsdate, jmod), 
                            nmember = nmember[jmod], leadtimes = leadtimes, mask = maskmod[[jmod]],
                            is_file_per_dataset = FALSE, dimnames = exp[[jmod]][['dimnames']],
@@ -594,21 +681,22 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       }
       jsdate <- jsdate + 1
     }
+    replace_values[extra_vars] <- NULL
     jmod <- jmod + 1
   }
   if (dims2define && length(exp) > 0) {
-    cat("! Warning: no data found in file system for any experimental dataset.\n")
+    .warning("no data found in file system for any experimental dataset.")
   }
 
-  dims <- dim_exp[na.omit(match(c('dataset', 'member', 'sdate', 'time', 'lat', 'lon'), names(dim_exp)))]
+  dims <- dim_exp[na.omit(match(c('dataset', 'member', 'sdate', 'ftime', 'lat', 'lon'), names(dim_exp)))]
   if (is.null(dims[['member']]) || any(is.na(unlist(dims))) || any(unlist(dims) == 0)) {
     dims <- 0
     dim_exp <- NULL
   }
   if (!silent) {
-    message <- "* Success. Detected dimensions of experimental data: "
-    cat(paste0(message, paste(unlist(dims), collapse = ', '), '\n'))
-    cat("* Fetching first observational files to work out 'var_obs' size...\n")
+    message <- "Success. Detected dimensions of experimental data: "
+    .message(paste0(message, paste(unlist(dims), collapse = ', ')))
+    .message("Fetching first observational files to work out 'var_obs' size...")
   }
 
   # If there are no experiments to load we need to choose a number of time steps
@@ -616,13 +704,17 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   # the current date.
   if (is.null(exp) || dims == 0) {
     if (is.null(leadtimemax)) {
-      cat("! Warning: loading observations only and no 'leadtimemax' specified. Data will be loaded from each starting date to current time.\n")
-      diff <- Sys.time() - as.POSIXct(paste(substr(sdates[1], 1, 4), '-',
-              substr(sdates[1], 5, 6), '-', substr(sdates[1], 7, 8), sep=''))
-      if (storefreq == 'monthly') { 
-        leadtimemax <- as.integer(diff/30) 
+      diff <- Sys.time() - as.POSIXct(sdates[1], format = '%Y%m%d')
+      if (diff > 0) {
+        .warning("Loading observations only and no 'leadtimemax' specified. Data will be loaded from each starting date to current time.")
+        if (storefreq == 'monthly') { 
+          leadtimemax <- as.integer(diff / 30)
+          if (leadtimemax == 0) leadtimemax <- 1
+        } else {
+          leadtimemax <- as.integer(diff)
+        }
       } else {
-        leadtimemax <- as.integer(diff)
+        stop("Loading only observational data for future start dates but no 'leadtimemax' specified.")
       }
     }
     if (is.null(nleadtime)) {
@@ -644,7 +736,14 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   is_file_per_member_obs <- rep(FALSE, nobs)
   jobs <- 1
   while (jobs <= nobs) {
-    tags_to_find <- c('MONTH', 'DAY', 'YEAR', 'MEMBER_NUMBER')
+    first_dataset_file_found <- FALSE
+    replace_values[["OBS_NAME"]] <- obs[[jobs]][['name']]
+    replace_values[["NC_VAR_NAME"]] <- obs[[jobs]][['nc_var_name']]
+    replace_values[["SUFFIX"]] <- obs[[jobs]][['suffix']]
+    extra_vars <- names(obs[[jobs]])[which(!(names(obs[[jobs]]) %in% obs_info_names))]
+    replace_values[extra_vars] <- obs[[jobs]][extra_vars]
+    namevar <- .ConfigReplaceVariablesInString(obs[[jobs]][['nc_var_name']], replace_values)
+    tags_to_find <- c('START_DATE', 'MONTH', 'DAY', 'YEAR', 'MEMBER_NUMBER')
     position_of_tags <- na.omit(match(tags_to_find, names(replace_values)))
     if (length(position_of_tags) > 0) {
       quasi_final_path <- .ConfigReplaceVariablesInString(obs[[jobs]][['path']], 
@@ -656,10 +755,6 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     is_file_per_dataset_obs[jobs] <- !any(sapply(c("$MONTH$", "$DAY$", "$YEAR$"), 
                                           grepl, quasi_final_path, fixed = TRUE))
     is_file_per_member_obs[jobs] <- grepl("$MEMBER_NUMBER$", quasi_final_path, fixed = TRUE)
-    replace_values[["OBS_NAME"]] <- obs[[jobs]][['name']]
-    replace_values[["NC_VAR_NAME"]] <- obs[[jobs]][['nc_var_name']]
-    namevar <- .ConfigReplaceVariablesInString(obs[[jobs]][['nc_var_name']], replace_values)
-    replace_values[["SUFFIX"]] <- obs[[jobs]][['suffix']]
     if (is.null(varmin)) {
       obs_var_min <- as.numeric(.ConfigReplaceVariablesInString(obs[[jobs]][['var_min']], replace_values))
     } else {
@@ -681,7 +776,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       ## TODO: Open file-per-dataset-files only once.
       if (dims2define) {
         work_piece <- list(dataset_type = dataset_type,
-                           filename = .ConfigReplaceVariablesInString(obs[[jobs]][['path']], replace_values),
+                           filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                            namevar = namevar, grid = grid, remap = remap, remapcells = remapcells,
                            is_file_per_member = is_file_per_member_obs[jobs],
                            is_file_per_dataset = is_file_per_dataset_obs[jobs],
@@ -695,16 +790,19 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         if (!is.null(found_dims)) {
           is_2d_var <- found_data$is_2d_var
           if (!is_2d_var && (output != 'areave')) {
-            cat(paste("! Warning: '", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'.\n",
-                sep = ''))
+            .warning(paste0("'", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'."))
             output <- 'areave'
+          }
+          if (output == 'lonlat' || output == 'lon') {
+            data_across_gw <- found_data$data_across_gw
+            array_across_gw <- found_data$array_across_gw
           }
           if (output != 'areave' && is.null(grid)) {
             grid <- found_data$grid
           }
           if (is.null(nmemberobs)) {
             if (is.null(found_dims[['member']])) {
-              cat("! Warning: loading observational data from a server but 'nmemberobs' not specified. Loading only one member.\n")
+              .warning("loading observational data from a server but 'nmemberobs' not specified. Loading only one member.")
               nmemberobs <- rep(1, nobs)
             } else {
               nmemberobs <- rep(found_dims[['member']], nobs)
@@ -721,14 +819,27 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           if (output == 'lat' || output == 'lonlat') {
             dim_obs[['lat']] <- length(latitudes)
           }
-          dim_obs[['time']] <- length(leadtimes)
+          dim_obs[['ftime']] <- length(leadtimes)
           dim_obs[['member']] <- max(nmemberobs)
           dim_obs[['sdate']] <- nsdates
           dim_obs[['dataset']] <- nobs
           dims2define <- FALSE
         }
       }
-      work_piece <- list(filename = .ConfigReplaceVariablesInString(obs[[jobs]][['path']], replace_values),
+      if (!first_dataset_file_found) {
+        found_path <- Sys.glob(.ConfigReplaceVariablesInString(quasi_final_path, replace_values))
+        if (length(found_path) > 0) {
+          found_path <- head(found_path, 1)
+          if (replace_globs) {
+            quasi_final_path <- .ReplaceGlobExpressions(quasi_final_path, found_path, 
+                                                        replace_values, tags_to_find, 
+                                                        obs[[jobs]][['name']],
+                                                        path_glob_permissive == 'partial')
+          }
+          first_dataset_file_found <- TRUE
+        }
+      }
+      work_piece <- list(filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                          namevar = namevar, indices = c(1, 1, 1, jobs), 
                          nmember = nmemberobs[jobs], 
                          mask = maskobs[[jobs]], leadtimes = leadtimes, 
@@ -776,12 +887,12 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           } else {
             obs_file_indices <- 1
           }
+          if (is_file_per_member_obs[jobs]) {
+            replace_values[["MEMBER_NUMBER"]] <- '*'
+          }
           if (dims2define) {
-            if (is_file_per_member_obs[jobs]) {
-              replace_values[["MEMBER_NUMBER"]] <- '*'
-            }
             work_piece <- list(dataset_type = dataset_type,
-                               filename = .ConfigReplaceVariablesInString(obs[[jobs]][['path']], replace_values),
+                               filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                                namevar = namevar, grid = grid, remap = remap, remapcells = remapcells,
                                is_file_per_member = is_file_per_member_obs[jobs],
                                is_file_per_dataset = is_file_per_dataset_obs[jobs],
@@ -795,16 +906,19 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
             if (!is.null(found_dims)) {
               is_2d_var <- found_data$is_2d_var
               if (!is_2d_var && (output != 'areave')) {
-                cat(paste("! Warning: '", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'\n.",
-                    sep = ''))
+                .warning(paste0("'", output, "' output format not allowed when loading global mean variables. Forcing to 'areave'."))
                 output <- 'areave'
+              }
+              if (output == 'lonlat' || output == 'lon') {
+                data_across_gw <- found_data$data_across_gw
+                array_across_gw <- found_data$array_across_gw
               }
               if (output != 'areave' && is.null(grid)) {
                 grid <- found_data$grid
               }
               if (is.null(nmemberobs)) {
                 if (is.null(found_dims[['member']])) {
-                  cat("! Warning: loading observational data from a server but 'nmemberobs' not specified. Loading only one member.\n")
+                  .warning("loading observational data from a server but 'nmemberobs' not specified. Loading only one member.")
                   nmemberobs <- rep(1, nobs)
                 } else {
                   nmemberobs <- rep(found_dims[['member']], nobs)
@@ -821,18 +935,31 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
               if (output == 'lat' || output == 'lonlat') {
                 dim_obs[['lat']] <- length(latitudes)
               }
-              dim_obs[['time']] <- length(leadtimes)
+              dim_obs[['ftime']] <- length(leadtimes)
               dim_obs[['member']] <- max(nmemberobs)
               dim_obs[['sdate']] <- nsdates
               dim_obs[['dataset']] <- nobs
               dims2define <- FALSE
             }
           }
+          if (!first_dataset_file_found) {
+            found_path <- Sys.glob(.ConfigReplaceVariablesInString(quasi_final_path, replace_values))
+            if (length(found_path) > 0) {
+              found_path <- head(found_path, 1)
+              if (replace_globs) {
+                quasi_final_path <- .ReplaceGlobExpressions(quasi_final_path, found_path, 
+                                                            replace_values, tags_to_find, 
+                                                            obs[[jobs]][['name']], 
+                                                            path_glob_permissive == 'partial')
+              }
+              first_dataset_file_found <- TRUE
+            }
+          }
           if (is_file_per_member_obs[jobs]) {
             jmember <- 1
             while (jmember <= nmemberobs[jobs]) {
               replace_values[["MEMBER_NUMBER"]] <- sprintf(paste("%.", (nmemberobs[jobs] %/% 10) + 1, "i", sep = ''), jmember - 1)
-              work_piece <- list(filename = .ConfigReplaceVariablesInString(obs[[jobs]][['path']], replace_values),
+              work_piece <- list(filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                                  namevar = namevar, indices = c(jleadtime, jmember, jsdate, jobs), 
                                  nmember = nmemberobs[jobs], leadtimes = obs_file_indices, 
                                  mask = maskobs[[jobs]], dimnames = obs[[jobs]][['dimnames']],
@@ -842,7 +969,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
               jmember <- jmember + 1
             }
           } else {
-            work_piece <- list(filename = .ConfigReplaceVariablesInString(obs[[jobs]][['path']], replace_values),
+            work_piece <- list(filename = .ConfigReplaceVariablesInString(quasi_final_path, replace_values),
                                namevar = namevar, indices = c(jleadtime, 1, jsdate, jobs), 
                                nmember = nmemberobs[jobs], leadtimes = obs_file_indices, 
                                mask = maskobs[[jobs]], dimnames = obs[[jobs]][['dimnames']],
@@ -867,19 +994,20 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         jsdate <- jsdate + 1
       }
     }
+    replace_values[extra_vars] <- NULL
     jobs <- jobs + 1
   }
   if (dims2define && length(obs) > 0) {
-    cat("! Warning: no data found in file system for any observational dataset.\n")
+    .warning("no data found in file system for any observational dataset.")
   }
-  dims <- dim_obs[na.omit(match(c('dataset', 'member', 'sdate', 'time', 'lat', 'lon'), names(dim_obs)))]
+  dims <- dim_obs[na.omit(match(c('dataset', 'member', 'sdate', 'ftime', 'lat', 'lon'), names(dim_obs)))]
   if (is.null(dims[['member']]) || any(is.na(unlist(dims))) || any(unlist(dims) == 0)) {
     dims <- 0
     dim_obs <- NULL
   }
   if (!silent) {
-    message <- "* Success. Detected dimensions of observational data: "
-    cat(paste0(message, paste(unlist(dims), collapse = ', '), '\n'))
+    message <- "Success. Detected dimensions of observational data: "
+    .message(paste0(message, paste(unlist(dims), collapse = ', ')))
   }
 
   if (!(is.null(dim_obs) && is.null(dim_exp))) {
@@ -950,7 +1078,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     }
     selected_pieces <- c(selected_exp_pieces, selected_obs_pieces + length(exp_work_pieces))
     progress_steps <- paste0(' + ', round(progress_steps, 2), '%')
-    progress_message <- '* Progress: 0%'
+    progress_message <- 'Progress: 0%'
   } else {
     progress_message <- ''
     selected_pieces <- NULL
@@ -972,30 +1100,30 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                    wp
                  })
   if (!silent) {
-    cat(paste("* Will now proceed to read and process ", length(work_pieces), " data files:\n", sep = ''))
+    .message(paste("Will now proceed to read and process ", length(work_pieces), " data files:", sep = ''))
     if (length(work_pieces) < 30) {
-      lapply(work_pieces, function (x) cat(paste("*   ", x[['filename']], '\n', sep = '')))
+      lapply(work_pieces, function (x) .message(x[['filename']], indent = 2))
     } else {
-      cat(paste("*   The list of files is long. You can check it after Load() finishes in the output '$source_files'.\n"))
+      .message("The list of files is long. You can check it after Load() finishes in the output '$source_files'.", indent = 2, exdent = 5)
     }
     if (length(dim_obs) == 0) {
       bytes_obs <- 0
       obs_dim_sizes <- '0'
     } else {
       bytes_obs <- prod(c(dim_obs, 8))
-      obs_dim_sizes <- paste(na.omit(as.vector(dim_obs[c('dataset', 'member', 'sdate', 'time', 'lat', 'lon')])), collapse = ' x ')
+      obs_dim_sizes <- paste(na.omit(as.vector(dim_obs[c('dataset', 'member', 'sdate', 'ftime', 'lat', 'lon')])), collapse = ' x ')
     }
     if (length(dim_exp) == 0) {
       bytes_exp <- 0
       exp_dim_sizes <- '0'
     } else {
       bytes_exp <- prod(c(dim_exp, 8))
-      exp_dim_sizes <- paste(na.omit(as.vector(dim_exp[c('dataset', 'member', 'sdate', 'time', 'lat', 'lon')])), collapse = ' x ')
+      exp_dim_sizes <- paste(na.omit(as.vector(dim_exp[c('dataset', 'member', 'sdate', 'ftime', 'lat', 'lon')])), collapse = ' x ')
     }
-    cat(paste("* Total size of requested data: ", bytes_obs + bytes_exp, "bytes.\n"))
-    cat(paste("*   - Experimental data:  (", exp_dim_sizes, ") x 8 bytes =", bytes_exp, "bytes.\n"))
-    cat(paste("*   - Observational data: (", obs_dim_sizes, ") x 8 bytes =", bytes_obs, "bytes.\n"))
-    cat(paste("* If size of requested data is close to or above the free shared RAM memory, R will crash.\n"))
+    .message(paste("Total size of requested data: ", bytes_obs + bytes_exp, "bytes."))
+    .message(paste("- Experimental data:  (", exp_dim_sizes, ") x 8 bytes =", bytes_exp, "bytes."), indent = 2)
+    .message(paste("- Observational data: (", obs_dim_sizes, ") x 8 bytes =", bytes_obs, "bytes."), indent = 2)
+    .message("If size of requested data is close to or above the free shared RAM memory, R will crash.")
   }
   # Build the cluster of processes that will do the work and dispatch work pieces.
   # The function .LoadDataFile is applied to each work package. This function will
@@ -1055,7 +1183,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     ###  }
     ###})
 
-    # Open from the workers side
+    # Open from the workers sidtr(data)
     ###open_connections <- clusterApply(cluster, progress_ports, 
     ###  function (x) {
     ###    progress_connection <<- NULL
@@ -1077,8 +1205,10 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     ###}
 
     if (!silent) {
-      cat(paste("* Loading... This may take several minutes...\n", sep = ''))
-      cat(progress_message)
+      .message("Loading... This may take several minutes...")
+      if (progress_message != '') {
+        .message(progress_message, appendLF = FALSE)
+      }
     }
     # Send the heavy work to the workers
     work_errors <- try({
@@ -1088,14 +1218,15 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   }
   if (!silent) {
     if (progress_message != '') {
-      cat("\n")
+      .message("\n")
     }
     if (any(unlist(lapply(found_files, is.null)))) {
       if (sum(unlist(lapply(found_files, is.null))) < 30) {
-        cat("! WARNING: The following files were not found in the file system. Filling with NA values instead.\n")
-        lapply(work_pieces[which(unlist(lapply(found_files, is.null)))], function (x) cat(paste("*   ", x[['filename']], '\n', sep = '')))
+        warning_text <- "The following files were not found in the file system. Filling with NA values instead.\n"
+        warning_text <- paste0(warning_text, do.call(paste, lapply(work_pieces[which(unlist(lapply(found_files, is.null)))], function (x) paste0("  ", x[['filename']], "\n"))))
+        .warning(warning_text)
       } else {
-        cat("! WARNING: Some files were not found in the file system. The list is long. You can check it in the output '$not_found_files'. Filling with NA values instead.\n")
+        .warning("Some files were not found in the file system. The list is long. You can check it in the output '$not_found_files'. Filling with NA values instead.")
       }
     }
   }
@@ -1104,11 +1235,43 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
 
   } else {
     error_message <- "Error: No found files for any dataset. Check carefully the file patterns and correct either the pattern or the provided parameters:\n"
+    tags_to_find <- c('START_DATE', 'YEAR', 'MONTH', 'DAY', 'MEMBER_NUMBER')
+    position_of_tags <- na.omit(match(tags_to_find, names(replace_values)))
     if (!is.null(exp)) {
-      lapply(exp, function (x) error_message <<- paste0(error_message, paste0(x[['path']], '\n')))
+      lapply(exp, function (x) {
+        replace_values[["EXP_NAME"]] <- x[['name']]
+        replace_values[["NC_VAR_NAME"]] <- x[['nc_var_name']]
+        replace_values[["SUFFIX"]] <- x[['suffix']]
+        extra_vars <- names(x)[which(!(names(x) %in% exp_info_names))]
+        replace_values[extra_vars] <- x[extra_vars]
+        if (length(position_of_tags) > 0) {
+          quasi_final_path <- .ConfigReplaceVariablesInString(x[['path']],
+                                replace_values[-position_of_tags], TRUE)
+        } else {
+          quasi_final_path <- .ConfigReplaceVariablesInString(x[['path']],
+                                replace_values, TRUE)
+        }
+        error_message <<- paste0(error_message, paste0(quasi_final_path, '\n'))
+        replace_values[extra_vars] <- NULL
+      })
     }
     if (!is.null(obs)) {
-      lapply(obs, function (x) error_message <<- paste0(error_message, paste0(x[['path']], '\n')))
+      lapply(obs, function (x) {
+        replace_values[["OBS_NAME"]] <- x[['name']]
+        replace_values[["NC_VAR_NAME"]] <- x[['nc_var_name']]
+        replace_values[["SUFFIX"]] <- x[['suffix']]
+        extra_vars <- names(x)[which(!(names(x) %in% obs_info_names))]
+        replace_values[extra_vars] <- x[extra_vars]
+        if (length(position_of_tags) > 0) {
+          quasi_final_path <- .ConfigReplaceVariablesInString(x[['path']],
+                                replace_values[-position_of_tags], TRUE)
+        } else {
+          quasi_final_path <- .ConfigReplaceVariablesInString(x[['path']],
+                                replace_values, TRUE)
+        }
+        error_message <<- paste0(error_message, paste0(quasi_final_path, '\n'))
+        replace_values[extra_vars] <- NULL
+      })
     }
     stop(error_message)
   }
@@ -1118,16 +1281,20 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   if (class(errors) == 'try-error') {
     invisible(list(load_parameters = load_parameters))
   } else {
-    variable <- list()
-    variable[['varName']] <- var
-    variable[['level']] <- NULL
-    attr(variable, 'is_standard') <- FALSE
+    # Before ending, the data is arranged in the common format, with the following
+    # dimension order:
+    #  nmod/nobs, members, startdates, leadtimes, latitudes, longitudes
+    # and the metadata is generated following the conventions in downscaleR.
+    variable <- list(varName = var, level = NULL)
+    attr(variable, 'use_dictionary') <- FALSE
     attr(variable, 'units') <- units
     attr(variable, 'longname') <- var_long_name
+    attr(variable, 'description') <- 'none'
     attr(variable, 'daily_agg_cellfun') <- 'none'
     attr(variable, 'monthly_agg_cellfun') <- 'none'
     attr(variable, 'verification_time') <- 'none'
-    
+
+    number_ftime <- NULL 
     if (is.null(var_exp)) {
       mod_data <- NULL
     } else { 
@@ -1137,6 +1304,8 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       dim_exp <- dim_exp[dim_reorder]
       mod_data <- aperm(array(bigmemory::as.matrix(var_exp), dim = old_dims), dim_reorder)
       attr(mod_data, 'dimensions') <- names(dim_exp)
+      names(dim(mod_data)) <- names(dim_exp)
+      number_ftime <- dim_exp[["ftime"]]
     }
 
     if (is.null(var_obs)) {
@@ -1148,44 +1317,112 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       dim_obs <- dim_obs[dim_reorder]
       obs_data <- aperm(array(bigmemory::as.matrix(var_obs), dim = old_dims), dim_reorder)
       attr(obs_data, 'dimensions') <- names(dim_obs)
+      names(dim(obs_data)) <- names(dim_obs)
+      if (is.null(number_ftime)) {
+        number_ftime <- dim_obs[["ftime"]]
+      }
     }
 
     if (is.null(latitudes)) {
       lat <- 0
       attr(lat, 'cdo_grid_name') <- 'none'
+      attr(lat, 'first_lat') <- 'none'
+      attr(lat, 'last_lat') <- 'none' 
     } else {
       lat <- latitudes
       attr(lat, 'cdo_grid_name') <- if (is.null(grid)) 'none' else grid
+      attr(lat, 'first_lat') <- tail(lat, 1)
+      attr(lat, 'last_lat') <- head(lat, 1)
     }
     attr(lat, 'projection') <- 'none'
 
     if (is.null(longitudes)) {
       lon <- 0
-      attr(lon, 'cdo_grid_name') <- 'none' 
+      attr(lon, 'cdo_grid_name') <- 'none'
+      attr(lon, 'data_across_gw') <- 'none'
+      attr(lon, 'array_across_gw') <- 'none'
+      attr(lon, 'first_lon') <- 'none'
+      attr(lon, 'last_lon') <- 'none'
     } else {
       lon <- longitudes
       attr(lon, 'cdo_grid_name') <- if (is.null(grid)) 'none' else grid
+      attr(lon, 'data_across_gw') <- data_across_gw
+      attr(lon, 'array_across_gw') <- array_across_gw
+      attr(lon, 'first_lon') <- lon[which.min(abs(lon - lonmin))]
+      attr(lon, 'last_lon') <- lon[which.min(abs(lon - lonmax))]
     }
     attr(lon, 'projection') <- 'none'
 
     dates <- list()
-    dates[['start']] <- NULL
-    dates[['end']] <- NULL
+    ## we must put a start and end time for each prediction c(start date, forecast time)
+    if (storefreq == 'minutely') {
+      store_period <- 'min'
+    } else if (storefreq == 'hourly') {
+      store_period <- 'hour'
+    } else if (storefreq == 'daily') {
+      store_period <- 'day'
+    } else if (storefreq == 'monthly') {
+      store_period <- 'month'
+    }
 
+    addTime <- function(date, period, n = 1) {
+      seq(date, by = paste(n, period), length = 2)[2]
+    }
+
+    # We build dates, a list with components start and end.
+    # Start is a list with as many components as start dates.
+    # Each component is a vector of the initial POSIXct date of each
+    # forecast time step
+    dates[["start"]] <- do.call(c, lapply(sdates,
+      function(x) {
+        do.call(c, lapply((0:(number_ftime - 1)) * sampleperiod,
+          function(y) {
+            addTime(as.POSIXct(x, format = "%Y%m%d"), store_period, y + leadtimemin - 1)
+          }))
+      }))
+    # end is similar to start, but contains the end dates of each forecast 
+    # time step
+    dates[["end"]] <- do.call(c, lapply(dates[["start"]],
+      function(x) {
+        do.call(c, lapply(x,
+          function(y) {
+            addTime(y, store_period)
+          }))
+      }))
+
+    tags_to_find <- c('START_DATE', 'MEMBER_NUMBER', 'YEAR', 'MONTH', 'DAY')
+    position_of_tags <- na.omit(match(tags_to_find, names(replace_values)))
+    if (length(position_of_tags) > 0) {
+      replace_values <- replace_values[-position_of_tags]
+    }
     models <- NULL
     if (length(exp) > 0 && !is.null(dim_exp)) {
       models <- list()
       for (jmod in 1:length(exp)) {
-        models[[exp[[jmod]][['name']]]] <- list(
-          members = paste0('Member_', 1:nmember[jmod]),
-          source = if ((nchar(exp[[jmod]][['path']]) - 
-                        nchar(gsub("/", "", exp[[jmod]][['path']])) > 2) &&
-                       (length(sdates) > 1 && !is_file_per_member_exp[jmod])) {
-                     parts <- strsplit(exp[[jmod]][['path']], '/')[[1]]
-                     paste(parts[-length(parts)], sep = '', collapse = '/')
-                   } else {
-                     exp[[jmod]][['path']]
-                   })
+        member_names <- paste0("Member_", 1:nmember[jmod])
+        models[[exp[[jmod]][["name"]]]] <- list(
+          InitializationDates = lapply(member_names,
+            function(x) {
+              do.call(c, lapply(sdates, function(y) {
+                as.POSIXct(y, format = "%Y%m%d")
+              }))
+            }),
+          Members = member_names)
+        names(models[[exp[[jmod]][["name"]]]]$InitializationDates) <- member_names
+        attr(models[[exp[[jmod]][["name"]]]], 'dataset') <- exp[[jmod]][["name"]]
+        attr(models[[exp[[jmod]][["name"]]]], 'source') <- {
+          quasi_final_path <- .ConfigReplaceVariablesInString(exp[[jmod]][['path']],
+                                replace_values, TRUE)
+          if ((nchar(quasi_final_path) -
+              nchar(gsub("/", "", quasi_final_path)) > 2) &&
+              (length(sdates) > 1 && !is_file_per_member_exp[jmod])) {
+            parts <- strsplit(quasi_final_path, "/")[[1]]
+            paste(parts[-length(parts)], sep = "", collapse = "/")
+          } else {
+            quasi_final_path
+          }
+        }
+        attr(models[[exp[[jmod]][["name"]]]], 'URL') <- 'none'
       }
     }
 
@@ -1193,22 +1430,33 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     if (length(obs) > 0 && !is.null(dim_obs)) {
       observations <- list()
       for (jobs in 1:length(obs)) {
-        observations[[obs[[jobs]][['name']]]] <- list(
-          members = paste0('Member_', 1:nmemberobs[jobs]),
-          source = if ((nchar(obs[[jobs]][['path']]) - 
-                        nchar(gsub("/", "", obs[[jobs]][['path']])) > 2) &&
-                       !is_file_per_dataset_obs[jobs]) {
-                     parts <- strsplit(obs[[jobs]][['path']], '/')[[1]]
-                     paste(parts[-length(parts)], sep = '', collapse = '/')
-                   } else {
-                     obs[[jobs]][['path']]
-                   })
+        member_names <- paste0("Member_", 1:nmemberobs[jobs])
+        observations[[obs[[jobs]][["name"]]]] <- list(
+          InitializationDates = lapply(member_names,
+            function(x) {
+              do.call(c, lapply(sdates, function(y) {
+                as.POSIXct(y, format = "%Y%m%d")
+              }))
+            }),
+          Members = member_names)
+        names(observations[[obs[[jobs]][["name"]]]]$InitializationDates) <- member_names
+        attr(observations[[obs[[jobs]][["name"]]]], 'dataset') <- obs[[jobs]][["name"]]
+        attr(observations[[obs[[jobs]][["name"]]]], 'source') <- {
+            quasi_final_path <- .ConfigReplaceVariablesInString(obs[[jobs]][['path']],
+                                  replace_values, TRUE)
+            if ((nchar(quasi_final_path) -
+                nchar(gsub("/", "", quasi_final_path)) > 2) &&
+                !is_file_per_dataset_obs[jobs]) {
+              parts <- strsplit(quasi_final_path, "/")[[1]]
+              paste(parts[-length(parts)], sep = "", collapse = "/")
+            } else {
+              quasi_final_path
+            }
+          }
+        attr(observations[[obs[[jobs]][["name"]]]], 'URL') <- 'none'
       }
     }
 
-    # Before ending, the data is arranged in the common format, with the following
-    # dimension order:
-    #  nmod/nobs, members, startdates, leadtimes, latitudes, longitudes
     invisible(list(mod = mod_data,
                    obs = obs_data,
                    lon = lon,
@@ -1216,13 +1464,6 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                    Variable = variable,
                    Datasets = list(exp = models, obs = observations),
                    Dates = dates,
-                   InitializationDates = lapply(sdates, 
-                     function (x) {
-                       sink('/dev/null')
-                       date <- print(as.POSIXct(as.Date(x, format = '%Y%m%d')))
-                       sink()
-                       date
-                     }),
                    when = Sys.time(),
                    source_files = source_files,
                    not_found_files = not_found_files,

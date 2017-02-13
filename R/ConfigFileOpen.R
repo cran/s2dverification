@@ -1,6 +1,6 @@
 ConfigFileOpen <- function(file_path, silent = FALSE, stop = FALSE) {
   if (!silent) {
-    cat(paste("* Reading configuration file:", file_path, "\n"))
+    .message(paste("Reading configuration file:", file_path))
   }
   # Read the data from the configuration file.
   ## Remove comments, tabulations, spaces, empty lines, ...
@@ -51,11 +51,11 @@ ConfigFileOpen <- function(file_path, silent = FALSE, stop = FALSE) {
                              "DEFAULT_OBS_FILE_PATH", "DEFAULT_DIM_NAME_LONGITUDES",
                              "DEFAULT_DIM_NAME_LATITUDES", "DEFAULT_DIM_NAME_MEMBERS")
   if (any(!(mandatory_definitions %in% names(definitions)))) {
-    cat("* WARNING: Some of the mandatory variables below are not defined in the configuration file. You can add them with ConfigFileOpen(), ConfigEditDefinition() and ConfigFileSave() or by editing the configuration file by hand, as specified in ?ConfigFileOpen.")
+    .warning("Some of the mandatory variables below are not defined in the configuration file. You can add them with ConfigFileOpen(), ConfigEditDefinition() and ConfigFileSave() or by editing the configuration file by hand, as specified in ?ConfigFileOpen.")
     if (stop) {
       stop(paste(mandatory_definitions, collapse = ', '))
     } else {
-      cat(paste(mandatory_definitions, collapse = ', '))
+      .warning(paste(mandatory_definitions, collapse = ', '))
     }
   }
 
@@ -131,7 +131,7 @@ ConfigFileOpen <- function(file_path, silent = FALSE, stop = FALSE) {
   }
   
   if (!silent) {
-    cat("* Config file read successfully.\n")
+    .message("Config file read successfully.")
   }
 
   invisible(list(definitions = definitions, 

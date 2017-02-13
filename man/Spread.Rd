@@ -5,10 +5,10 @@ Computes InterQuartile Range, Maximum-Minimum, Standard Deviation and Median Abs
 }
 \description{
 Computes the InterQuartile Range, the Maximum minus Mininum, the Standard Deviation and the Median Absolute Deviation along the list of dimensions provided by the posdim argument (typically along the ensemble member and start date dimension).\cr
-The confidence interval is computed by bootstrapping.
+The confidence interval is optionally computed by bootstrapping.
 }
 \usage{
-Spread(var, posdim = 2, narm = TRUE)
+Spread(var, posdim = 2, narm = TRUE, siglev = 0.95, conf = TRUE)
 }
 \arguments{
   \item{var}{
@@ -20,6 +20,12 @@ List of dimensions along which to compute IQR/MaxMin/SD/MAD.
   \item{narm}{
 TRUE/FALSE if NA removed/kept for computation. Default = TRUE.
   }
+  \item{siglev}{
+Confidence level of the computed confidence interval. 0.95 by default.
+  }
+  \item{conf}{
+Whether to compute the confidence intervals or not. TRUE by default.
+  }
 }
 \details{
 Example:
@@ -28,7 +34,7 @@ To compute IQR, Max-Min, SD & MAD accross the members and start dates of var out
   spread(var, posdim = c(2, 3), narm = TRUE)
 }
 \value{
-Matrix with the same dimensions as var except along the first posdim dimension which is replaced by a length 3 dimension, corresponding to the lower limit of the 95\% confidence interval, the spread and the upper limit of the 95\% confidence interval for each experiment/leadtime/latitude/longitude.
+Matrix with the same dimensions as var except along the first posdim dimension which is replaced by a length 1 or 3 dimension, corresponding to the lower limit of the \code{siglev}\% confidence interval (only present if \code{conf = TRUE}), the spread, and the upper limit of the \code{siglev}\% confidence interval (only present if \code{conf = TRUE}) for each experiment/leadtime/latitude/longitude.
   \item{$iqr}{
 InterQuartile Range.
   }

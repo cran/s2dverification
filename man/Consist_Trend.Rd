@@ -4,9 +4,9 @@
 Computes Trends Using Only Model Data For Which Observations Are Available
 }
 \description{
-Computes trends by least square fitting together with the associated error interval for both the observational and model data.\cr
+Computes the trend coefficients for a time series by least square fitting, together with the associated error interval for both the observational and model data.\cr
 Provides also the detrended observational and modeled data.\cr
-The trend is computed along the second dimension, expected to be the start date dimension (the user is supposed to perform an ensemble averaging operation with \code{Mean1Dim()} prior to using \code{Consist_trend()}).
+By default, the trend is computed along the second dimension of the input array, which is expected to be the start date dimension. For arrays containing multiple model members, the user will first have to calculate the ensemble average using \code{Mean1Dim()} or elsewhise (see the example).
 }
 \usage{
 Consist_Trend(var_exp, var_obs, interval = 1)
@@ -29,7 +29,7 @@ Number of months/years between 2 start dates. Default = 1. The trends will be pr
 }
 \value{
   \item{$trend}{
-Trends of model and observational data with dimensions:\cr
+Trend coefficients of model and observational data with dimensions:\cr
   c(nmod/nexp + nobs, 3, nltime) up to\cr
   c(nmod/nexp + nobs, 3, nltime, nlevel, nlat, nlon)\cr
 The length 3 dimension corresponds to the lower limit of the 95\% confidence interval, the slope of the trends and the upper limit of the 95\% confidence interval.

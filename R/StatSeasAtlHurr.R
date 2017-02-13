@@ -1,0 +1,79 @@
+StatSeasAtlHurr <- function(atlano = NULL, tropano = NULL, hrvar = "HR") {
+  # Verify that variables are either TC, HR or PDI.
+  # -----------------------------------------------
+  if (hrvar != "HR" && hrvar != "TC" && hrvar != "PDI") {
+    stop("Hurricane variable not recognized.")
+  }
+  # Verify that both Atl and Trop SSTA are present.
+  # -----------------------------------------------
+  if (is.null(atlano)) {
+    stop("Atlantic SST missing.")
+  }
+  if (is.null(tropano)) {
+    stop("Tropical SST missing.")
+  }
+  # Verify that Atl and Trop SSTA are of the same dimensions.
+  # ---------------------------------------------------------
+  if (length(dim(atlano)) != length(dim(tropano))) {
+    stop("Input arrays are of different dimensions.")
+  } else {
+    for (i in 1:length(dim(atlano))) {
+      if (dim(atlano)[i] != dim(tropano)[i]) {
+        stop("Input arrays are of different sizes.")
+      }
+    }
+  }
+  # Get the values of the betas according to the hurricane
+  # activity measure we specified.
+  # ------------------------------------------------------
+  if (hrvar == "HR") {
+    # beta's are derived from Villarini et al. (2012), Mon Wea
+    # Rev, 140, 44-65.  beta's are for corrected hurricane data +
+    # ERSST with SBC criteria (table 2)
+    beta0 <- 1.85
+    betaAtl <- 1.05
+    betaTrop <- -1.17
+  } else if (hrvar == "TC") {
+    # beta's are from Villarini et al. (2010), Mon Wea Rev, 138,
+    # 2681-2705.  beta's are for corrected TC data (lifetime >=
+    # 48h) + ERSST (table 5)
+    beta0 <- 2.1
+    betaAtl <- 1.02
+    betaTrop <- -1.05
+  } else if (hrvar == "PDI") {
+    # beta's are from Villarini et al. (2012), J Clim, 25,
+    # 625-637.  beta's are from ERSST, with SBC penalty criterion
+    # (table 1)
+    beta0 <- 0.76
+    betaAtl <- 1.94
+    betaTrop <- -1.78
+  }
+  # Create matrix of similar dimension as atlano for beta0.
+  # -------------------------------------------------------
+  intercept <- array(beta0, dim(atlano))
+  # Compute statistical relationship b/w SSTAs and mean
+  # hurricane activity.
+  # ---------------------------------------------------
+  atl <- betaAtl * atlano
+  trop <- betaTrop * tropano
+  # 
+  temp <- intercept + atl + trop
+  # 
+  statval <- list(mean = array(NA, dim(atl)), var = array(NA, dim(atl)))
+  statval$mean[] <- vapply(X = temp, FUN = exp, numeric(1))
+  # Compute the variance of the distribution.  TC and HR follow
+  # a Poisson distribution, so the variance is equal to the
+  # mean.  PDI follows a gamma distribution, with sigma =
+  # -0.57.  (variance = sigma^2 * mean^2).
+  # -----------------------------------------------------------
+  if (hrvar == "HR" && hrvar == "TC") {
+    statval$var <- statval$mean
+  } else {
+    sigma <- -0.57
+    statval$var[] <- sigma^2 * vapply(X = statval$mean, FUN = function(x) x^2, 
+      numeric(1))
+  }
+  #  Output 
+  # ~~~~~~~~
+  statval
+} 

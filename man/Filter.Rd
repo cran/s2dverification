@@ -2,9 +2,9 @@
 \alias{Filter}
 \title{Filter Frequency Peaks From An Array}
 \description{
-This function filters from the xdata array, the signal of frequency freq.\cr 
-The filtering is performed by dichotomy, seeking for the frequency around freq and the phase that maximizes the signal to subtract to xdata.\cr
-The maximization of the signal to subtract relies on a minimization of the mean square differences between xdata and a cosine of given frequency and phase.
+This function filters out the selected frequency from a time series.\cr 
+The filtering is performed by dichotomy, seeking for a frequency around the parameter \code{freq} and the phase that maximizes the signal to subtract from the time series.\cr
+The maximization of the signal to subtract relies on a minimization of the mean square differences between the time series (xdata) and the cosine of the specified frequency and phase.
 }
 \usage{
 Filter(xdata, freq)

@@ -1,8 +1,14 @@
 \name{Clim}
 \alias{Clim}
-\title{Computes Per-pair/Kharin/Fuckar Climatologies}
+\title{Computes Bias Corrected Climatologies}
 \description{
-This function computes climatologies from the experimental and observational matrices output from \code{Load()} using one of the following methods:
+This function computes only per-pair climatologies from the experimental and observational matrices output from \code{Load()}.
+To compute plain climatologies from only experimental or observational data from \code{Load()}, the following code can be used:\cr
+  \code{
+clim <- array(apply(obs_data, c(1, 4, 5, 6), mean), 
+              dim = dim(obs_datta)[-c(2, 3)])
+  }
+The function \code{Clim()} computes per-pair climatologies using one of the following methods:
   \itemize{
     \item{
 1) per-pair method (Garcia-Serrano and Doblas-Reyes, CD, 2012)
@@ -14,7 +20,7 @@ This function computes climatologies from the experimental and observational mat
 3) Fuckar method (Fuckar et al, GRL, 2014)
     }
   }
-Clim function computes climatologies using the startdates covered by the whole experiments/observational data sets. The startdates not available for all the data (model and obs) are excluded when computing the climatologies.
+\code{Clim()} computes climatologies using the startdates covered by the whole experiments/observational data sets. The startdates not available for all the data (model and obs) are excluded when computing the climatologies.
 }
 \usage{
 Clim(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE)

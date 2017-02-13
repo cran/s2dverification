@@ -2,7 +2,7 @@
 \alias{Spectrum}
 \title{Estimates Frequency Spectrum}
 \description{
-This function estimates the frequency spectrum of the xdata array together with its 95\% and 99\% significance level. The output is provided as a matrix with dimensions c(number of frequencies, 4). The column contains the frequency values, the power, the 95\% significance level and the 99\% one.\cr
+This function estimates the frequency spectrum of the xdata array together with its 95\% and 99\% significance level. The output is provided as an array with dimensions c(number of frequencies, 4). The column contains the frequency values, the power, the 95\% significance level and the 99\% one.\cr
 The spectrum estimation relies on a R built-in function and the significance levels are estimated by a Monte-Carlo method.
 }
 \usage{Spectrum(xdata)}

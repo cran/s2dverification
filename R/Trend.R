@@ -1,4 +1,4 @@
-Trend <- function(var, posTR = 2, interval = 1) {
+Trend <- function(var, posTR = 2, interval = 1, siglev = 0.95, conf = TRUE) {
   # 
   #  Enlarge the size of var to 10 and move posTR to first position 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9,7 +9,16 @@ Trend <- function(var, posTR = 2, interval = 1) {
   }
   enlvar <- Enlarge(var, 10)
   outdim <- c(dimsvar, array(1, dim = (10 - length(dimsvar))))
-  outdim[posTR] <- 4
+  if (conf) {
+    nvals <- 4
+    poscoef2 <- 2
+    poscoef1 <- 4
+  } else {
+    nvals <- 2
+    poscoef2 <- 1
+    poscoef1 <- 2
+  }
+  outdim[posTR] <- nvals
   posaperm <- 1:10
   posaperm[posTR] <- 1
   posaperm[1] <- posTR
@@ -31,19 +40,19 @@ Trend <- function(var, posTR = 2, interval = 1) {
                 for (j9 in 1:dimsaperm[9]) {
                   for (j10 in 1:dimsaperm[10]) {
                     tmp <- enlvar[, j2, j3, j4, j5, j6, j7, j8, j9, j10]
-                    if (length(sort(tmp)) > 0) {
+                    if (any(!is.na(tmp))) {
                       mon <- seq(tmp) * interval
                       lm.out <- lm(tmp ~ mon, na.action = na.omit)
-                      enltrend[1, j2, j3, j4, j5, j6, j7, j8, j9, 
-                               j10] <- confint(lm.out)[2, 1]
-                      enltrend[2, j2, j3, j4, j5, j6, j7, j8, j9, 
+                      enltrend[poscoef2, j2, j3, j4, j5, j6, j7, j8, j9, 
                                j10] <- lm.out$coefficients[2]
-                      enltrend[3, j2, j3, j4, j5, j6, j7, j8, j9, 
-                               j10] <- confint(lm.out)[2, 2]
-                      enltrend[4, j2, j3, j4, j5, j6, j7, j8, j9, 
+                      enltrend[poscoef1, j2, j3, j4, j5, j6, j7, j8, j9, 
                                j10] <- lm.out$coefficients[1]
+                      if (conf) {
+                        enltrend[c(1, 3), j2, j3, j4, j5, j6, j7, j8, j9, 
+                                 j10] <- confint(lm.out, level = siglev)[2, 1:2]
+                      }
                       enldetrend[is.na(tmp) == FALSE, j2, j3, j4, j5, j6, j7, j8, 
-                        j9, j10] <- tmp[is.na(tmp) == FALSE] - lm.out$fitted.values
+                                 j9, j10] <- tmp[is.na(tmp) == FALSE] - lm.out$fitted.values
                     }
                   } 
                 }
@@ -57,15 +66,36 @@ Trend <- function(var, posTR = 2, interval = 1) {
   # 
   #  Back to the original dimensions
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # 
-  detrended <- array(dim = dimsvar)
-  dimsvar[posTR] <- 4
-  trend <- array(dim = dimsvar)
-  trend[] <- aperm(enltrend, posaperm)
-  detrended[] <- aperm(enldetrend, posaperm)
+  #
+  enldetrend <- aperm(enldetrend, posaperm)
+  dim(enldetrend) <- dimsvar 
+  enltrend <- aperm(enltrend, posaperm)
+  dimsvar[posTR] <- nvals
+  dim(enltrend) <- dimsvar
   # 
   #  Outputs
   # ~~~~~~~~~
   # 
-  invisible(list(trend = trend, detrended = detrended))
+  invisible(list(trend = enltrend, detrended = enldetrend))
+}
+
+.Trend <- function(exp, interval = 1, siglev = 0.95, conf = TRUE) {
+  
+  ensmean <- rowMeans(exp, na.rm = TRUE)
+  
+  if (any(!is.na(ensmean))) {
+    mon <- seq(ensmean) * interval
+    lm.out <- lm(ensmean ~ mon, na.action = na.omit)
+    trend <- c(lm.out$coefficients[2], lm.out$coefficients[1])
+    if (conf) {
+      conf.int <- confint(lm.out, level = siglev)[2, 1:2]
+    }
+    detrend <- ensmean[is.na(ensmean) == FALSE] - lm.out$fitted.values
+  }  
+                 
+  # 
+  #  Outputs
+  # ~~~~~~~~~
+  # 
+  invisible(list(trend = trend, conf.int = conf.int, detrended = detrend))
 }

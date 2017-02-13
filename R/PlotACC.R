@@ -1,7 +1,22 @@
 PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "", 
                     limits = NULL, legends = NULL, freq = 12, biglab = FALSE, 
                     fill = FALSE, linezero = FALSE, points = TRUE, vlines = NULL, 
-                    fileout = "output_PlotACC.eps") {
+                    fileout = "output_PlotACC.eps", 
+                    width = 8, height = 5, size_units = 'in', res = 100, ...) {
+  # Process the user graphical parameters that may be passed in the call
+  ## Graphical parameters to exclude
+  excludedArgs <- c("cex", "cex.axis", "cex.lab", "cex.main", "col", "lab", "las", "lty", "lwd", "mai", "mgp", "new", "pch", "pin", "ps", "pty")
+  userArgs <- .FilterUserGraphicArgs(excludedArgs, ...)
+
+  # If there is any filenames to store the graphics, process them
+  # to select the right device 
+  if (!is.null(fileout)) {
+    deviceInfo <- .SelectDevice(fileout = fileout, width = width, height = height, units = size_units, res = res)
+    saveToFile <- deviceInfo$fun
+    fileout <- deviceInfo$files
+  }
+
+  #
   if (length(dim(ACC)) != 5 | dim(ACC)[5] != 4) {
     stop("5 dim needed : c(nexp, nobs, nsdates, nltime, 4)")
   }
@@ -35,7 +50,17 @@ PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "",
   colorblock <- c("red1", "dodgerblue1", "lightgoldenrod1", "deeppink1", 
                   "mediumpurple1", "green1", "orange1", "lightblue1", 
                   "mediumorchid1", "olivedrab1")
-  postscript(fileout, width = 550, height = 300)
+
+  # Open connection to graphical device
+  if (!is.null(fileout)) {
+    saveToFile(fileout)
+  } else if (names(dev.cur()) == 'null device') {
+    dev.new(units = size_units, res = res, width = width, height = height)
+  }
+
+  # Load the user parameters
+  par(userArgs)
+
   if (biglab) {
     par(mai = c(1, 1.1, 0.5, 0), mgp = c(2.8, 0.9, 0))
     par(cex = 1.3, cex.lab = 2, cex.axis = 1.8)
@@ -126,5 +151,7 @@ PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "",
              col = color[1:(nobs * nexp)], cex = legsize)
     }
   }
-  dev.off()
+
+  # If the graphic was saved to file, close the connection with the device
+  if(!is.null(fileout)) dev.off()
 }

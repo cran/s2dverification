@@ -1,5 +1,6 @@
 ACC <- function(var_exp, var_obs, lon = NULL, lat = NULL,
-                lonlatbox = NULL, conf = TRUE, conftype = "parametric") {
+                lonlatbox = NULL, conf = TRUE, conftype = "parametric",
+                siglev = 0.95) {
   #library(abind)
 
   # Security checks and getting dimensions
@@ -126,18 +127,18 @@ ACC <- function(var_exp, var_obs, lon = NULL, lat = NULL,
         
           eno <- Mean1Dim( Eno(tmp2, 4), 1)
           t <- apply(eno, c(1, 2), 
-                   function(x) qt(0.95, x - 2))
+                   function(x) qt(siglev, x - 2))
           enot <- abind(eno, t, along = 3)
 
           ACC[iexp, iobs, , , 4] <- apply(enot, c(1, 2), function(x)
-                 sqrt((x[2] * x[2]) / ((x[2] * x[2]) + x[1] - 2)) )
+                 sqrt((x[2] * x[2]) / ((x[2] * x[2]) + x[1] - 2)))
         
           correno <- abind(ACCaux, eno, along = 3)
         
           ACC[iexp, iobs, , , 1] <- apply(correno, c(1, 2), function(x)
-                  tanh(atanh(x[1]) + qnorm(0.975) / sqrt(x[2] - 3)) )
+                  tanh(atanh(x[1]) + qnorm(1 - (1 - siglev) / 2) / sqrt(x[2] - 3)))
           ACC[iexp, iobs, , , 3] <- apply(correno, c(1, 2), function(x)
-                  tanh(atanh(x[1]) + qnorm(0.025) / sqrt(x[2] - 3)) )
+                  tanh(atanh(x[1]) + qnorm((1 - siglev) / 2) / sqrt(x[2] - 3)))
         }
       } else {
         ACC[iexp, iobs, , ] <- ACCaux
@@ -207,15 +208,15 @@ ACC <- function(var_exp, var_obs, lon = NULL, lat = NULL,
 
     #calculate the confidence interval
     ACC[ , , , , 3] <- apply(ACC_draw, c(1, 2, 3, 4), function(x)
-                                       quantile(x, 0.975, na.rm = TRUE))  
+                                       quantile(x, 1 - (1 - siglev) / 2, na.rm = TRUE))  
     ACC[ , , , , 1] <- apply(ACC_draw, c(1, 2, 3, 4), function(x)
-                                       quantile(x, 0.025, na.rm = TRUE))  
+                                       quantile(x, (1 - siglev) / 2, na.rm = TRUE))  
 
     MACC <- InsertDim(MACC, 4, 3)
     MACC[ , , , 3] <- apply(MACC_draw, c(1, 2, 3), function(x)
-                                       quantile(x, 0.975, na.rm = TRUE))  
+                                       quantile(x, 1 - (1 - siglev) / 2, na.rm = TRUE))  
     MACC[ , , , 1] <- apply(MACC_draw, c(1, 2, 3), function(x)
-                                       quantile(x, 0.025, na.rm = TRUE))  
+                                       quantile(x, (1 - siglev) / 2, na.rm = TRUE))  
   }
 
   invisible(list(ACC = ACC, MACC = MACC))

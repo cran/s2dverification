@@ -107,7 +107,7 @@ Load(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
      maskmod = vector("list", 15), maskobs = vector("list", 15), 
      configfile = NULL, varmin = NULL, varmax = NULL, 
      silent = FALSE, nprocs = NULL, dimnames = NULL, 
-     remapcells = 2)
+     remapcells = 2, path_glob_permissive = 'partial')
 }
 \arguments{
   \item{var}{
@@ -336,6 +336,18 @@ The result of this interpolation can vary if the values surrounding the spatial 
 A value beyond the limits in the data files will be automatically runcated to the actual limit.\cr
 The default value is 2. 
   }
+  \item{path_glob_permissive}{
+In some cases, when specifying a path pattern (either in the parameters 'exp'/'obs' or in a configuration file) one can specify path patterns that contain shell globbing expressions. Too much freedom in putting globbing expressions in the path patterns can be dangerous and make \code{Load()} find a file in the file system for a start date for a dataset that really does not belong to that dataset. For example, if the file system contains two directories for two different experiments that share a part of their path and the path pattern contains globbing expressions:
+  /experiments/model1/expA/monthly_mean/tos/tos_19901101.nc
+  /experiments/model2/expA/monthly_mean/tos/tos_19951101.nc
+And the path pattern is used as in the example right below to load data of only the experiment 'expA' of the model 'model1' for the starting dates '19901101' and '19951101', \code{Load()} will undesiredly yield data for both starting dates, even if in fact there is data only for the first one:\cr
+    \code{
+expA <- list(path = file.path('/experiments/*/expA/monthly_mean/$VAR_NAME$',
+                              '$VAR_NAME$_$START_DATE$.nc')
+data <- Load('tos', list(expA), NULL, c('19901101', '19951101'))
+    }
+To avoid these situations, the parameter \code{path_glob_permissive} is set by default to \code{'partial'}, which forces \code{Load()} to replace all the globbing expressions of a path pattern of a data set by fixed values taken from the path of the first found file for each data set, up to the folder right before the final files (globbing expressions in the file name will not be replaced, only those in the path to the file). Replacement of globbing expressions in the file name can also be triggered by setting \code{path_glob_permissive} to \code{FALSE} or \code{'no'}. If needed to keep all globbing expressions, \code{path_glob_permissive} can be set to \code{TRUE} or \code{'yes'}.
+  }
 }
 \details{
 The two output matrices have between 2 and 6 dimensions:\cr
@@ -355,12 +367,15 @@ For a detailed explanation of the process, read the documentation attached to th
 \code{Load()} returns a named list following a structure similar to the used in the package 'downscaleR'.\cr
 The components are the following:
   \itemize{
-    \item{'mod' is the array that contains the experimental data. It has the attribute 'dimensions' associated to a vector of strings with the labels of each dimension of the array, in order.}
-    \item{'obs' is the array that contains the observational data. It has the attribute 'dimensions' associated to a vector of strings with the labels of each dimension of the array, in order.}
-    \item{'obs' is the array that contains the observational data.}
-    \item{'lat' and 'lon' are the latitudes and longitudes of the grid into which the data is interpolated (0 if the loaded variable is a global mean or the output is an area average).\cr
+    \item{
+'mod' is the array that contains the experimental data. It has the attribute 'dimensions' associated to a vector of strings with the labels of each dimension of the array, in order. The order of the latitudes is always forced to be from 90 to -90 whereas the order of the longitudes is kept as in the original files (if possible). The longitude values provided in \code{lon} lower than 0 are added 360 (but still kept in the original order). In some cases, however, if multiple data sets are loaded in longitude-latitude mode, the longitudes (and also the data arrays in \code{mod} and \code{obs}) are re-ordered afterwards by \code{Load()} to range from 0 to 360; a warning is given in such cases. The longitude and latitude of the center of the grid cell that corresponds to the value [j, i] in 'mod' (along the dimensions latitude and longitude, respectively) can be found in the outputs \code{lon}[i] and \code{lat}[j]
+    }
+    \item{'obs' is the array that contains the observational data. The same documentation of parameter 'mod' applies to this parameter.}
+    \item{'lat' and 'lon' are the latitudes and longitudes of the centers of the cells of the grid the data is interpolated into (0 if the loaded variable is a global mean or the output is an area average).\cr
 Both have the attribute 'cdo_grid_des' associated with a character string with the name of the common grid of the data, following the CDO naming conventions for grids.\cr
-The attribute 'projection' is kept for compatibility with 'downscaleR'.}    
+'lon' has the attributes 'first_lon' and 'last_lon', with the first and last longitude values found in the region defined by 'lonmin' and 'lonmax'. 'lat' has also the equivalent attributes 'first_lat' and 'last_lat'.\cr
+'lon' has also the attribute 'data_across_gw' which tells whether the requested region via 'lonmin', 'lonmax', 'latmin', 'latmax' goes across the Greenwich meridian. As explained in the documentation of the parameter 'mod', the loaded data array is kept in the same order as in the original files when possible: this means that, in some cases, even if the data goes across the Greenwich, the data array may not go across the Greenwich. The attribute 'array_across_gw' tells whether the array actually goes across the Greenwich. E.g: The longitudes in the data files are defined to be from 0 to 360. The requested longitudes are from -80 to 40. The original order is kept, hence the longitudes in the array will be ordered as follows: 0, ..., 40, 280, ..., 360. In that case, 'data_across_gw' will be TRUE and 'array_across_gw' will be FALSE.\cr
+The attribute 'projection' is kept for compatibility with 'downscaleR'.}
     \item{'Variable' has the following components:
       \itemize{
         \item{'varName', with the short name of the loaded variable as specified in the parameter 'var'.}
@@ -399,10 +414,10 @@ And the following attributes:
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN\cr
-1.2  -  2015-02  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Generalisation + parallelisation\cr
-1.3  -  2015-07  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Improvements related to configuration file mechanism\cr
+0.1  -  2011-03  (V. Guemas, \email{virginie.guemas at bsc.es})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Formatting to CRAN\cr
+1.2  -  2015-02  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Generalisation + parallelisation\cr
+1.3  -  2015-07  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Improvements related to configuration file mechanism\cr
 1.4  -  2016-01  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Added subsetting capabilities\cr
 }
 \examples{
@@ -475,15 +490,33 @@ History:\cr
 # The observational dataset used for verification is the 'ERSST' 
 # observational dataset.
 #
-# The configuration file 'sample.conf' that we will create in the example 
-# has the proper entries to load these (see ?LoadConfigFile for details on 
-# writing a configuration file). 
-#
 # The code is not run because it dispatches system calls to 'cdo' and 'nco'
 # which is not allowed as per CRAN policies. You can run it in your system 
 # though. Instead, the code in 'dontshow' is run, which loads the equivalent
 # data already processed in R.
+#
+# Example 1: providing lists in 'exp' and 'obs'.
   \dontrun{
+data_path <- system.file('sample_data', package = 's2dverification')
+expA <- list(name = 'experiment', path = file.path(data_path, 
+             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+             '$VAR_NAME$_$START_DATE$.nc'))
+obsX <- list(name = 'observation', path = file.path(data_path,
+             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+
+# Now we are ready to use Load().
+startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+sampleData <- Load('tos', list(expA), list(obsX), startDates,
+                   output = 'areave', latmin = 27, latmax = 48, 
+                   lonmin = -12, lonmax = 40)
+#
+# Example 2: providing character strings in 'exp' and 'obs', and providing
+# a configuration file.
+# The configuration file 'sample.conf' that we will create in the example 
+# has the proper entries to load these (see ?LoadConfigFile for details on 
+# writing a configuration file). 
+#
 configfile <- paste0(tempdir(), '/sample.conf')
 ConfigFileCreate(configfile, confirm = FALSE)
 c <- ConfigFileOpen(configfile)

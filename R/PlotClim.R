@@ -1,8 +1,22 @@
 PlotClim <- function(exp_clim, obs_clim = NULL, toptitle = '', ytitle = '', 
                      monini = 1, freq = 12, limits = NULL, 
                      listexp = c('exp1', 'exp2', 'exp3'), 
-                     listobs = c('obs1', 'obs2', 'obs3'), biglab = FALSE, leg = TRUE, 
-                     fileout = 'output_plotclim.eps', sizetit = 1) {
+                     listobs = c('obs1', 'obs2', 'obs3'), biglab = FALSE, 
+                     leg = TRUE, sizetit = 1, fileout = 'output_plotclim.eps',
+                     width = 8, height = 5, size_units = 'in', res = 100, ...) {
+  # Process the user graphical parameters that may be passed in the call
+  ## Graphical parameters to exclude
+  excludedArgs <- c("cex", "cex.axis", "cex.lab", "cex.main", "col", "fin", "lab", "las", "lty", "lwd", "mai", "mgp", "new", "pin", "ps", "pty", "tcl")
+  userArgs <- .FilterUserGraphicArgs(excludedArgs, ...)
+
+  # If there is any filenames to store the graphics, process them
+  # to select the right device 
+  if (!is.null(fileout)) {
+    deviceInfo <- .SelectDevice(fileout = fileout, width = width, height = height, units = size_units, res = res)
+    saveToFile <- deviceInfo$fun
+    fileout <- deviceInfo$files
+  }
+
   #
   #  Get some arguments
   # ~~~~~~~~~~~~~~~~~~~~
@@ -74,7 +88,17 @@ PlotClim <- function(exp_clim, obs_clim = NULL, toptitle = '', ytitle = '',
   #  Define plot layout
   # ~~~~~~~~~~~~~~~~~~~~
   # 
-  postscript(fileout, width = 550, height = 300)
+
+  # Open connection to graphical device
+  if (!is.null(fileout)) {
+    saveToFile(fileout)
+  } else if (names(dev.cur()) == 'null device') {
+    dev.new(units = size_units, res = res, width = width, height = height)
+  }
+
+  # Load the user parameters
+  par(userArgs)
+
   if (biglab) {
     par(mai = c(1.25, 1.4, 0.5, 0), mgp = c(4, 2.5, 0))
     par(cex = 1.3, cex.lab = 2, cex.axis = 1.8)
@@ -124,5 +148,7 @@ PlotClim <- function(exp_clim, obs_clim = NULL, toptitle = '', ytitle = '',
              cex = legsize)
     }
   }
-  dev.off()
+  
+  # If the graphic was saved to file, close the connection with the device
+  if(!is.null(fileout)) dev.off()
 }

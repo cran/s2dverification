@@ -1,10 +1,10 @@
 \name{InsertDim}
 \alias{InsertDim}
 \title{
-Adds A Dimension To A Matrix
+Adds A Dimension To An Array
 }
 \description{
-Add one dimension to the matrix var in position posdim with length lendim and which correspond to lendim repetitions of the var matrix.
+Inserts an extra dimension into an array at position 'posdim' with length 'lendim' and which correspond to 'lendim' repetitions of the 'var' array.
 }
 \usage{
 InsertDim(var, posdim, lendim)
@@ -31,7 +31,8 @@ print(dim(InsertDim(InsertDim(a[, , , ], 2, 1), 4, 1)))
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to R CRAN\cr
+1.1  -  2015-03  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Improvements
 }
 \keyword{datagen}

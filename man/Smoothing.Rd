@@ -1,10 +1,10 @@
 \name{Smoothing}
 \alias{Smoothing}
 \title{
-Smoothes A Matrix Along A Dimension
+Smoothes An Array Along A Dimension
 }
 \description{
-Smoothes a matrix of any number of dimensions up to 10 dimensions along one of its dimensions
+Smoothes an array of any number of dimensions along one of its dimensions
 }
 \usage{
 Smoothing(var, runmeanlen = 12, numdimt = 4)
@@ -41,5 +41,7 @@ PlotAno(smooth_ano_exp, smooth_ano_obs, startDates,
 History:\cr
 0.1  -  2011-03  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
 1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+1.1  -  2015-05  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Adding
+security checks, fixing computation in cases where runmeanlen is odd and making it able to work on arrays of any number of dimensions.
 }
 \keyword{datagen}

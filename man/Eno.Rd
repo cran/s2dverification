@@ -4,8 +4,8 @@
 Computes Effective Sample Size With Classical Method
 }
 \description{
-Computes the effective number of independant data along the posdim dimension of a matrix.\cr
-This effective number of independant date may be required to perform statistical/inference tests.\cr
+Computes the effective number of independent values along the posdim dimension of a matrix.\cr
+This effective number of independent observations can be used in statistical/inference tests.\cr
 Based on eno function from Caio Coelho from rclim.txt.
 }
 \usage{

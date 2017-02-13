@@ -10,9 +10,9 @@ Set of tools to verify forecasts through the computation of typical prediction s
   \tabular{ll}{
 Package: \tab s2dverification\cr
 Type: \tab Package\cr
-Version: \tab 2.5.0\cr
-Date: \tab 2016-01-04\cr
-License: \tab GPLv3\cr
+Version: \tab 2.8.0\cr
+Date: \tab 2017-02-13\cr
+License: \tab LGPLv3\cr
   }
 Check an overview of the package functionalities and its modules at \url{https://earth.bsc.es/gitlab/es/s2dverification/wikis/home}.
 For more information load the package and check the help for each function or the documentation attached to the package.

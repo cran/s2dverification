@@ -2,21 +2,41 @@ PlotVsLTime <- function(var, toptitle = '', ytitle = '', monini = 1, freq = 12,
                nticks = NULL, limits = NULL, 
                listexp = c('exp1', 'exp2', 'exp3'), 
                listobs = c('obs1', 'obs2', 'obs3'), biglab = FALSE, hlines = NULL, 
-               leg = TRUE, siglev = FALSE, fileout = 'output_plotvsltime.eps', 
-               sizetit = 1, show_conf = TRUE) {
+               leg = TRUE, siglev = FALSE, sizetit = 1, show_conf = TRUE,
+               fileout = 'output_plotvsltime.eps', 
+               width = 8, height = 5, size_units = 'in', res = 100, ...) {
+  # Process the user graphical parameters that may be passed in the call
+  ## Graphical parameters to exclude
+  excludedArgs <- c("cex", "cex.axis", "cex.lab", "cex.main", "col", "fin", "lab", "las", "lend", "lty", "lwd", "mai", "mgp", "new", "pin", "ps", "pty")
+  userArgs <- .FilterUserGraphicArgs(excludedArgs, ...)
+
+  # If there is any filenames to store the graphics, process them
+  # to select the right device 
+  if (!is.null(fileout)) {
+    deviceInfo <- .SelectDevice(fileout = fileout, width = width, height = height, units = size_units, res = res)
+    saveToFile <- deviceInfo$fun
+    fileout <- deviceInfo$files
+  }
+
   #
   #  Get some arguments
   # ~~~~~~~~~~~~~~~~~~~~
   #
   if (length(dim(var)) == 3) {
     var <- InsertDim(var, posdim = 2, lendim = 1)
+  } else if (length(dim(var)) != 4) {
+    stop("Parameter 'var' should have 3 or 4 dimensions: c(n. exp[, n. obs], 3/4, n. lead-times)")
   }
   nleadtime <- dim(var)[4]
   nexp <- dim(var)[1]
   nobs <- dim(var)[2]
   if (is.null(limits) == TRUE) {
-    ll <- min(var, na.rm = TRUE)
-    ul <- max(var, na.rm = TRUE)
+	if (all(is.na(var > 0))) {
+      ll <- ul <- 0
+	} else {
+      ll <- min(var, na.rm = TRUE)
+      ul <- max(var, na.rm = TRUE)
+    }
     if (biglab) {
       ul <- ul + 0.4 * (ul - ll)
     } else {
@@ -71,7 +91,17 @@ PlotVsLTime <- function(var, toptitle = '', ytitle = '', monini = 1, freq = 12,
   #  Define plot layout
   # ~~~~~~~~~~~~~~~~~~~~
   #
-  postscript(fileout, width = 550, height = 300)
+
+  # Open connection to graphical device
+  if (!is.null(fileout)) {
+    saveToFile(fileout)
+  } else if (names(dev.cur()) == 'null device') {
+    dev.new(units = size_units, res = res, width = width, height = height)
+  }
+
+  # Load the user parameters
+  par(userArgs)
+  
   if (biglab) {
     par(mai = c(1.25, 1.4, 0.5, 1), mgp = c(4, 2.5, 0))
     par(cex = 1.3, cex.lab = 2, cex.axis = 1.8)
@@ -133,5 +163,7 @@ PlotVsLTime <- function(var, toptitle = '', ytitle = '', monini = 1, freq = 12,
     legend(1, ul, legendnames, lty = legendsty, lwd = legendthick,
            col = legendcol, cex = legsize)
   }
-  dev.off()
+  
+  # If the graphic was saved to file, close the connection with the device
+  if(!is.null(fileout)) dev.off()
 }

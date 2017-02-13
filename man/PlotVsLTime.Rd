@@ -10,8 +10,9 @@ Plots The Correlation (\code{Corr()}) or the Root Mean Square Error (\code{RMS()
 PlotVsLTime(var, toptitle = "", ytitle = "", monini = 1, freq = 12, 
             nticks = NULL, limits = NULL, listexp = c("exp1", "exp2", "exp3"), 
             listobs = c("obs1", "obs2", "obs3"), biglab = FALSE, hlines = NULL,
-            leg = TRUE, siglev = FALSE, fileout = "output_plotvsltime.eps", 
-            sizetit = 1, show_conf = TRUE)
+            leg = TRUE, siglev = FALSE, sizetit = 1, show_conf = TRUE,
+            fileout = "output_plotvsltime.eps", 
+            width = 8, height = 5, size_units = 'in', res = 100, ...)
 }
 \arguments{
   \item{var}{
@@ -57,14 +58,36 @@ TRUE/FALSE if legend should be added or not to the plot. Default = TRUE.
 TRUE/FALSE if significance level should replace confidence interval.\cr
 Default = FALSE.
   }
-  \item{fileout}{
-Name of the output eps file.
-  }
   \item{sizetit}{
 Multiplicative factor to change title size, optional.
   }
   \item{show_conf}{
 TRUE/FALSE to show/not confidence intervals for input variables.
+  }
+  \item{fileout}{
+Name of output file. Extensions allowed: eps/ps, jpeg, png, pdf, bmp 
+and tiff.\cr
+Default = 'output_plotvsltime.eps'
+  }
+  \item{width}{
+File width, in the units specified in the parameter size_units (inches by default). Takes 8 by default.
+  }
+  \item{height}{
+File height, in the units specified in the parameter size_units (inches by default). Takes 5 by default.
+  }
+  \item{size_units}{
+Units of the size of the device (file or window) to plot in. Inches ('in') by default. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{res}{ 
+Resolution of the device (file or window) to plot in. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{...}{
+    Arguments to be passed to the method. Only accepts the following
+    graphical parameters:
+
+    adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt csi cxy err family fg fig font font.axis font.lab font.main font.sub lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page pch plt smo srt tck tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog
+    
+    For more information about the parameters see `par`
   }
 }
 \details{

@@ -1,6 +1,21 @@
 PlotSection <- function(var, horiz, depth, toptitle = '', sizetit = 1, 
                         units = '', brks = NULL, cols = NULL, axelab = TRUE, 
-                        intydep = 200, intxhoriz = 20, drawleg = TRUE) {
+                        intydep = 200, intxhoriz = 20, drawleg = TRUE, 
+                        fileout = NULL, width = 8, height = 5, 
+                        size_units = 'in', res = 100, ...) {
+  # Process the user graphical parameters that may be passed in the call
+  ## Graphical parameters to exclude
+  excludedArgs <- c("cex", "cex.axis", "cex.main", "col", "lab", "las", "mai", "mar", "mgp", "new", "ps", "tck")
+  userArgs <- .FilterUserGraphicArgs(excludedArgs, ...)
+
+  # If there is any filenames to store the graphics, process them
+  # to select the right device 
+  if (!is.null(fileout)) {
+    deviceInfo <- .SelectDevice(fileout = fileout, width = width, height = height, units = size_units, res = res)
+    saveToFile <- deviceInfo$fun
+    fileout <- deviceInfo$files
+  }
+
   #
   #  Input arguments 
   # ~~~~~~~~~~~~~~~~~
@@ -51,6 +66,17 @@ PlotSection <- function(var, horiz, depth, toptitle = '', sizetit = 1,
   #  Plotting the section
   # ~~~~~~~~~~~~~~~~~~
   #
+
+  # Open connection to graphical device
+  if (!is.null(fileout)) {
+    saveToFile(fileout)
+  } else if (names(dev.cur()) == 'null device') {
+    dev.new(units = size_units, res = res, width = width, height = height)
+  }
+
+  # Load the user parameters
+  par(userArgs)
+
   xmargin <- 0.5
   ymargin <- 0.5
   topmargin <- 3
@@ -92,4 +118,7 @@ PlotSection <- function(var, horiz, depth, toptitle = '', sizetit = 1,
     box()
     axis(1, at = seq(0.5, length(brks) - 0.5, 1), labels = brks, cex.axis = 1)
   }
+
+  # If the graphic was saved to file, close the connection with the device
+  if(!is.null(fileout)) dev.off()
 }

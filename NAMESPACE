@@ -1,7 +1,2 @@
 exportPattern("^[^\\.]")
-import(ncdf4, GEOmap, geomapdata, mapproj, abind, parallel, bigmemory, SpecsVerification, plyr, methods)
-importFrom("grDevices", "colorRampPalette", "dev.off", "gray", "postscript", "rainbow")
-importFrom("graphics", "abline", "axis", "box", "contour", "filled.contour", "image", "layout", "legend", "lines", "matplot", "matpoints", "par", "plot", "points", "polygon", "rect", "segments", "text", "title")
-importFrom("stats", "IQR", "acf", "confint", "cor", "lm", "mad", "median", "na.omit", "na.pass", "pf", "qchisq", "qnorm", "qt", "quantile", "rnorm", "runif", "sd", "spectrum", "ts", "window")
-importFrom("utils", "data")
-importFrom("maps", "map")
+import(abind, bigmemory, GEOmap, geomapdata, graphics, grDevices, mapproj, maps, methods, NbClust, ncdf4, parallel, plyr, stats, SpecsVerification)

@@ -12,7 +12,8 @@ Plots climatologies as a function of the forecast time for any index output from
 PlotClim(exp_clim, obs_clim = NULL, toptitle = "", ytitle = "", monini = 1, 
          freq = 12, limits = NULL, listexp = c("exp1", "exp2", "exp3"), 
          listobs = c("obs1", "obs2", "obs3"), biglab = FALSE, leg = TRUE, 
-         fileout = "output_plotclim.eps", sizetit = 1)
+         sizetit = 1, fileout = "output_plotclim.eps", 
+         width = 8, height = 5, size_units = 'in', res = 100, ...)
 }
 \arguments{
   \item{exp_clim}{
@@ -50,11 +51,33 @@ TRUE/FALSE for presentation/paper plot. Default = FALSE.
   \item{leg}{
 TRUE/FALSE to plot the legend or not.
   }
-  \item{fileout}{
-Name of the output eps file.
-  }
   \item{sizetit}{
 Multiplicative factor to scale title size, optional.
+  }
+  \item{width}{
+File width, in the units specified in the parameter size_units (inches by default). Takes 8 by default.
+  }
+  \item{height}{
+File height, in the units specified in the parameter size_units (inches by default). Takes 5 by default.
+  }
+  \item{size_units}{
+Units of the size of the device (file or window) to plot in. Inches ('in') by default. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{res}{ 
+Resolution of the device (file or window) to plot in. See ?Devices and the creator function of the corresponding device.
+  }
+ \item{fileout}{
+Name of output file. Extensions allowed: eps/ps, jpeg, png, pdf, bmp 
+and tiff. \cr
+Default = 'output_plotclim.eps'
+  }
+  \item{...}{
+    Arguments to be passed to the method. Only accepts the following
+    graphical parameters:
+
+    adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt csi cxy err family fg fig font font.axis font.lab font.main font.sub lend lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page pch plt smo srt tck usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog
+    
+    For more information about the parameters see `par`
   }
 }
 \examples{

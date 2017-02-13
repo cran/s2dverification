@@ -4,20 +4,20 @@
 Computes Seasonal Means
 }
 \description{
-Computes seasonal means on timeseries organized in a matrix of any number of dimensions up to 10 dimensions where the time dimension is one of those 10 dimensions.
+Computes seasonal means on timeseries organized in a array of any number of dimensions up to 10 dimensions where the time dimension is one of those 10 dimensions.
 }
 \usage{
 Season(var, posdim = 4, monini, moninf, monsup)
 }
 \arguments{
   \item{var}{
-Matrix containing the timeseries along one of its dimensions.
+Array containing the timeseries along one of its dimensions.
   }
   \item{posdim}{
 Dimension along which to compute seasonal means = Time dimension
   }
   \item{monini}{
-First month of the time-series: 1 to 12.
+First month of the time series: 1 to 12.
   }
   \item{moninf}{
 Month when to start the seasonal means: 1 to 12.
@@ -27,7 +27,7 @@ Month when to stop the seasonal means: 1 to 12.
   }
 }
 \value{
-Matrix with the same dimensions as var except along the posdim dimension which length corresponds to the number of seasons. Partial seasons are not accounted for.
+Array with the same dimensions as var except along the posdim dimension whose length corresponds to the number of seasons. Partial seasons are not accounted for.
 }
 \examples{
 # Load sample data as in Load() example:

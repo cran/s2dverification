@@ -4,24 +4,24 @@
 Slices A Matrix Along A Dimension
 }
 \description{
-This function allows to select a subensemble from a matrix of any dimensions, providing the dimension along which the user aims at cutting the input matrix and between which indices.
+This function selects a subset of ensemble members from an array containing any number of dimensions.
 }
 \usage{
 SelIndices(var, posdim, limits)
 }
 \arguments{
   \item{var}{
-A matrix of any dimensions.
+An array with any number of dimensions.
   }
   \item{posdim}{
-The dimension along which a submatrix should be selected.
+The dimension along which the ensemble subset should be selected.
   }
   \item{limits}{
-The lower and upper indice of the selection along the posdim dimension.
+The lower and upper limits for the selection of ensemble members along the posdim dimension.
   }
 }
 \value{
-The sliced matrix.
+The subsetted array.
 }
 \examples{
 a <- array(rnorm(24), dim = c(2, 3, 4, 1))

@@ -1,10 +1,10 @@
 \name{Mean1Dim}
 \alias{Mean1Dim}
 \title{
-Averages A Matrix Along A Dimension
+Averages An Array Along A Dimension
 }
 \description{
-Averages the matrix var along the posdim dimension between limits [1] and limits [2] if limits argument is provided by the user.
+Averages the array along the posdim dimension along the user specified dimension. The user can specify a subset of the dimension to take the mean along.
 }
 \usage{
 Mean1Dim(var, posdim, narm = TRUE, limits = NULL)
@@ -20,11 +20,11 @@ Dimension to average along.
 Ignore NA (TRUE) values or not (FALSE).
   }
   \item{limits}{
-Limits to average between.
+Limits to average between. Default is to take the mean along the entire dimension.
   }
 }
 \value{
-Matrix with one dimension less than the input one containing the average along posdim dimension.
+Array with one dimension less than the input array, containing the average along the posdim dimension.
 }
 \examples{
 a <- array(rnorm(24), dim = c(2, 3, 4))

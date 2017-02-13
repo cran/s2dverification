@@ -1,16 +1,21 @@
 \name{RMSSS}
 \alias{RMSSS}
+\alias{.RMSSS}
 \title{
 Computes Root Mean Square Skill Score
 }
 \description{
-Arrays var_exp & var_obs should have the same dimensions except along posloop where the length can be different, with the number of experiments/models for var_exp (nexp) and the number of obserational datasets for var_obs (nobs).\cr
+Computes the root mean square error skill score between an array of forecasts, var_exp and an array of observations, var_obs, which should have the same dimensions except along posloop where the lengths can be different, with the number of experiments/models for var_exp (nexp) and the number of obserational datasets for var_obs (nobs).\cr
 RMSSS computes the Root Mean Square Skill Score of each jexp in 1:nexp against each jobs in 1:nobs which gives nexp x nobs RMSSS for each other grid point of the matrix (each latitude/longitude/level/leadtime).\cr
 The RMSSS are computed along the posRMS dimension which should correspond to the startdate dimension.\cr
-The p-value is provided by a one-sided Fisher test.
+The p-value is optionally provided by a one-sided Fisher test.\cr
+\cr
+.RMSSS provides the same functionality but taking a matrix of ensemble members as input (exp).
 }
 \usage{
-RMSSS(var_exp, var_obs, posloop = 1, posRMS = 2)
+RMSSS(var_exp, var_obs, posloop = 1, posRMS = 2, pval = TRUE)
+
+.RMSSS(exp, obs, pval = TRUE)
 }
 \arguments{
   \item{var_exp}{
@@ -25,12 +30,30 @@ Dimension nobs and nexp.
   \item{posRMS}{
 Dimension along which the RMSE are to be computed (the dimension of the start dates).
   }
+  \item{pval}{
+Whether to compute or not the p-value of the test Ho : RMSSS = 0. TRUE by default.
+  }
+  \item{exp}{
+N by M matrix of N forecasts from M ensemble members.
+  }
+  \item{obs}{
+Vector of the corresponding observations of length N.
+  }
 }
 \value{
-Array with dimensions :\cr
-  c(length(posloop) in var_exp, length(posloop) in var_obs, 2, all other dimensions of var_exp & var_obs except posRMS).\cr
-The dimension 2 corresponds to the RMSSS and the p.value of the one-sided 
-Fisher test with Ho: RMSSS = 0.
+RMSSS: Array with dimensions:\cr
+  c(length(posloop) in var_exp, length(posloop) in var_obs, 1 or 2, all other dimensions of var_exp & var_obs except posRMS).\cr
+The 3rd dimension corresponds to the RMSSS and, if \code{pval = TRUE}, the p-value of the one-sided Fisher test with Ho: RMSSS = 0.\cr
+\cr
+.RMSSS:
+  \itemize{
+    \item{$rmsss}{
+The RMSSS.
+    }
+    \item{$p_val}{
+Corresponds to the p values (only present if \code{pval = TRUE}) for the RMSSS.
+    }
+  }
 }
 \examples{
 # Load sample data as in Load() example:
@@ -39,17 +62,27 @@ clim <- Clim(sampleData$mod, sampleData$obs)
 ano_exp <- Ano(sampleData$mod, clim$clim_exp)
 ano_obs <- Ano(sampleData$obs, clim$clim_obs)
 rmsss <- RMSSS(Mean1Dim(ano_exp, 2), Mean1Dim(ano_obs, 2))
-rmsss2 <- array(dim = c(dim(rmsss)[1:2], 4, dim(rmsss)[4]))
-rmsss2[, , 2, ] <- rmsss[, , 1, ]
-rmsss2[, , 4, ] <- rmsss[, , 2, ]
-PlotVsLTime(rmsss, toptitle = "Root Mean Square Skill Score", ytitle = "", 
+rmsss_plot <- array(dim = c(dim(rmsss)[1:2], 4, dim(rmsss)[4]))
+rmsss_plot[, , 2, ] <- rmsss[, , 1, ]
+rmsss_plot[, , 4, ] <- rmsss[, , 2, ]
+PlotVsLTime(rmsss_plot, toptitle = "Root Mean Square Skill Score", ytitle = "", 
             monini = 11, limits = c(-1, 1.3), listexp = c('CMIP5 IC3'), 
             listobs = c('ERSST'), biglab = FALSE, hlines = c(-1, 0, 1), 
             fileout = 'tos_rmsss.eps')
+# The following example uses veriApply combined with .RMSSS instead of RMSSS
+  \dontrun{
+require(easyVerification)
+RMSSS2 <- s2dverification:::.RMSSS
+rmsss2 <- veriApply("RMSSS2", ano_exp,
+                    # see ?veriApply for how to use the 'parallel' option
+                    Mean1Dim(ano_obs, 2),
+                    tdim = 3, ensdim = 2)
+  }
 }
 \author{
 History:\cr
-0.1  -  2012-04  (V. Guemas, \email{vguemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+0.1  -  2012-04  (V. Guemas, \email{vguemas at bsc.es})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Formatting to R CRAN\cr
+1.1  -  2017-02  (A. Hunter, \email{alasdair.hunter at bsc.es})  -  Adapted to veriApply()
 }
 \keyword{datagen}

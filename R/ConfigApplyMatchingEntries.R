@@ -6,11 +6,11 @@ ConfigApplyMatchingEntries <- function(configuration, var, exp = NULL, obs = NUL
 
   var_entries_in_exps <- c()
   if (length(unlist(configuration$experiments, recursive = FALSE)) > 0) {
-    var_entries_in_exps <- which(unlist(lapply(lapply(as.list(unlist(lapply(configuration$experiments, lapply, "[[", 2))), regexpr, var), isFullMatch, var) > 0))
+    var_entries_in_exps <- which(unlist(lapply(lapply(lapply(as.list(unlist(lapply(configuration$experiments, lapply, "[[", 2))), .ConfigReplaceVariablesInString, configuration$definitions), regexpr, var), isFullMatch, var) > 0))
   }
   var_entries_in_obs <- c()
   if (length(unlist(configuration$observations, recursive = FALSE)) > 0) {
-    var_entries_in_obs <- which(unlist(lapply(lapply(as.list(unlist(lapply(configuration$observations, lapply, "[[", 2))), regexpr, var), isFullMatch, var) > 0))
+    var_entries_in_obs <- which(unlist(lapply(lapply(lapply(as.list(unlist(lapply(configuration$observations, lapply, "[[", 2))), .ConfigReplaceVariablesInString, configuration$definitions), regexpr, var), isFullMatch, var) > 0))
   }
 
   exp_info <- list()
@@ -19,7 +19,7 @@ ConfigApplyMatchingEntries <- function(configuration, var, exp = NULL, obs = NUL
     mod_var_matching_entries <- mod_var_matching_indices <- mod_var_matching_entries_levels <- c()
     
     if (length(unlist(configuration$experiments, recursive = FALSE)) > 0) {
-      mod_entries_in_exps <- which(unlist(lapply(lapply(unlist(lapply(configuration$experiments, lapply, "[[", 1), recursive = FALSE), regexpr, mod), isFullMatch, mod)))
+      mod_entries_in_exps <- which(unlist(lapply(lapply(lapply(unlist(lapply(configuration$experiments, lapply, "[[", 1), recursive = FALSE), .ConfigReplaceVariablesInString, configuration$definitions), regexpr, mod), isFullMatch, mod)))
       if (length(mod_entries_in_exps) > 0) {
         mod_var_matching_indices <- intersect(var_entries_in_exps, mod_entries_in_exps)
         mod_var_matching_entries <- unlist(configuration$experiments, recursive = FALSE)[mod_var_matching_indices]
@@ -33,16 +33,16 @@ ConfigApplyMatchingEntries <- function(configuration, var, exp = NULL, obs = NUL
                  '. Please check the configuration file.)'))
     } else {
       if (show_entries) {
-        header <- paste0("# Matching entries for experiment '", exp[jmod], "' and variable '", var, "' #\n")
-        cat(paste0(paste(rep("#", nchar(header) - 1), collapse = ''), "\n"))
-        cat(header)
-        cat(paste0(paste(rep("#", nchar(header) - 1), collapse = ''), "\n"))
+        header <- paste0("# Matching entries for experiment '", exp[jmod], "' and variable '", var, "' #")
+        .message(paste(rep("#", nchar(header) - 1), collapse = ''))
+        .message(header)
+        .message(paste(rep("#", nchar(header) - 1), collapse = ''))
         ConfigShowTable(list(experiments = list(mod_var_matching_entries)), 'experiments', mod_var_matching_indices)
         cat("\n")
       }
       result <- .ConfigGetDatasetInfo(mod_var_matching_entries, 'experiments')
       if (show_result) {
-        cat(paste0("The result of applying the matching entries to experiment name '", exp[jmod], "' and variable name '", var, "' is:\n"))
+        .message(paste0("The result of applying the matching entries to experiment name '", exp[jmod], "' and variable name '", var, "' is:"))
         configuration$definitions[["VAR_NAME"]] <- var
         configuration$definitions[["EXP_NAME"]] <- exp[jmod]
         fields <- c("MAIN_PATH: ", "FILE_PATH: ", "NC_VAR_NAME: ", "SUFFIX: ", "VAR_MIN: ", "VAR_MAX: ")
@@ -62,7 +62,7 @@ ConfigApplyMatchingEntries <- function(configuration, var, exp = NULL, obs = NUL
     ref_var_matching_entries <- ref_var_matching_indices <- ref_var_matching_entries_levels <- c()
     
     if (length(unlist(configuration$observations, recursive = FALSE)) > 0) {
-      ref_entries_in_obs <- which(unlist(lapply(lapply(unlist(lapply(configuration$observations, lapply, "[[", 1), recursive = FALSE), regexpr, ref), isFullMatch, ref)))
+      ref_entries_in_obs <- which(unlist(lapply(lapply(lapply(unlist(lapply(configuration$observations, lapply, "[[", 1), recursive = FALSE), .ConfigReplaceVariablesInString, configuration$definitions), regexpr, ref), isFullMatch, ref)))
       if (length(ref_entries_in_obs) > 0) {
         ref_var_matching_indices <- intersect(var_entries_in_obs, ref_entries_in_obs)
         ref_var_matching_entries <- unlist(configuration$observations, recursive = FALSE)[ref_var_matching_indices]
@@ -77,15 +77,15 @@ ConfigApplyMatchingEntries <- function(configuration, var, exp = NULL, obs = NUL
     } else {
       if (show_entries) {
         header <- paste0("# Matching entries for observation '", obs[jobs], "' and variable '", var, "' #\n")
-        cat(paste0(paste(rep("#", nchar(header) - 1), collapse = ''), "\n"))
-        cat(header)
-        cat(paste0(paste(rep("#", nchar(header) - 1), collapse = ''), "\n"))
+        .message(paste(rep("#", nchar(header) - 1), collapse = ''))
+        .message(header)
+        .message(paste(rep("#", nchar(header) - 1), collapse = ''))
         ConfigShowTable(list(observations = list(ref_var_matching_entries)), 'observations', ref_var_matching_indices)
         cat("\n")
       }
       result <- .ConfigGetDatasetInfo(ref_var_matching_entries, 'observations')
       if (show_result) {
-        cat(paste0("The result of applying the matching entries to observation name '", obs[jobs], "' and variable name '", var, "' is:\n"))
+        .message(paste0("The result of applying the matching entries to observation name '", obs[jobs], "' and variable name '", var, "' is:"))
         configuration$definitions[['VAR_NAME']] <- var
         configuration$definitions[["OBS_NAME"]] <- obs[jobs]
         fields <- c("MAIN_PATH: ", "FILE_PATH: ", "NC_VAR_NAME: ", "SUFFIX: ", "VAR_MIN: ", "VAR_MAX: ")

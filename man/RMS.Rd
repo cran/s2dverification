@@ -1,18 +1,23 @@
 \name{RMS}
 \alias{RMS}
+\alias{.RMS}
 \title{
-Computes Root Mean Square Error Skill Measure
+Computes Root Mean Square Error
 }
 \description{
-Matrix var_exp & var_obs should have the same dimensions except along posloop dimension where the length can be different, with the number of experiments/models for var_exp (nexp) and the number of obserational datasets for var_obs (nobs).\cr
-RMS computes the Root Mean Square Error skill of each jexp in 1:nexp against each jobs in 1:nobs which gives nexp x nobs RMSE skill measures for each other grid point of the matrix (each latitude/longitude/level/leadtime).\cr
-The RMSE are computed along the posRMS dimension which should correspond to the startdate dimension.\cr
-If compROW is given, the RMSE are computed only if rows along the compROW dimension are complete between limits[1] and limits[2], that mean with no NA between limits[1] and limits[2]. This option can be activated if the user wishes   to account only for the forecasts for which observations are available at all leadtimes.\cr
+Computes the root mean square error for an array of forecasts, var_exp and an array of observations, var_obs, which should have the same dimensions except along the posloop dimension where the lengths can be different, with the number of experiments/models for var_exp (nexp) and the number of obserational datasets for var_obs (nobs).\cr
+The RMSE is computed along the posRMS dimension which should correspond to the startdate dimension.\cr
+If compROW is given, the RMSE is computed only if rows along the compROW dimension are complete between limits[1] and limits[2], i.e. there are no NAs between limits[1] and limits[2]. This option can be activated if the user wishes   to account only for the forecasts for which observations are available at all leadtimes.\cr
 Default: limits[1] = 1 and limits[2] = length(compROW dimension).\cr
-The confidence interval relies on a chi2 distribution.
+The confidence interval relies on a chi2 distribution.\cr
+\cr
+.RMS provides the same functionality but taking a matrix of ensemble members as input (exp).
 }
 \usage{
-RMS(var_exp, var_obs, posloop = 1, posRMS = 2, compROW = NULL, limits = NULL)
+RMS(var_exp, var_obs, posloop = 1, posRMS = 2, compROW = NULL, 
+    limits = NULL, siglev = 0.95, conf = TRUE)
+
+.RMS(exp, obs, siglev = 0.95, conf = TRUE)      
 }
 \arguments{
   \item{var_exp}{
@@ -34,11 +39,34 @@ Default = NULL.
   \item{limits}{
 Complete between limits[1] & limits[2]. Default = NULL.
   }
+  \item{siglev}{
+Confidence level of the computed confidence interval. 0.95 by default.
+  }
+  \item{conf}{
+Whether to compute confidence interval or not. TRUE by default.
+  }
+  \item{exp}{
+N by M matrix of N forecasts from M ensemble members.
+  }
+  \item{obs}{
+Vector of the corresponding observations of length N.
+  }
 }
 \value{
-Matrix with dimensions:\cr
-  c(length(posloop) in var_exp, length(posloop) in var_obs, 3, all other dimensions of var_exp & var_obs except posRMS).\cr
-The dimension 3 corresponds to the lower limit of the  95\% confidence interval, the RMSE and the upper limit of the 95\% confidence interval.
+RMS: Array with dimensions:\cr
+  c(length(posloop) in var_exp, length(posloop) in var_obs, 1 or 3, all other dimensions of var_exp & var_obs except posRMS).\cr
+The 3rd dimension corresponds to the lower limit of the  95\% confidence interval (only present if \code{conf = TRUE}), the RMSE, and the upper limit of the 95\% confidence interval (only present if \code{conf = TRUE}). \cr
+\cr
+.RMS: 
+  \item{$rms}{
+The root mean square error, 
+  }
+  \item{$conf_low}{
+Corresponding to the lower limit of the \code{siglev}\% confidence interval (only present if \code{conf = TRUE}) for the rms.
+  } 
+  \item{$conf_high}{
+Corresponding to the upper limit of the \code{siglev}\% confidence interval (only present if \code{conf = TRUE}) for the rms.
+  } 
 }
 \examples{
 # Load sample data as in Load() example:
@@ -51,7 +79,8 @@ dim_to_smooth <- 4  # Smooth along lead-times
 smooth_ano_exp <- Smoothing(ano_exp, runmean_months, dim_to_smooth)
 smooth_ano_obs <- Smoothing(ano_obs, runmean_months, dim_to_smooth)
 dim_to_mean <- 2  # Mean along members
-required_complete_row <- 3  # Discard start-dates for which some leadtimes are missing
+# Discard start-dates for which some leadtimes are missing
+required_complete_row <- 3
 leadtimes_per_startdate <- 60
 rms <- RMS(Mean1Dim(smooth_ano_exp, dim_to_mean), 
            Mean1Dim(smooth_ano_obs, dim_to_mean), 
@@ -62,10 +91,21 @@ PlotVsLTime(rms, toptitle = "Root Mean Square Error", ytitle = "K",
             monini = 11, limits = NULL, listexp = c('CMIP5 IC3'), 
             listobs = c('ERSST'), biglab = FALSE, hlines = c(0), 
             fileout = 'tos_rms.eps')
+# The following example uses veriApply combined with .RMS instead of RMS
+  \dontrun{
+require(easyVerification)
+RMS2 <- s2dverification:::.RMS
+rms2 <- veriApply("RMS2",
+                  smooth_ano_exp,
+                  # see ?veriApply for how to use the 'parallel' option
+                  Mean1Dim(smooth_ano_obs, dim_to_mean),
+                  tdim = 3, ensdim = 2)
+  }
 }
 \author{
 History:\cr
 0.1  -  2011-05  (V. Guemas, \email{vguemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN\cr
+1.1  -  2017-02  (A. Hunter, \email{alasdair.hunter at bsc.es})  -  Adapted to veriApply()
 }
 \keyword{datagen}

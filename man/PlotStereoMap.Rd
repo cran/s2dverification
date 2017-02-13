@@ -4,23 +4,38 @@
 Maps A Two-Dimensional Variable On A Polar Stereographic Projection
 }
 \description{
-Map a two dimensional matrix with (longitude, latitude) dimensions on a polar stereographic projection.
+Map longitude-latitude array (on a regular rectangular or gaussian grid) on a polar stereographic world projection with coloured grid cells. Only the region within a specified latitude interval is displayed. A colour bar (legend) can be plotted and adjusted. It is possible to draw superimposed dots, symbols and boxes. A number of options is provided to adjust the position, size and colour of the components. This plot function is compatible with figure layouts if colour bar is disabled..
 }
 \usage{
-PlotStereoMap(var, lon, lat, latlims = c(60,90), toptitle = "", sizetit = 1, 
-             units = "", brks = NULL, cols = NULL, filled.continents = FALSE, 
-             dots = NULL, intlat = 10, drawleg = TRUE, subsampleg = 1, 
-             colNA = "white")
+PlotStereoMap(var, lon, lat, latlims = c(60, 90),
+              toptitle = NULL, sizetit = NULL, units = NULL,
+              brks = NULL, cols = NULL, bar_limits = NULL,
+              triangle_ends = NULL, col_inf = NULL, col_sup = NULL,
+              colNA = NULL, color_fun = clim.palette(),
+              filled.continents = FALSE, coast_color = NULL,
+              coast_width = 1,
+              dots = NULL, dot_symbol = 4, dot_size = 0.8,
+              intlat = 10,
+              drawleg = TRUE, subsampleg = NULL, 
+              bar_extra_labels = NULL, draw_bar_ticks = TRUE,
+              draw_separators = FALSE, triangle_ends_scale = 1,
+              bar_label_digits = 4, bar_label_scale = 1,
+              units_scale = 1, bar_tick_scale = 1,
+              bar_extra_margin = rep(0, 4),
+              boxlim = NULL, boxcol = "purple2", boxlwd = 5,
+              margin_scale = rep(1, 4), title_scale = 1,
+              numbfig = NULL, fileout = NULL, width = 6, height = 5, 
+              size_units = 'in', res = 100, ...)
 }
 \arguments{
   \item{var}{
-Matrix to plot with (longitude, latitude) dimensions.
+Array with the values at each cell of a grid on a regular rectangular or gaussian grid. The array is expected to have two dimensions: c(latitude, longitude). Longitudes can be in ascending or descending order and latitudes in any order. It can contain NA values (coloured with 'colNA'). Arrays with dimensions c(longitude, latitude) will also be accepted but 'lon' and 'lat' will be used to disambiguate so this alternative is not appropriate for square arrays.
   }
   \item{lon}{
-Array of longitudes.
+Numeric vector of longitude locations of the cell centers of the grid of 'var', in ascending or descending order (same as 'var'). Expected to be regularly spaced, within either of the ranges [-180, 180] or [0, 360]. Data for two adjacent regions split by the limits of the longitude range can also be provided, e.g. \code{lon = c(0:50, 300:360)} ('var' must be provided consitently).
   }
   \item{lat}{
-Array of latitudes.
+Numeric vector of latitude locations of the cell centers of the grid of 'var', in any order (same as 'var'). Expected to be from a regular rectangular or gaussian grid, within the range [-90, 90].
   }
   \item{latlims}{
 Latitudinal limits of the figure.\cr
@@ -28,54 +43,115 @@ Example : c(60, 90) for the North Pole\cr
           c(-90,-60) for the South Pole
   }
   \item{toptitle}{
-Title, optional.
+Top title of the figure, scalable with parameter 'title_scale'.
   }
   \item{sizetit}{
-Multiplicative factor to increase title size, optional.
+Scale factor for the figure top title provided in parameter 'toptitle'. Deprecated. Use 'title_scale' instead.
   }
   \item{units}{
-Units, optional.
+Title at the top of the colour bar, most commonly the units of the variable provided in parameter 'var'.
   }
-  \item{brks}{
-Colour levels, optional.
+  \item{brks,cols,bar_limits,triangle_ends}{
+Usually only providing 'brks' is enough to generate the desired colour bar. These parameters allow to define n breaks that define n - 1 intervals to classify each of the values in 'var'. The corresponding grid cell of a given value in 'var' will be coloured in function of the interval it belongs to. These parameters are sent to \code{ColorBar()} to generate the breaks and colours. Additional colours for values beyond the limits of the colour bar are also generated and applied to the plot if 'bar_limits' or 'brks' and 'triangle_ends' are properly provided to do so. See ?ColorBar for a full explanation.\cr
   }
-  \item{cols}{
-List of colours, optional.
+  \item{col_inf,col_sup,colNA}{
+Colour identifiers to colour the values in 'var' that go beyond the extremes of the colour bar and to colour NA values, respectively. 'colNA' takes attr(cols, 'na_color') if available by default, where cols is the parameter 'cols' if provided or the vector of colors returned by 'color_fun'. If not available, it takes 'pink' by default. 'col_inf' and 'col_sup' will take the value of 'colNA' if not specified. See ?ColorBar for a full explanation on 'col_inf' and 'col_sup'.
+  }
+  \item{color_fun,subsampleg,bar_extra_labels,draw_bar_ticks,draw_separators,triangle_ends_scale,bar_label_digits,bar_label_scale,units_scale,bar_tick_scale,bar_extra_margin}{
+Set of parameters to control the visual aspect of the drawn colour bar. See ?ColorBar for a full explanation.
   }
   \item{filled.continents}{
-Continents filled in grey (TRUE) or represented by a black line (FALSE).\cr
-Default = FALSE.
+Colour to fill in drawn projected continents. Takes the value gray(0.5) by default. If set to FALSE, continents are not filled in.
+  }
+  \item{coast_color}{
+Colour of the coast line of the drawn projected continents. Takes the value gray(0.5) by default.
+  }
+  \item{coast_width}{
+Line width of the coast line of the drawn projected continents. Takes the value 1 by default.
   }
   \item{dots}{
-Matrix with TRUE / FALSE flags to add black dots over the maps (to show where a score is significant for example).  
+Array of same dimensions as 'var' or with dimensions c(n, dim(var)), where n is the number of dot/symbol layers to add to the plot. A value of TRUE at a grid cell will draw a dot/symbol on the corresponding square of the plot. By default all layers provided in 'dots' are plotted with dots, but a symbol can be specified for each of the layers via the parameter 'dot_symbol'.
+  }
+  \item{dot_symbol}{
+Single character/number or vector of characters/numbers that correspond to each of the symbol layers specified in parameter 'dots'. If a single value is specified, it will be applied to all the layers in 'dots'. Takes 15 (centered square) by default. See 'pch' in par() for additional accepted options.
+  }
+  \item{dot_size}{
+Scale factor for the dots/symbols to be plotted, specified in 'dots'. If a single value is specified, it will be applied to all layers in 'dots'. Takes 1 by default.
   }
   \item{intlat}{
-Interval between latitude circles. Default = 10deg.
+Interval between latitude lines (circles), in degrees. Defaults to 10.
   }
   \item{drawleg}{
-Draw a colorbar. 
+Whether to plot a color bar (legend, key) or not. Defaults to TRUE.
   }
-  \item{subsampleg}{
-Supsampling factor of the interval between ticks on colorbar.\cr
-Default = 1 = every colour level.
+  \item{boxlim}{
+Limits of a box to be added to the plot, in degrees: c(x1, y1, x2, y2). A list with multiple box specifications can also be provided.
   }
-  \item{colNA}{
-Color used to represent NA. Default = 'white'
+  \item{boxcol}{
+Colour of the box lines. A vector with a colour for each of the boxes is also accepted. Defaults to 'purple2'.
+  }
+  \item{boxlwd}{
+Line width of the box lines. A vector with a line width for each of the boxes is also accepted. Defaults to 5.
+  }
+  \item{margin_scale}{
+Scale factor for the margins to be added to the plot, with the format c(y1, x1, y2, x2). Defaults to rep(1, 4). If drawleg = TRUE, margin_scale[1] is subtracted 1 unit.
+  }
+  \item{title_scale}{
+Scale factor for the figure top title. Defaults to 1.
+  }
+  \item{numbfig}{
+Number of figures in the layout the plot will be put into. A higher numbfig will result in narrower margins and smaller labels, axe labels, ticks, thinner lines, ... Defaults to 1.
+  }
+  \item{fileout}{
+File where to save the plot. If not specified (default) a graphics device will pop up. Extensions allowed: eps/ps, jpeg, png, pdf, bmp and tiff. \cr
+  }
+  \item{width}{
+File width, in the units specified in the parameter size_units (inches by default). Takes 8 by default.
+  }
+  \item{height}{
+File height, in the units specified in the parameter size_units (inches by default). Takes 5 by default.
+  }
+  \item{size_units}{
+Units of the size of the device (file or window) to plot in. Inches ('in') by default. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{res}{ 
+Resolution of the device (file or window) to plot in. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{\dots}{
+Arguments to be passed to the method. Only accepts the following graphical parameters:
+
+adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt csi cxy err family fg font font.axis font.lab font.main font.sub lend lheight ljoin lmitre mex mfcol mfrow mfg mkh omd omi page pch pin plt pty smo srt tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog
+
+For more information about the parameters see `par`.
+  }
+}
+\value{
+  \item{brks}{
+Breaks used for colouring the map (and legend if drawleg = TRUE).
+  }
+  \item{cols}{
+Colours used for colouring the map (and legend if drawleg = TRUE). Always of length length(brks) - 1.
+  }
+  \item{col_inf}{
+Colour used to draw the lower triangle end in the colour bar (NULL if not drawn at all).
+  }
+  \item{col_sup}{
+Colour used to draw the upper triangle end in the colour bar (NULL if not drawn at all).
   }
 }
 \examples{
 data <- matrix(rnorm(100 * 50), 100, 50)
 x <- seq(from = 0, to = 360, length.out = 100)
 y <- seq(from = -90, to = 90, length.out = 50)
-breaks <- seq(from = min(data, na.rm = TRUE), to = max(data, na.rm = TRUE), 
-              length.out = 21)
-colors <- colorRampPalette(c("blue", "lightblue", "white", "yellow", "red"))
-colors <- colors(20)
-PlotStereoMap(var = data, lon = x, lat = y, latlims = c(60, 90), brks = breaks,
-              cols = colors, toptitle = "This is the title", sizetit = 0.8)
+PlotStereoMap(data, x, y, latlims = c(60, 90), brks = 50,
+              toptitle = "This is the title")
 }
 \author{
 History:\cr
 1.0  -  2014-07  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code
+1.1  -  2015-12  (C. Ardilouze, \email{constantin.ardilouze at meteo.fr})  - Box(es) drawing
+1.2  -  2016-08  (N. Manubens, \email{nicolau.manubens at bsc.es})  - Refacotred the function and 
+                                                                      merged in Jean-Philippe circle
+                                                                      border and Constantin boxes.
 }
 \keyword{dynamic}

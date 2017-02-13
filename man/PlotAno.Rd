@@ -4,19 +4,15 @@
 Plot Raw Or Smoothed Anomalies
 }
 \description{
-Plots timeseries of raw or smoothed anomalies of any index output from \code{Load()} or \code{Ano()} or or \code{Ano_CrossValid()} or \code{Smoothing()} and organized in matrices with dimensions:\cr
-  c(nmod/nexp, nmemb/nparam, nsdates, nltime) for the model data\cr
-  c(nobs, nmemb, nsdates, nltime) for the observational data
+Plots timeseries of raw or smoothed anomalies of any variable output from \code{Load()} or \code{Ano()} or or \code{Ano_CrossValid()} or \code{Smoothing()}.
 }
 \usage{
-PlotAno(exp_ano, obs_ano = NULL, sdates, toptitle = c("", "", "", "", "", "", 
-        "", "", "", "", "", "", "", "", ""), ytitle = c("", "", "", "", "", 
-        "", "", "", "", "", "", "", "", "", ""), limits = NULL, 
-        legends = NULL, freq = 12, biglab = FALSE, fill = TRUE, memb = TRUE, 
-        ensmean = TRUE, linezero = FALSE, points = FALSE, vlines = NULL, 
-        fileout = c("output1_plotano.eps", "output2_plotano.eps", 
-        "output3_plotano.eps", "output4_plotano.eps", "output5_plotano.eps"), 
-        sizetit = 1)
+PlotAno(exp_ano, obs_ano = NULL, sdates, toptitle = rep("", 15), 
+        ytitle = rep("", 15), limits = NULL, legends = NULL, freq = 12, 
+        biglab = FALSE, fill = TRUE, memb = TRUE, ensmean = TRUE, 
+        linezero = FALSE, points = FALSE, vlines = NULL, sizetit = 1, 
+        fileout = paste0("output", 1:5, "_plotano.eps"), 
+        width = 8, height = 5, size_units = 'in', res = 100, ...)
 }
 \arguments{
   \item{exp_ano}{
@@ -67,11 +63,37 @@ TRUE/FALSE if points instead of lines should be shown. Default = FALSE.
   \item{vlines}{
 List of x location where to add vertical black lines, optional.
   }
-  \item{fileout}{
-Name of the output eps file for each experiment: c('','').
-  }
   \item{sizetit}{
 Multiplicative factor to scale title size, optional.
+  }
+  \item{fileout}{
+Name of the output file for each experiment: c('',''). 
+Extensions allowed: eps/ps, jpeg, png, pdf, bmp and tiff. If filenames with 
+different extensions are passed, it will be considered only the first one 
+and it will be extended to the rest. \cr
+Default = c('output1_plotano.eps', 'output2_plotano.eps', 
+            'output3_plotano.eps', 'output4_plotano.eps', 
+            'output5_plotano.eps')
+  }
+  \item{width}{
+File width, in the units specified in the parameter size_units (inches by default). Takes 8 by default.
+  }
+  \item{height}{
+File height, in the units specified in the parameter size_units (inches by default). Takes 5 by default.
+  }
+  \item{size_units}{
+Units of the size of the device (file or window) to plot in. Inches ('in') by default. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{res}{ 
+Resolution of the device (file or window) to plot in. See ?Devices and the creator function of the corresponding device.
+  }
+  \item{...}{
+    Arguments to be passed to the method. Only accepts the following
+    graphical parameters:
+    
+    adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt csi cxy err family fg fig font font.axis font.lab font.main font.sub lend lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page plt smo srt tck tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog
+
+    For more information about the parameters see `par`
   }
 }
 \examples{

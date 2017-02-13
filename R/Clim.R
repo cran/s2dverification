@@ -39,7 +39,7 @@ Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
   # ~~~~~~~~~~~~~~~~~~~~~~~
   #
   out_clim_obs <- Mean1Dim(var_obs, posdim = 3, narm = TRUE)
-  dim_clim_obs <- c(dimobs[1:2], dimobs[4:length(dimobs)])
+  dim_clim_obs <- dimobs[-3]
 
   if (kharin == TRUE) {
     tmp_obs <- Trend(var_obs, posTR = 3)
@@ -81,7 +81,7 @@ Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
     dim_clim_exp <- dimexp
   } else {
     out_clim_exp <- Mean1Dim(var_exp, posdim = 3, narm = TRUE)
-    dim_clim_exp <- c(dimexp[1:2], dimexp[4:length(dimexp)])
+    dim_clim_exp <- dimexp[-3]
   }
 
   if (memb != TRUE) {

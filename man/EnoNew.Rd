@@ -2,14 +2,14 @@
 \alias{EnoNew}
 \title{Computes Effective Sample Size Following Guemas et al, BAMS, 2013b}
 \description{
-This function computes the equivalent number of independent data in the xdata array following the method described in Guemas V., Auger L., Doblas-Reyes F., JAMC, 2013. The method relies on the Trenberth (1984) formula combined with a reduced uncertainty of the estimated autocorrelation function compared to the original approach.}
+This function computes the effective number of independent values in the xdata array following the method described in Guemas V., Auger L., Doblas-Reyes F., JAMC, 2013. \code{EnoNew} provides similar functionality to \code{Eno} but with the added options to remove the linear trend or filter the frequency.}
 \usage{
 EnoNew(xdata, detrend = FALSE, filter = FALSE)
 }
 \arguments{
-  \item{xdata}{Timeseries from which the equivalent number of independent data is requested}
-  \item{detrend}{TRUE applies a linear detrending to xdata prior to the estimation of the equivalent number of independant data.}
-  \item{filter}{TRUE applies a filtering of any frequency peak prior to the estimation of the equivalent number of independant data.}
+  \item{xdata}{a numeric vector}
+  \item{detrend}{should the linear trend be removed from the data prior to the estimation of the equivalent number of independent values.}
+  \item{filter}{should a filtering of the frequency peaks be applied prior to the estimation of the equivalent number of independant data.}
 }
 \examples{
 # See examples on Load() to understand the first lines in this example
@@ -49,6 +49,9 @@ sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
   }
 eno <- EnoNew(sampleData$mod[1, 1, , 1, 2, 3])
 print(eno)
+}
+\references{
+Guemas V, Auger L, Doblas-Reyes FJ, Rust H, Ribes A, 2014, Dependencies in Statistical Hypothesis Tests for Climate Time Series. Bulletin of the American Meteorological Society, 95 (11), 1666-1667.
 }
 \author{
 History:\cr

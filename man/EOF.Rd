@@ -1,0 +1,123 @@
+\name{EOF}
+\alias{EOF}
+\title{
+Area-Weighted Empirical Orthogonal Function Analysis Using SVD
+}
+\description{
+Performs an area-weighted EOF analysis using SVD based on a covariance matrix 
+by default, based on the correlation matrix if \code{corr} argument is set to 
+\code{TRUE}.
+}
+\usage{
+EOF(ano, lon, lat, neofs = 15, corr = FALSE)
+}
+\arguments{
+  \item{ano}{
+Array of anomalies with dimensions (number of timesteps, number of latitudes,
+number of longitudes).
+  }
+  \item{lon}{
+Vector of longitudes of \code{ano}.
+  }
+  \item{lat}{
+Vector of latitudes of \code{ano}.
+  }
+  \item{neofs}{
+Number of modes to be kept. Default = 15.
+  }
+  \item{corr}{
+Whether to base on a correlation matrix (\code{TRUE}) or on a covariance 
+matrix (default, \code{FALSE}).
+  }
+}
+\value{
+  \item{EOFs}{
+An array of EOF patterns normalized to 1 (unitless) with dimensions (number of 
+modes, number of latitudes, number of longitues). Multiplying \code{EOFs} by 
+\code{PCs} gives the original reconstructed field.
+  }
+  \item{PCs}{
+An array of pincipal components with the units of the original field to the 
+power of 2, with dimensions (number of time steps, number of modes). \code{PCs} 
+contains already the percentage of explained variance so, to reconstruct the 
+original field it's only needed to multiply \code{EOFs} by \code{PCs}. 
+  }
+  \item{var}{
+Percentage (%) of variance fraction of total variance explained by each mode
+(number of modes).
+  }
+  \item{mask}{
+Mask with dimensions (number of latitudes, number of lonfitudes).
+  }
+  \item{wght}{
+Weights with dimensions (number of latitudes, number of longitudes).
+  }
+}
+\examples{
+# See examples on Load() to understand the first lines in this example
+  \dontrun{
+data_path <- system.file('sample_data', package = 's2dverification')
+expA <- list(name = 'experiment', path = file.path(data_path, 
+             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+             '$VAR_NAME$_$START_DATE$.nc'))
+obsX <- list(name = 'observation', path = file.path(data_path, 
+             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+
+# Now we are ready to use Load().
+startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+sampleData <- Load('tos', list(expA), list(obsX), startDates,
+                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat',
+                   latmin = 27, latmax = 48, lonmin = -12, lonmax = 40)
+  }
+  \dontshow{
+startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
+                                                c('observation'), startDates,
+                                                leadtimemin = 1,
+                                                leadtimemax = 4,
+                                                output = 'lonlat',
+                                                latmin = 27, latmax = 48,
+                                                lonmin = -12, lonmax = 40)
+  }
+# This example computes the EOFs along forecast horizons and plots the one that 
+# explains the greatest amount of variability. The example data is very low 
+# resolution so it does not make a lot of sense.
+ano <- Ano_CrossValid(sampleData$mod, sampleData$obs)
+eof <- EOF(Mean1Dim(ano$ano_exp, 2)[1, , 1, , ], sampleData$lon, sampleData$lat)
+PlotEquiMap(eof$EOFs[1, , ], sampleData$lon, sampleData$lat)
+}
+\author{
+History:\cr
+0.1  -  2012-10  (F. Lienert, \email{fabian.lienert at ic3.cat})  -  Original\cr
+code, inspired by R. Benestad's EOF() in R package clim.pact.\cr
+0.2  -  2014-03  (Lauriane Batte, \email{lauriane.batte at ic3.cat})  -  Bug-fixes:\cr
+        1- Reversion of latitudes in the weights\cr
+        2- Correlation matrix was used instead of covariance\cr
+        3- Double use of the weights\cr
+0.3  -  2014-03  (Virginie Guemas, \email{virginie.guemas at bsc.es})  -  Bug-fixes:\cr
+        1- Weight computation - division by sum of cos(lat)\cr
+        2- Shuffling of EOFs in EOF.2 intermediate vector\cr
+        3- Crash when neofs = 1 sorted out\cr
+        4- Crash when neofs > nt sorted out\cr
+0.4  -  2014-03  (Lauriane Batte, \email{lauriane.batte at ic3.cat})  -  Fixes:\cr
+        1- BIG cleanup of code and clarification\cr
+        2- Reduction of the number of transpositions and associated bug-fixes\cr
+        4- Remove of the obsolete LINPACK options\cr
+0.5  -  2014-04  (Virginie Guemas, \email{virginie.guemas at bsc.es})  - Fixes:\cr
+        1- Bug-fix in dimensions handling EOF composition restitutes now the\
+original field in all cases\cr
+        2- Simplification of the convention transpose\cr
+        3- Options to use the correlation matrix rather than the 
+covariance matrix\cr
+        4- Security checks\cr
+        5- New normalization of PCs so that PC*EOF only reconstruct the 
+original file\cr
+        6- Weights = sqrt(cos(lat)) for ano so that covariance matrice 
+weighted by cos(lat)\cr
+        7- Division of EOF by weights so that the reconstruction is simply 
+EOF * PC\cr
+1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Formatting to R CRAN
+}
+\seealso{ProjectField, NAO, PlotBoxWhisker}
+\keyword{datagen}
