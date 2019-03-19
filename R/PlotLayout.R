@@ -127,21 +127,19 @@ PlotLayout <- function(fun, plot_dims, var, ..., special_args = NULL,
   }
 
   # Check the rest of parameters (unless the user simply wants to build an empty layout)
-  if (!(drawleg == FALSE)) {
-    var_limits <- NULL
-    if (!all(sapply(var, is_single_na))) {
-      var_limits <- c(min(unlist(var), na.rm = TRUE), max(unlist(var), na.rm = TRUE))
-      if ((any(is.infinite(var_limits)) || var_limits[1] == var_limits[2]))  {
-        stop("Arrays in parameter 'var' must contain at least 2 different values.")
-      }
+  var_limits <- NULL
+  if (!all(sapply(var, is_single_na))) {
+    var_limits <- c(min(unlist(var), na.rm = TRUE), max(unlist(var), na.rm = TRUE))
+    if ((any(is.infinite(var_limits)) || var_limits[1] == var_limits[2]))  {
+      stop("Arrays in parameter 'var' must contain at least 2 different values.")
     }
-    colorbar <- ColorBar(brks, cols, FALSE, subsampleg, bar_limits,
-                         var_limits, triangle_ends, col_inf, col_sup, color_fun, 
-                         plot = FALSE, draw_bar_ticks, 
-                         draw_separators, triangle_ends_scale, bar_extra_labels,
-                         units, units_scale, bar_label_scale, bar_tick_scale,
-                         bar_extra_margin, bar_label_digits)
   }
+  colorbar <- ColorBar(brks, cols, FALSE, subsampleg, bar_limits,
+                       var_limits, triangle_ends, col_inf, col_sup, color_fun, 
+                       plot = FALSE, draw_bar_ticks, 
+                       draw_separators, triangle_ends_scale, bar_extra_labels,
+                       units, units_scale, bar_label_scale, bar_tick_scale,
+                       bar_extra_margin, bar_label_digits)
  
   # Check bar_scale
   if (!is.numeric(bar_scale)) {
@@ -227,8 +225,8 @@ PlotLayout <- function(fun, plot_dims, var, ..., special_args = NULL,
       dim_ids <- plot_dims[[plot_array_i]]
       if (is.character(dim_ids)) {
         dimnames <- NULL
-        if (!is.null(names(plot_array))) {
-          dimnames <- names(plot_array)
+        if (!is.null(names(dim(plot_array)))) {
+          dimnames <- names(dim(plot_array))
         } else if (!is.null(attr(plot_array, 'dimensions'))) {
           dimnames <- attr(plot_array, 'dimensions')
         }
@@ -237,7 +235,7 @@ PlotLayout <- function(fun, plot_dims, var, ..., special_args = NULL,
             stop("All arrays provided in parameter 'var' must have all the dimensions in 'plot_dims'.")
           }
           dim_ids <- sapply(dim_ids, function(x) which(dimnames == x)[1])
-          var[[plot_array_i]] <- aperm(var[[plot_array_i]], c((1:length(dim(plot_array)))[-dim_ids], dim_ids))
+          var[[plot_array_i]] <- .aperm2(var[[plot_array_i]], c((1:length(dim(plot_array)))[-dim_ids], dim_ids))
         } else {
           .warning(paste0("Assuming the ", plot_array_i, "th array provided in 'var' has 'plot_dims' as last dimensions (right-most)."))
           dims <- tail(c(rep(1, length(dim_ids)), dim(plot_array)), length(dim_ids))
@@ -253,6 +251,7 @@ PlotLayout <- function(fun, plot_dims, var, ..., special_args = NULL,
       #n_plots <- n_plots + prod(head(c(rep(1, length(dim_ids)), dim(plot_array)), length(dim(plot_array))))
       if (length(dim(var[[plot_array_i]])) == length(dim_ids)) {
         dim(var[[plot_array_i]]) <- c(1, dim(var[[plot_array_i]]))
+        dim_ids <- dim_ids + 1
       }
       plot_dims[[plot_array_i]] <- dim_ids
     }
@@ -434,8 +433,13 @@ PlotLayout <- function(fun, plot_dims, var, ..., special_args = NULL,
       }
       plot_number <<- plot_number + 1
     } else {
+      if (is.character(plot_dims[[array_number]])) {
+        plot_dim_indices <- which(names(dim(x)) %in% plot_dims[[array_number]])
+      } else {
+        plot_dim_indices <- plot_dims[[array_number]]
+      }
       # For each of the arrays provided in that array
-      apply(x, (1:length(dim(x)))[1:(length(dim(x)) - length(plot_dims[[array_number]]))], 
+      apply(x, (1:length(dim(x)))[-plot_dim_indices], 
             function(y) {
         # Do the plot
         fun_args <- c(list(y, toptitle = titles[plot_number]), list(...), 

@@ -33,7 +33,7 @@ TRUE/FALSE for vertical/horizontal colour bar (disregarded if plot = FALSE).
   }
   \item{subsampleg}{
 The first of each subsampleg breaks will be ticked on the colorbar.\cr
-Takes by default an approximation of a value that yields a readable tick arrangement (extreme breaks always ticked). See the code of the function for details or use 'extra_labels' for customized tick arrangements.
+Takes by default an approximation of a value that yields a readable tick arrangement (extreme breaks always ticked). If set to 0 or lower, no labels are drawn. See the code of the function for details or use 'extra_labels' for customized tick arrangements.
   }
   \item{bar_limits}{
 Vector of two numeric values with the extremes of the range of values represented in the colour bar. If 'var_limits' go beyond this interval, the drawing of triangle extremes is triggered at the corresponding sides, painted in 'col_inf' and 'col_sup'. Either of them can be set as NA and will then take as value the corresponding extreme in 'var_limits' (hence a triangle end won't be triggered for these sides). Takes as default the extremes of 'brks' if available, else the same values as 'var_limits'.

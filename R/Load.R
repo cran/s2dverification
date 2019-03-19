@@ -18,38 +18,38 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   }
   load_parameters <- lapply(parameter_names, get, envir = environment())
   names(load_parameters) <- parameter_names
-  parameters_to_show <- c('var', 'exp', 'obs', 'sdates', 'grid', 'output', 'storefreq')
+  parameters_to_show <- c('var', 'exp', 'obs', 'sdates', 'nmember', 'leadtimemin',
+                          'leadtimemax', 'latmin', 'latmax', 'lonmin', 'lonmax',
+                          'output', 'grid', 'storefreq')
   load_parameters <- c(load_parameters[parameters_to_show], load_parameters[-match(parameters_to_show, names(load_parameters))])
-  message(paste("* The load call you issued is:\n*   Load(", 
+  if (!silent) {
+    message(paste("* The load call you issued is:\n*   Load(", 
             paste(strwrap(
               paste(unlist(lapply(names(load_parameters[1:length(parameters_to_show)]), 
               function(x) paste(x, '=', 
                 if (x == 'sdates' && length(load_parameters[[x]]) > 4) {
                   paste0("c('", load_parameters[[x]][1], "', '", load_parameters[[x]][2], 
                          "', ..., '", tail(load_parameters[[x]], 1), "')")
+                } else if ((x %in% c('exp', 'obs')) && is.list(load_parameters[[x]])) {
+                  paste0("list(", paste(unlist(lapply(load_parameters[[x]], 
+                    function (y) {
+                      paste0("list(", 
+                        if ('name' %in% names(y)) {
+                          paste0('name = "', y[['name']], '", ...')
+                        } else {
+                          "..."
+                        }, ")"
+                      )
+                    })), collapse = ', '), 
+                  ")")
+  # Print a stamp of the call the user issued.
                 } else {
                   paste(deparse(load_parameters[[x]]), collapse = '')
                 }))), 
               collapse = ', '), width = getOption('width') - 9, indent = 0, exdent = 8), collapse = '\n*'),
             ", ...)\n* See the full call in '$load_parameters' after Load() finishes.", sep = ''))
 
-  # .message("* The load call you issued is:")
-  # .message("*   Load(")
-  # .message( 
-  #   strwrap(
-  #     paste(
-  #       unlist(lapply(names(load_parameters[1:length(parameters_to_show)]), 
-  #             function(x) paste(x, '=', 
-  #               if (x == 'sdates' && length(load_parameters[[x]]) > 4) {
-  #                 paste0("c('", load_parameters[[x]][1], "', '", load_parameters[[x]][2], 
-  #                        "', ..., '", tail(load_parameters[[x]], 1), "')")
-  #               } else {
-  #                 paste(deparse(load_parameters[[x]]), collapse = '')
-  #               }))), 
-  #       collapse = ', '), 
-  #     width = getOption('width') - 9, indent = 0, exdent = 8))
-  # .message("*        , ...)")
-  # .message("* See the full call in '$load_parameters' after Load() finishes.")
+  }
 
   # Run Load() error-aware, so that it always returns something
   errors <- try({
@@ -262,16 +262,20 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   if (is.null(method) || !(method %in% c('bilinear', 'bicubic', 'conservative', 'distance-weighted'))) {
     stop("Error: parameter 'method' is wrong, can take value 'bilinear', 'bicubic', 'conservative' or 'distance-weighted'.")
   }
-  remap <- switch(method, 'bilinear' = 'remapbil', 'bicubic' = 'remapbic', 
-                  'conservative' = 'remapcon', 'distance-weighted' = 'remapdis')
+  remap <- switch(method, 'bilinear' = 'bil', 'bicubic' = 'bic', 
+                  'conservative' = 'con', 'distance-weighted' = 'dis')
 
   # grid
   if (!is.null(grid)) {
     if (is.character(grid)) {
-      supported_grids <- list('r[0-9]{1,}x[0-9]{1,}', 't[0-9]{1,}grid')
-      grid_matches <- unlist(lapply(lapply(supported_grids, regexpr, grid), .IsFullMatch, grid))
-      if (sum(grid_matches) < 1) {
-        stop("The specified grid in the parameter 'grid' is incorrect. Must be one of r<NX>x<NY> or t<RES>grid.")
+      if (grid == 'none') {
+        grid <- NULL
+      } else {
+        supported_grids <- list('r[0-9]{1,}x[0-9]{1,}', 't[0-9]{1,}grid')
+        grid_matches <- unlist(lapply(lapply(supported_grids, regexpr, grid), .IsFullMatch, grid))
+        if (sum(grid_matches) < 1) {
+          stop("The specified grid in the parameter 'grid' is incorrect. Must be one of r<NX>x<NY> or t<RES>grid.")
+        }
       }
     } else {
       stop("Error: parameter 'grid' should be a character string, if specified.")
@@ -375,8 +379,10 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   replace_globs <- path_glob_permissive %in% c('no', 'partial')
 
   # If not all data has been provided in 'exp' and 'obs', configuration file is read.
-  if (length(exps_to_fetch) > 0 || length(obs_to_fetch) > 0) {
-    .message("Some 'path's not explicitly provided in 'exp' and 'obs', so will now proceed to open the configuration file.")
+  if ((length(exps_to_fetch) > 0 || length(obs_to_fetch) > 0)) {
+    if (!silent) {
+      .message("Some 'path's not explicitly provided in 'exp' and 'obs', so will now proceed to open the configuration file.")
+    }
     data_info <- ConfigFileOpen(configfile, silent, TRUE)
 
     # Check that the var, exp and obs parameters are right and keep the entries

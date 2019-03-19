@@ -40,7 +40,7 @@ ArrayToNetCDF <- function(arrays, file_path) {
       }
       dim_names <- names(dim(arrays[[i]]))
       if (!is.null(dim_names)) {
-        if (any(is.na(dim_names) || (sapply(dim_names, nchar) == 0))) {
+        if (any(is.na(dim_names) | (sapply(dim_names, nchar) == 0))) {
           stop("The provided arrays must have all named dimensions or ",
                "all unnamed dimensions.")
         }
@@ -74,7 +74,7 @@ ArrayToNetCDF <- function(arrays, file_path) {
             if (!is.numeric(dim_info[['len']])) {
               stop("The provided 'len' for the ", k, "th dimension in the ", i, "th array must be a numeric value.")
             }
-            dim_info[['len']] <- round(dim_info[['len']][1])
+            dim_info[['len']] <- as.integer(round(dim_info[['len']][1]))
             if (dim_info[['len']] != dim(arrays[[i]])[k]) {
               stop("The provided 'len' for the ", k, "th dimension in the ", i, "th array does not match the actual length of the provided array.")
             }
@@ -98,7 +98,7 @@ ArrayToNetCDF <- function(arrays, file_path) {
           if (!('vals' %in% names(dim_info))) {
             dim_info[['vals']] <- 1:dim_info[['len']]
           } else {
-            if (!is.numeric(dim_info[['vals']])) {
+            if (!(is.numeric(dim_info[['vals']]))) {
               stop("The provided 'vals' for the ", k, "th dimension in the ", i, "th array must be a numeric vector.")
             }
             if (dim_info[['units']] == '') {
@@ -292,10 +292,25 @@ ArrayToNetCDF <- function(arrays, file_path) {
         if (!is.character(var_info[['coordinates']])) {
           stop("The attribute 'coordinates' must be a character string.")
         }
-        if (!(all(strsplit(var_info[['coordinates']], ' ')[[1]] %in% sapply(defined_vars, '[[', 'name')))) {
-          stop("All the dimensions appearing in 'coordinates' must point to defined variables.")
+        coords <- strsplit(var_info[['coordinates']], ' ')[[1]]
+        if (!(all(coords %in% sapply(defined_vars, '[[', 'name') | 
+                  coords %in% sapply(defined_dims[which(sapply(defined_dims, '[[', 'create_dimvar'))], '[[', 'name')))) {
+          coords <- coords[which(coords %in% sapply(defined_vars, '[[', 'name') |
+                                 coords %in% sapply(defined_dims[which(sapply(defined_dims, '[[', 'create_dimvar'))], '[[', 'name'))]
+          .warning("Some of the dimensions appearing in 'coordinates' have been removed because they point to undefined variables.")
         }
-        ncatt_put(ncdf_object, defined_vars[[var_counter]]$name, 'coordinates', var_info[['coordinates']])
+        ncatt_put(ncdf_object, defined_vars[[var_counter]]$name, 'coordinates', paste(coords, collapse = ' '))
+      }
+      attrs_to_skip <- which(names(var_info) %in% c('addOffset', 'scaleFact', 'coordinates', 'dim'))
+      attrs_to_add <- names(var_info)
+      if (length(attrs_to_skip) > 0) {
+        attrs_to_add <- attrs_to_add[-attrs_to_skip]
+      }
+      for (attribute_name in attrs_to_add) {
+        if (is.numeric(var_info[[attribute_name]]) ||
+            is.character(var_info[[attribute_name]])) {
+          ncatt_put(ncdf_object, defined_vars[[var_counter]]$name, attribute_name, var_info[[attribute_name]])
+        }
       }
       var_counter <- var_counter + 1
     }

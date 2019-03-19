@@ -26,9 +26,9 @@ year0 <- 1960     # first start date
 yearf <- 2005     # last start date
 intsdate <- 5     # interval between start dates
 runmeanlen <- 12  # length of the window for running mean (in months)
-members <- list(19900101 = c('r1i1p1')) 
+members <- list('19900101' = c('r1i1p1')) 
 #PUT IN ORDER. NONE CAN BE MISSING
-chunks <- list(19900101 = c('199001-199001', '199002-199002', '199003-199003'))
+chunks <- list('19900101' = c('199001-199001', '199002-199002', '199003-199003'))
 
 
 

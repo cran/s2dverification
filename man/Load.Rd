@@ -111,13 +111,13 @@ Load(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
 }
 \arguments{
   \item{var}{
-Name of the variable to load.\cr
-If the variable name inside the files to load is not the same as this, adjust properly the parameters 'exp' and 'obs'.\cr
-This parameter is mandatory.\cr
-Ex: 'tas'
+Short name of the variable to load. It should coincide with the variable name inside the data files.\cr
+E.g.: \code{var = 'tos'}, \code{var = 'tas'}, \code{var = 'prlr'}.\cr
+In some cases, though, the path to the files contains twice or more times the short name of the variable but the actual name of the variable inside the data files is different. In these cases it may be convenient to provide \code{var} with the name that appears in the file paths (see details on parameters \code{exp} and \code{obs}).
   }
   \item{exp}{
-This argument can take two formats: a list of lists or a vector of character strings. Each format will trigger a different mechanism of locating the requested datasets.\cr
+Parameter to specify which experimental datasets to load data from.\cr
+It can take two formats: a list of lists or a vector of character strings. Each format will trigger a different mechanism of locating the requested datasets.\cr
 The first format is adequate when loading data you'll only load once or occasionally. The second format is targeted to avoid providing repeatedly the information on a certain dataset but is more complex to use.\cr\cr
 IMPORTANT: Place first the experiment with the largest number of members and, if possible, with the largest number of leadtimes. If not possible, the arguments 'nmember' and/or 'nleadtime' should be filled to not miss any member or leadtime.\cr
 If 'exp' is not specified or set to NULL, observational data is loaded for each start-date as far as 'leadtimemax'. If 'leadtimemax' is not provided, \code{Load()} will retrieve data of a period of time as long as the time period between the first specified start date and the current date.\cr
@@ -272,8 +272,9 @@ Takes by default the value 'conservative'.
   \item{grid}{
 A common grid can be specified through the parameter 'grid' when loading 2-dimensional data. Data is then interpolated onto this grid whichever 'output' type is specified. If the selected output type is 'areave' and a 'grid' is specified, the area averages are calculated after interpolating to the specified grid.\cr
 If not specified and the selected output type is 'lon', 'lat' or 'lonlat', this parameter takes as default value the grid of the first experimental dataset, which is read automatically from the source files.\cr
-The grid must be supported by 'cdo' tools: rNXxNY or tTRgrid.\cr
-Ex: 'r96x72'\cr
+The grid must be supported by 'cdo' tools. Now only supported: rNXxNY or tTRgrid.\cr
+Both rNXxNY and tRESgrid yield rectangular regular grids. rNXxNY yields grids that are evenly spaced in longitudes and latitudes (in degrees). tRESgrid refers to a grid generated with series of spherical harmonics truncated at the RESth harmonic. However these spectral grids are usually associated to a gaussian grid, the latitudes of which are spaced with a Gaussian quadrature (not evenly spaced in degrees). The pattern tRESgrid will yield a gaussian grid.\cr
+Ex: 'r96x72' 
 Advanced: If the output type is 'lon', 'lat' or 'lonlat' and no common grid is specified, the grid of the first experimental or observational dataset is detected and all data is then interpolated onto this grid. If the first experimental or observational dataset's data is found shifted along the longitudes (i.e., there's no value at the longitude 0 but at a longitude close to it), the data is re-interpolated to suppress the shift. This has to be done in order to make sure all the data from all the datasets is properly aligned along longitudes, as there's no option so far in \code{Load} to specify grids starting at longitudes other than 0. This issue doesn't affect when loading in 'areave' mode without a common grid, the data is not re-interpolated in that case.
   }
   \item{maskmod}{
@@ -490,12 +491,46 @@ History:\cr
 # The observational dataset used for verification is the 'ERSST' 
 # observational dataset.
 #
-# The code is not run because it dispatches system calls to 'cdo' and 'nco'
-# which is not allowed as per CRAN policies. You can run it in your system 
-# though. Instead, the code in 'dontshow' is run, which loads the equivalent
-# data already processed in R.
+# The next two examples are equivalent and show how to load the variable 
+# 'tos' from these sample datasets, the first providing lists of lists to 
+# the parameters 'exp' and 'obs' (see documentation on these parameters) and 
+# the second providing vectors of character strings, hence using a 
+# configuration file.
 #
-# Example 1: providing lists in 'exp' and 'obs'.
+# The code is not run because it dispatches system calls to 'cdo' which is 
+# not allowed in the examples as per CRAN policies. You can run it on your 
+# system though. 
+# Instead, the code in 'dontshow' is run, which loads the equivalent
+# already processed data in R.
+#
+# Example 1: Providing lists of lists to 'exp' and 'obs':
+#
+  \dontrun{
+data_path <- system.file('sample_data', package = 's2dverification')
+exp <- list(
+         name = 'experiment',
+         path = file.path(data_path, 'model/$EXP_NAME$/monthly_mean',
+                          '$VAR_NAME$_3hourly/$VAR_NAME$_$START_DATES$.nc')
+       )
+obs <- list(
+         name = 'observation',
+         path = file.path(data_path, 'observation/$OBS_NAME$/monthly_mean',
+                          '$VAR_NAME$/$VAR_NAME$_$YEAR$$MONTH$.nc')
+       )
+# Now we are ready to use Load().
+startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+sampleData <- Load('tos', list(exp), list(obs), startDates,
+                   output = 'areave', latmin = 27, latmax = 48, 
+                   lonmin = -12, lonmax = 40)
+  }
+#
+# Example 2: Providing vectors of character strings to 'exp' and 'obs'
+#            and using a configuration file.
+#
+# The configuration file 'sample.conf' that we will create in the example 
+# has the proper entries to load these (see ?LoadConfigFile for details on 
+# writing a configuration file). 
+#
   \dontrun{
 data_path <- system.file('sample_data', package = 's2dverification')
 expA <- list(name = 'experiment', path = file.path(data_path, 

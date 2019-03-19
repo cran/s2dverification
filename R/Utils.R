@@ -202,8 +202,11 @@
     } else {
       is_2d_var <- work_piece[['is_2d_var']]
     }
-    if ((is_2d_var || work_piece[['is_file_per_dataset']]) && (Sys.which("cdo")[[1]] == "")) {
-      stop("Error: CDO libraries not available")
+    if ((is_2d_var || work_piece[['is_file_per_dataset']])) {
+      if (Sys.which("cdo")[[1]] == "") {
+        stop("Error: CDO libraries not available")
+      }
+      cdo_version <- as.numeric_version(strsplit(suppressWarnings(system2("cdo", args = '-V', stderr = TRUE))[[1]], ' ')[[1]][5])
     }
     # If the variable to load is 2-d, we need to determine whether:
     #  - interpolation is needed
@@ -220,6 +223,9 @@
         # Here we read the grid type and its number of longitudes and latitudes
         file_info <- system(paste('cdo -s griddes', filein, '2> /dev/null'), intern = TRUE)
         grids_positions <- grep('# gridID', file_info)
+        if (length(grids_positions) < 1) {
+          stop("The grid should be defined in the files.")
+        }
         grids_first_lines <- grids_positions + 2
         grids_last_lines <- c((grids_positions - 2)[-1], length(file_info))
         grids_info <- as.list(1:length(grids_positions))
@@ -230,21 +236,23 @@
         grids_types <- unlist(lapply(grids_info, function (x) x[grep('gridtype', x) + 1]))
         grids_matches <- unlist(lapply(grids_info, function (x) {
           nlons <- if (length(grep('xsize', x)) > 0) {
-                     as.integer(x[grep('xsize', x) + 1])
+                     as.numeric(x[grep('xsize', x) + 1])
                    } else {
                      NA
                    }
           nlats <- if (length(grep('ysize', x)) > 0) {
-                    as.integer(x[grep('ysize', x) + 1])
+                    as.numeric(x[grep('ysize', x) + 1])
                   } else {
                     NA
                   }
-          if (identical(nlons, length(lon)) && 
-              identical(nlats, length(lat))) {
-            TRUE
-          } else {
-            FALSE
+          result <- FALSE
+          if (!any(is.na(c(nlons, nlats)))) {
+            if ((nlons == length(lon)) && 
+                (nlats == length(lat))) {
+              result <- TRUE
+            }
           }
+          result
         }))
         grids_matches <- grids_matches[which(grids_types %in% c('gaussian', 'lonlat'))]
         grids_info <- grids_info[which(grids_types %in% c('gaussian', 'lonlat'))]
@@ -261,8 +269,10 @@
           } else {
             stop("Error: Load() can't disambiguate: More than one lonlat/gaussian grids with the same size as the requested variable defined in ", filename)
           }
-        } else {
+        } else if (sum(grids_matches) == 1) {
           grid_type <- grids_types[which(grids_matches)]
+        } else {
+          stop("Unexpected error.")
         }
         grid_lons <- length(lon)
         grid_lats <- length(lat)
@@ -279,14 +289,14 @@
         # Now we calculate the common grid type and its lons and lats
         if (length(grep('^t\\d{1,+}grid$', work_piece[['grid']])) > 0) {
           common_grid_type <- 'gaussian'
-          common_grid_res <- as.integer(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][2])
+          common_grid_res <- as.numeric(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][2])
           nlonlat <- .t2nlatlon(common_grid_res)
           common_grid_lats <- nlonlat[1]
           common_grid_lons <- nlonlat[2]
         } else if (length(grep('^r\\d{1,+}x\\d{1,+}$', work_piece[['grid']])) > 0) {
           common_grid_type <- 'lonlat'
-          common_grid_lons <- as.integer(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][2])
-          common_grid_lats <- as.integer(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][3])
+          common_grid_lons <- as.numeric(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][2])
+          common_grid_lats <- as.numeric(strsplit(work_piece[['grid']], '[^0-9]{1,+}')[[1]][3])
         } else {
           stop("Error: Only supported grid types in parameter 'grid' are t<RES>grid and r<NX>x<NY>")
         }
@@ -324,6 +334,10 @@
         common_grid_name <- grid_name
         remove_shift <- TRUE
       }
+      if (remap_needed && (work_piece[['remap']] == 'con') && 
+          (cdo_version >= as.numeric_version('1.7.0'))) {
+        work_piece[['remap']] <- 'ycon'
+      }
       if (remove_shift && !explore_dims) {
         if (!is.null(work_piece[['progress_amount']])) {
           cat("\n")
@@ -341,12 +355,14 @@
         if (!is.null(work_piece[['progress_amount']])) {
           cat("\n")
         }
-        cat(paste0("! Warning: the dataset with index ", tail(work_piece[['indices']], 1), 
-                   " in '", work_piece[['dataset_type']], "' is originally on ",
-                   "a grid coarser than the common grid and it has been ",
-                   "extrapolated. Check the results carefully. It is ",
-                   "recommended to specify as common grid the coarsest grid ",
-                   "among all requested datasets via the parameter 'grid'.\n"))
+        if (!explore_dims) {
+          cat(paste0("! Warning: the dataset with index ", tail(work_piece[['indices']], 1), 
+                     " in '", work_piece[['dataset_type']], "' is originally on ",
+                     "a grid coarser than the common grid and it has been ",
+                     "extrapolated. Check the results carefully. It is ",
+                     "recommended to specify as common grid the coarsest grid ",
+                     "among all requested datasets via the parameter 'grid'.\n"))
+        }
       }
       # Now calculate if the user requests for a lonlat subset or for the 
       # entire field
@@ -395,7 +411,7 @@
         filecopy <- tempfile(pattern = "load", fileext = ".nc")
         file.copy(filein, filecopy)
         filein <- tempfile(pattern = "loadRegridded", fileext = ".nc")
-        system(paste0("cdo -s ", work_piece[['remap']], ",", 
+        system(paste0("cdo -s remap", work_piece[['remap']], ",", 
                       common_grid_name, 
                       " -selname,", namevar, " ", filecopy, " ", filein, 
                       " 2>/dev/null", sep = ""))
@@ -610,15 +626,15 @@
                          ' 2>/dev/null'), intern = TRUE), split = ' ')
         years <- strsplit(system(paste('cdo showyear ', filein, 
                           ' 2>/dev/null'), intern = TRUE), split = ' ')
-        mons <- as.integer(mons[[1]][which(mons[[1]] != "")])
-        years <- as.integer(years[[1]][which(years[[1]] != "")])
+        mons <- as.numeric(mons[[1]][which(mons[[1]] != "")])
+        years <- as.numeric(years[[1]][which(years[[1]] != "")])
         time_indices <- ts(time_indices, start = c(years[1], mons[1]), 
                            end = c(years[length(years)], mons[length(mons)]),
                            frequency = 12)
         ltimes_list <- list()
         for (sdate in work_piece[['startdates']]) {
-          selected_time_indices <- window(time_indices, start = c(as.integer(
-                                   substr(sdate, 1, 4)), as.integer(substr(sdate, 5, 6))), 
+          selected_time_indices <- window(time_indices, start = c(as.numeric(
+                                   substr(sdate, 1, 4)), as.numeric(substr(sdate, 5, 6))), 
                                    end = c(3000, 12), frequency = 12, extend = TRUE)
           selected_time_indices <- selected_time_indices[work_piece[['leadtimes']]]
           ltimes_list <- c(ltimes_list, list(selected_time_indices))
@@ -717,45 +733,45 @@
             if (fnc$var[[namevar]]$hasScaleFact || fnc$var[[namevar]]$hasAddOffset) {
               tmp <- (tmp - add_offset) / scale_factor
             }
-            nc_close(fnc)
-            fnc <- nc_create(filein2, list(ncdf_var))
-            ncvar_put(fnc, ncdf_var, tmp)
+            #nc_close(fnc)
+            fnc2 <- nc_create(filein2, list(ncdf_var))
+            ncvar_put(fnc2, ncdf_var, tmp)
             if (add_offset != 0) {
-              ncatt_put(fnc, ncdf_var, 'add_offset', add_offset)
+              ncatt_put(fnc2, ncdf_var, 'add_offset', add_offset)
             }
             if (scale_factor != 1) {
-              ncatt_put(fnc, ncdf_var, 'scale_factor', scale_factor)
+              ncatt_put(fnc2, ncdf_var, 'scale_factor', scale_factor)
             }
-            nc_close(fnc)
+            nc_close(fnc2)
             system(paste0("cdo -s -sellonlatbox,", if (lonmin > lonmax) {
                                                      "0,360,"
                                                    } else {
                                                      paste0(lonmin, ",", lonmax, ",")
                                                    }, latmin, ",", latmax,
-                   " -", work_piece[['remap']], ",", common_grid_name, 
+                   " -remap", work_piece[['remap']], ",", common_grid_name, 
                    " ", filein2, " ", filein, " 2>/dev/null", sep = ""))
             file.remove(filein2)
-            fnc <- nc_open(filein)
-            lon <- ncvar_get(fnc, 'lon')
-            lat <- ncvar_get(fnc, 'lat')
+            fnc2 <- nc_open(filein)
+            sub_lon <- ncvar_get(fnc2, 'lon')
+            sub_lat <- ncvar_get(fnc2, 'lat')
             ## We read the longitudes and latitudes from the file.
             ## In principle cdo should put in order the longitudes
             ## and slice them properly unless data is across greenwich
-            lon[which(lon < 0)] <- lon[which(lon < 0)] + 360
-            lon_indices <- 1:length(lon)
+            sub_lon[which(sub_lon < 0)] <- sub_lon[which(sub_lon < 0)] + 360
+            sub_lon_indices <- 1:length(sub_lon)
             if (lonmax < lonmin) {
-              lon_indices <- lon_indices[which((lon <= lonmax) | (lon >= lonmin))]
+              sub_lon_indices <- sub_lon_indices[which((sub_lon <= lonmax) | (sub_lon >= lonmin))]
             }
-            lat_indices <- 1:length(lat)
+            sub_lat_indices <- 1:length(sub_lat)
             ## In principle cdo should put in order the latitudes
-            if (lat[1] < lat[length(lat)]) {
-              lat_indices <- length(lat):1
+            if (sub_lat[1] < sub_lat[length(sub_lat)]) {
+              sub_lat_indices <- length(sub_lat):1
             }
-            final_dims[c(1, 2)] <- c(length(lon_indices), length(lat_indices))
-            subset_indices[[dim_matches[1]]] <- lon_indices
-            subset_indices[[dim_matches[2]]] <- lat_indices
+            final_dims[c(1, 2)] <- c(length(sub_lon_indices), length(sub_lat_indices))
+            subset_indices[[dim_matches[1]]] <- sub_lon_indices
+            subset_indices[[dim_matches[2]]] <- sub_lat_indices
 
-            tmp <- take(ncvar_get(fnc, namevar, collapse_degen = FALSE), 
+            tmp <- take(ncvar_get(fnc2, namevar, collapse_degen = FALSE), 
                         1:length(subset_indices), subset_indices)
 
             if (!is.null(mask)) {
@@ -769,7 +785,7 @@
               fnc_mask <- nc_create(mask_file, list(ncdf_var))
               ncvar_put(fnc_mask, ncdf_var, array(rep(0, 4), dim = c(2, 2)))
               nc_close(fnc_mask)
-              system(paste0("cdo -s ", work_piece[['remap']], ",", common_grid_name, 
+              system(paste0("cdo -s remap", work_piece[['remap']], ",", common_grid_name, 
                      " ", mask_file, " ", mask_file_remap, " 2>/dev/null", sep = ""))
               fnc_mask <- nc_open(mask_file_remap)
               mask_lons <- ncvar_get(fnc_mask, 'lon')
@@ -786,20 +802,20 @@
                 mask_lon_indices <- which((mask_lons >= lonmin) | (mask_lons <= lonmax))
               }
               mask_lat_indices <- which((mask_lats >= latmin) & (mask_lats <= latmax))
-              if (lat[1] < lat[length(lat)]) {
+              if (sub_lat[1] < sub_lat[length(sub_lat)]) {
                 mask_lat_indices <- mask_lat_indices[length(mask_lat_indices):1]
               }
               mask <- mask[mask_lon_indices, mask_lat_indices]
             }
-            lon <- lon[lon_indices]
-            lat <- lat[lat_indices]
+            sub_lon <- sub_lon[sub_lon_indices]
+            sub_lat <- sub_lat[sub_lat_indices]
             ###  nc_close(fnc_mask)
             ###  system(paste0("cdo -s -sellonlatbox,", if (lonmin > lonmax) {
             ###                                           "0,360,"
             ###                                         } else {
             ###                                           paste0(lonmin, ",", lonmax, ",")
             ###                                         }, latmin, ",", latmax,
-            ###         " -", work_piece[['remap']], ",", common_grid_name, 
+            ###         " -remap", work_piece[['remap']], ",", common_grid_name, 
             ###This is wrong: same files  
             ###         " ", mask_file, " ", mask_file, " 2>/dev/null", sep = ""))
             ###  fnc_mask <- nc_open(mask_file) 
@@ -818,6 +834,13 @@
         dim(tmp) <- final_dims
         # If we are exploring the file we don't need to process and arrange
         # the retrieved data. We only need to keep the dimension sizes.
+        if (is_2d_var && lonlat_subsetting_requested && remap_needed) {
+          final_lons <- sub_lon
+          final_lats <- sub_lat
+        } else {
+          final_lons <- lon
+          final_lats <- lat
+        }
         if (explore_dims) {
           if (work_piece[['is_file_per_member']]) {
             ## TODO: When the exp_full_path contains asterisks and is file_per_member
@@ -830,7 +853,7 @@
               nmemb <- length(files)
             }
           }
-          dims <- list(member = nmemb, ftime = nltime, lon = lon, lat = lat)
+          dims <- list(member = nmemb, ftime = nltime, lon = final_lons, lat = final_lats)
         } else {
         # If we are not exploring, then we have to process the retrieved data
           if (is_2d_var) {
@@ -847,13 +870,13 @@
               }
   
               if (output == 'areave' || output == 'lon') {
-                weights <- InsertDim(cos(lat * pi / 180), 1, length(lon))
+                weights <- InsertDim(cos(final_lats * pi / 180), 1, length(final_lons))
                 weights[which(is.na(x))] <- NA
                 if (output == 'areave') {
                   weights <- weights / mean(weights, na.rm = TRUE)
                   mean(x * weights, na.rm = TRUE) 
                 } else {
-                  weights <- weights / InsertDim(Mean1Dim(weights, 2, narm = TRUE), 2, length(lat))
+                  weights <- weights / InsertDim(Mean1Dim(weights, 2, narm = TRUE), 2, length(final_lats))
                   Mean1Dim(x * weights, 2, narm = TRUE)
                 }
               } else if (output == 'lat') {
@@ -1156,7 +1179,7 @@
 
   if (give_warning) {
     .warning(paste0("Too complex path pattern specified for ", dataset_name, 
-                    ". Double check carefully the 'source_files' fetched for this dataset or specify a simpler path pattern."))
+                    ". Double check carefully the '$Files' fetched for this dataset or specify a simpler path pattern."))
   }
 
   if (permissive) {
@@ -1164,6 +1187,60 @@
   } else {
     actual_path
   }
+}
+
+.FindTagValue <- function(path_with_globs_and_tag, actual_path, tag) {
+  tag <- paste0('\\$', tag, '\\$')
+  path_with_globs_and_tag <- paste0('^', path_with_globs_and_tag, '$')
+  parts <- strsplit(path_with_globs_and_tag, '*', fixed = TRUE)[[1]]
+  parts <- as.list(parts[grep(tag, parts)])
+  longest_couples <- c()
+  pos_longest_couples <- c()
+  found_value <- NULL
+  for (i in 1:length(parts)) {
+    parts[[i]] <- strsplit(parts[[i]], tag)[[1]]
+    if (length(parts[[i]]) == 1) {
+      parts[[i]] <- c(parts[[i]], '')
+    }
+    len_parts <- sapply(parts[[i]], nchar)
+    len_couples <- len_parts[-length(len_parts)] + len_parts[2:length(len_parts)]
+    pos_longest_couples <- c(pos_longest_couples, which.max(len_couples))
+    longest_couples <- c(longest_couples, max(len_couples))
+  }
+  chosen_part <- which.max(longest_couples)
+  parts[[chosen_part]] <- parts[[chosen_part]][pos_longest_couples[chosen_part]:(pos_longest_couples[chosen_part] + 1)]
+  if (nchar(parts[[chosen_part]][1]) >= nchar(parts[[chosen_part]][2])) {
+    if (nchar(parts[[chosen_part]][1]) > 0) {
+      matches <- gregexpr(parts[[chosen_part]][1], actual_path)[[1]]
+      if (length(matches) == 1) {
+        match_left <- matches
+        actual_path <- substr(actual_path, match_left + attr(match_left, 'match.length'), nchar(actual_path))
+      }
+    }
+    if (nchar(parts[[chosen_part]][2]) > 0) {
+      matches <- gregexpr(parts[[chosen_part]][2], actual_path)[[1]]
+      if (length(matches) == 1) {
+        match_right <- matches
+        found_value <- substr(actual_path, 0, match_right - 1)
+      }
+    }
+  } else {
+    if (nchar(parts[[chosen_part]][2]) > 0) {
+      matches <- gregexpr(parts[[chosen_part]][2], actual_path)[[1]]
+      if (length(matches) == 1) {
+        match_right <- matches
+        actual_path <- substr(actual_path, 0, match_right - 1)
+      }
+    }
+    if (nchar(parts[[chosen_part]][1]) > 0) {
+      matches <- gregexpr(parts[[chosen_part]][1], actual_path)[[1]]
+      if (length(matches) == 1) {
+        match_left <- matches
+        found_value <- substr(actual_path, match_left + attr(match_left, 'match.length'), nchar(actual_path))
+      }
+    }
+  }
+  found_value
 }
 
 .FilterUserGraphicArgs <- function(excludedArgs, ...) {
@@ -1437,4 +1514,113 @@
   }
   plot(0, type = 'n', axes = FALSE, ann = FALSE)
   par(mfg = next_attempt)
+}
+
+# Function to permute arrays of non-atomic elements (e.g. POSIXct)
+.aperm2 <- function(x, new_order) {
+  old_dims <- dim(x)
+  attr_bk <- attributes(x)
+  if ('dim' %in% names(attr_bk)) {
+    attr_bk[['dim']] <- NULL
+  }
+  if (is.numeric(x)) {
+    x <- aperm(x, new_order)
+  } else {
+    y <- array(1:length(x), dim = dim(x))
+    y <- aperm(y, new_order)
+    x <- x[as.vector(y)]
+  }
+  dim(x) <- old_dims[new_order]
+  attributes(x) <- c(attributes(x), attr_bk)
+  x
+}
+
+# This function is a helper for the function .MergeArrays.
+# It expects as inputs two named numeric vectors, and it extends them
+# with dimensions of length 1 until an ordered common dimension
+# format is reached.
+# The first output is dims1 extended with 1s.
+# The second output is dims2 extended with 1s.
+# The third output is a merged dimension vector. If dimensions with
+# the same name are found in the two inputs, and they have a different
+# length, the maximum is taken.
+.MergeArrayDims <- function(dims1, dims2) {
+  new_dims1 <- c()
+  new_dims2 <- c()
+  while (length(dims1) > 0) {
+    if (names(dims1)[1] %in% names(dims2)) {
+      pos <- which(names(dims2) == names(dims1)[1])
+      dims_to_add <- rep(1, pos - 1)
+      if (length(dims_to_add) > 0) {
+        names(dims_to_add) <- names(dims2[1:(pos - 1)])
+      }
+      new_dims1 <- c(new_dims1, dims_to_add, dims1[1])
+      new_dims2 <- c(new_dims2, dims2[1:pos])
+      dims1 <- dims1[-1]
+      dims2 <- dims2[-c(1:pos)]
+    } else {
+      new_dims1 <- c(new_dims1, dims1[1])
+      new_dims2 <- c(new_dims2, 1)
+      names(new_dims2)[length(new_dims2)] <- names(dims1)[1]
+      dims1 <- dims1[-1]
+    }
+  }
+  if (length(dims2) > 0) {
+    dims_to_add <- rep(1, length(dims2))
+    names(dims_to_add) <- names(dims2)
+    new_dims1 <- c(new_dims1, dims_to_add)
+    new_dims2 <- c(new_dims2, dims2)
+  }
+  list(new_dims1, new_dims2, pmax(new_dims1, new_dims2))
+}
+
+# This function takes two named arrays and merges them, filling with
+# NA where needed.
+# dim(array1)
+#          'b'   'c'         'e'   'f'
+#           1     3           7     9
+# dim(array2)
+#    'a'   'b'         'd'         'f'   'g'
+#     2     3           5           9     11
+# dim(.MergeArrays(array1, array2, 'b'))
+#    'a'   'b'   'c'   'e'   'd'   'f'   'g'
+#     2     4     3     7     5     9     11
+.MergeArrays <- function(array1, array2, along) {
+  if (!(is.null(array1) || is.null(array2))) {
+    if (!(identical(names(dim(array1)), names(dim(array2))) &&
+        identical(dim(array1)[-which(names(dim(array1)) == along)],
+                  dim(array2)[-which(names(dim(array2)) == along)]))) {
+      new_dims <- .MergeArrayDims(dim(array1), dim(array2))
+      dim(array1) <- new_dims[[1]]
+      dim(array2) <- new_dims[[2]]
+      for (j in 1:length(dim(array1))) {
+        if (names(dim(array1))[j] != along) {
+          if (dim(array1)[j] != dim(array2)[j]) {
+            if (which.max(c(dim(array1)[j], dim(array2)[j])) == 1) {
+              na_array_dims <- dim(array2)
+              na_array_dims[j] <- dim(array1)[j] - dim(array2)[j]
+              na_array <- array(dim = na_array_dims)
+              array2 <- abind(array2, na_array, along = j)
+              names(dim(array2)) <- names(na_array_dims)
+            } else {
+              na_array_dims <- dim(array1)
+              na_array_dims[j] <- dim(array2)[j] - dim(array1)[j]
+              na_array <- array(dim = na_array_dims)
+              array1 <- abind(array1, na_array, along = j)
+              names(dim(array1)) <- names(na_array_dims)
+            }
+          }
+        }
+      }
+    }
+    if (!(along %in% names(dim(array2)))) {
+      stop("The dimension specified in 'along' is not present in the ",
+           "provided arrays.")
+    }
+    array1 <- abind(array1, array2, along = which(names(dim(array1)) == along))
+    names(dim(array1)) <- names(dim(array2))
+  } else if (is.null(array1)) {
+    array1 <- array2
+  }
+  array1
 }

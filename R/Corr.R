@@ -149,8 +149,8 @@ Corr <- function(var_exp, var_obs, posloop = 1, poscor = 2, compROW = NULL,
     }
   }
   if (pval && (method == "pearson")) {
-    t <- CORR * sqrt((eno - 2) / (1 - (CORR ^ 2)))
-    p_val <- 1 - pt(t, eno - 2)
+    t <-sqrt(CORR * CORR * (eno - 2) / (1 - (CORR ^ 2)))
+    p_val <- pt(t, eno - 2, lower.tail = FALSE)
   } 
   if (conf && (method == "pearson")) {
     conf_low <- (1 - siglev) / 2

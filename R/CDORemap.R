@@ -42,12 +42,25 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     return_array <- FALSE
     if (length(dim(lons)) == 1) {
       array_dims <- c(length(lats), length(lons))
-      names(array_dims) <- c('lat', 'lon')
+      new_lon_dim_name <- 'lon'
+      new_lat_dim_name <- 'lat'
     } else {
       array_dims <- dim(lons)
-      names(array_dims) <- c('j', 'i')
+      new_lon_dim_name <- 'i'
+      new_lat_dim_name <- 'j'
     }
-    data_array <- array(NA, array_dims)
+    if (!is.null(names(dim(lons)))) {
+      if (any(known_lon_names %in% names(dim(lons)))) {
+        new_lon_dim_name <- known_lon_names[which(known_lon_names %in% names(dim(lons)))[1]]
+      }
+    }
+    if (!is.null(names(dim(lats)))) {
+      if (any(known_lat_names %in% names(dim(lats)))) {
+        new_lat_dim_name <- known_lat_names[which(known_lat_names %in% names(dim(lats)))[1]]
+      }
+    }
+    names(array_dims) <- c(new_lat_dim_name, new_lon_dim_name)
+    data_array <- array(as.numeric(NA), array_dims)
   }
   if (!(is.logical(data_array) || is.numeric(data_array)) || !is.array(data_array)) {
     stop("Parameter 'data_array' must be a numeric array.")
@@ -86,7 +99,9 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     }
   }
   if (is.null(names(dim(lats)))) {
-    if (length(dim(lats)) > 1) {
+    if (length(dim(lats)) == 1) {
+      names(dim(lats)) <- lat_dim
+    } else {
       stop("Parameter 'lats' must be provided with dimension names.")
     }
   } else {
@@ -203,7 +218,8 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
           tmp_lon <- Subset(lons, lat_dim, min_pos[which(names(dim(lons)) == lat_dim)], drop = 'selected')
         }
         i <- 1:length(tmp_lon)
-        lon_model <- lm(tmp_lon ~ poly(i, 3))
+        degree <- min(3, length(i) - 1)
+        lon_model <- lm(tmp_lon ~ poly(i, degree))
         lon_extremes <- c(NA, NA)
         left_is_min <- FALSE
         right_is_max <- FALSE
@@ -211,6 +227,7 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
           left_is_min <- TRUE
           prev_lon <- predict(lon_model, data.frame(i = 0))
           first_lon_cell_width <- (tmp_lon[1] - prev_lon)
+          # The signif is needed because cdo sellonlatbox crashes with too many digits
           lon_extremes[1] <- tmp_lon[1] - first_lon_cell_width / 2
         } else {
           lon_extremes[1] <- min(tmp_lon)
@@ -261,7 +278,8 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
           tmp_lat <- Subset(lats, lon_dim, min_pos[which(names(dim(lats)) == lon_dim)], drop = 'selected')
         }
         i <- 1:length(tmp_lat)
-        lat_model <- lm(tmp_lat ~ poly(i, 3))
+        degree <- min(3, length(i) - 1)
+        lat_model <- lm(tmp_lat ~ poly(i, degree))
         lat_extremes <- c(NA, NA)
         if (which.min(tmp_lat) == 1) {
           prev_lat <- predict(lat_model, data.frame(i = 0))
@@ -377,6 +395,13 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     if (nchar(Sys.which('cdo')[1]) < 1) {
       stop("CDO must be installed in order to use the .CDORemap.")
     }
+    cdo_version <- as.numeric_version(
+      strsplit(suppressWarnings(system2("cdo", args = '-V', stderr = TRUE))[[1]], ' ')[[1]][5]
+    )
+    warning("CDORemap: Using CDO version ", cdo_version, ".")
+    if ((cdo_version >= as.numeric_version('1.7.0')) && (method == 'con')) {
+      method <- 'ycon'
+    }
     # CDO takes arrays of 3 dimensions or 4 if one of them is unlimited.
     # The unlimited dimension can only be the left-most (right-most in R).
     # There are no restrictions for the dimension names or variable names.
@@ -409,12 +434,13 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     if (length(other_dims) > 1 || (length(other_dims) > 0 && (is_irregular))) {
       if (!(length(dim(data_array)) %in% other_dims)) {
         if (avoid_writes || is_irregular) {
-          dim_to_move <- max(other_dims)
+          dims_mod <- dim(data_array)
+          dims_mod[which(names(dim(data_array)) %in%
+                   c(lon_dim, lat_dim))] <- 0
+          dim_to_move <- which.max(dims_mod)
           permutation <- (1:length(dim(data_array)))[-dim_to_move]
           permutation <- c(permutation, dim_to_move)
-          permutation_back <- 1:length(dim(data_array))
-          permutation_back[dim_to_move] <- length(dim(data_array))
-          permutation_back[length(dim(data_array))] <- dim_to_move
+          permutation_back <- sort(permutation, index.return = TRUE)$ix
           dim_backup <- dim(data_array)
           data_array <- aperm(data_array, permutation)
           dim(data_array) <- dim_backup[permutation]
@@ -436,6 +462,7 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
       }
       if ((other_dims_per_chunk > 1) || (other_dims_per_chunk > 0 && is_irregular)) {
         unlimited_dim <- tail(sort(tail(other_dims_ordered_by_size, other_dims_per_chunk)), 1)
+        #unlimited_dim <- tail(other_dims)
       }
     }
 
@@ -474,24 +501,34 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     }
     names(attr(lons, 'variables')) <- lon_var_name
     names(attr(lats, 'variables')) <- lat_var_name
+    if (!is.null(attr(lons, 'variables')[[1]][['dim']])) {
+      attr(lons, 'variables')[[1]][['dim']] <- NULL
+    }
+    if (!is.null(attr(lats, 'variables')[[1]][['dim']])) {
+      attr(lats, 'variables')[[1]][['dim']] <- NULL
+    }
+    lons_lats_taken <- FALSE
     for (i in 1:total_slices) {
       tmp_file <- tempfile('R_CDORemap_', write_dir, fileext = '.nc')
       tmp_file2 <- tempfile('R_CDORemap_', write_dir, fileext = '.nc')
       if (!is.null(dims_to_iterate)) {
         slice_indices <- which(slices_to_iterate == i, arr.ind = TRUE)
         subset <- Subset(data_array, dims_to_iterate, as.list(slice_indices), drop = 'selected')
+#        dims_before_crop <- dim(subset)
         # Make sure subset goes along with metadata
         ArrayToNetCDF(setNames(list(subset, lons, lats), c('var', lon_var_name, lat_var_name)), tmp_file)
       } else {
+#        dims_before_crop <- dim(data_array)
         ArrayToNetCDF(setNames(list(data_array, lons, lats), c('var', lon_var_name, lat_var_name)), tmp_file)
       }
       sellonlatbox <- ''
       if (crop) {
-        sellonlatbox <- paste0('sellonlatbox,', lon_extremes[1], ',', lon_extremes[2], 
-                                           ',', lat_extremes[1], ',', lat_extremes[2], ' -')
+        sellonlatbox <- paste0('sellonlatbox,', format(lon_extremes[1], scientific = FALSE), 
+                                           ',', format(lon_extremes[2], scientific = FALSE), 
+                                           ',', format(lat_extremes[1], scientific = FALSE), 
+                                           ',', format(lat_extremes[2], scientific = FALSE), ' -')
       }
       err <- try({
-## TODO: Here add sellonlatbox. Also check constantin's issue, may contain hint. Also search if possible to crop without
         system(paste0("cdo -s ", sellonlatbox, "remap", method, ",", grid, " ", tmp_file, " ", tmp_file2))
       })
       file.remove(tmp_file)
@@ -499,30 +536,70 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
         stop("CDO remap failed.")
       }
       ncdf_remapped <- nc_open(tmp_file2)
-      found_dim_names <- sapply(ncdf_remapped$var$var$dim, '[[', 'name')
-      found_lon_dim <- found_dim_names[which(found_dim_names %in% .KnownLonNames())[1]]
-      found_lat_dim <- found_dim_names[which(found_dim_names %in% .KnownLatNames())[1]]
-      found_lon_dim_size <- length(ncdf_remapped$dim[[found_lon_dim]]$vals)
-      found_lat_dim_size <- length(ncdf_remapped$dim[[found_lat_dim]]$vals)
-      found_lons <- ncvar_get(ncdf_remapped, 'lon', collapse_degen = FALSE)
-      found_lats <- ncvar_get(ncdf_remapped, 'lat', collapse_degen = FALSE)
-      if (length(dim(found_lons)) > 1) {
-        if (found_lon_dim < found_lat_dim) {
-          names(dim(found_lons)) <- c(found_lon_dim, found_lat_dim)
+      if (!lons_lats_taken) {
+        found_dim_names <- sapply(ncdf_remapped$var$var$dim, '[[', 'name')
+        found_lon_dim <- found_dim_names[which(found_dim_names %in% .KnownLonNames())[1]]
+        found_lat_dim <- found_dim_names[which(found_dim_names %in% .KnownLatNames())[1]]
+        found_lon_dim_size <- length(ncdf_remapped$dim[[found_lon_dim]]$vals)
+        found_lat_dim_size <- length(ncdf_remapped$dim[[found_lat_dim]]$vals)
+        found_var_names <- names(ncdf_remapped$var)
+        found_lon_var_name <- which(found_var_names %in% .KnownLonNames())
+        found_lat_var_name <- which(found_var_names %in% .KnownLatNames())
+        if (length(found_lon_var_name) > 0) {
+          found_lon_var_name <- found_var_names[found_lon_var_name[1]]
         } else {
-          names(dim(found_lons)) <- c(found_lat_dim, found_lon_dim)
+          found_lon_var_name <- NULL
         }
-      } else {
-        names(dim(found_lons)) <- found_lon_dim
-      }
-      if (length(dim(found_lats)) > 1) {
-        if (found_lon_dim < found_lat_dim) {
-          names(dim(found_lats)) <- c(found_lon_dim, found_lat_dim)
+        if (length(found_lat_var_name) > 0) {
+          found_lat_var_name <- found_var_names[found_lat_var_name[1]]
         } else {
-          names(dim(found_lats)) <- c(found_lat_dim, found_lon_dim)
+          found_lat_var_name <- NULL
         }
-      } else {
-        names(dim(found_lats)) <- found_lat_dim
+        if (length(found_lon_var_name) > 0) {
+          found_lons <- ncvar_get(ncdf_remapped, found_lon_var_name, 
+                                  collapse_degen = FALSE)
+        } else {
+          found_lons <- ncdf_remapped$dim[[found_lon_dim]]$vals
+          dim(found_lons) <- found_lon_dim_size
+        }
+        if (length(found_lat_var_name) > 0) {
+          found_lats <- ncvar_get(ncdf_remapped, found_lat_var_name, 
+                                  collapse_degen = FALSE)
+        } else {
+          found_lats <- ncdf_remapped$dim[[found_lat_dim]]$vals
+          dim(found_lats) <- found_lat_dim_size
+        }
+        if (length(dim(lons)) == length(dim(found_lons))) {
+          new_lon_name <- lon_dim
+        } else {
+          new_lon_name <- found_lon_dim
+        }
+        if (length(dim(lats)) == length(dim(found_lats))) {
+          new_lat_name <- lat_dim
+        } else {
+          new_lat_name <- found_lat_dim
+        }
+        if (length(dim(found_lons)) > 1) {
+          if (which(sapply(ncdf_remapped$var$lon$dim, '[[', 'name') == found_lon_dim) < 
+              which(sapply(ncdf_remapped$var$lon$dim, '[[', 'name') == found_lat_dim)) {
+            names(dim(found_lons)) <- c(new_lon_name, new_lat_name)
+          } else {
+            names(dim(found_lons)) <- c(new_lat_name, new_lon_name)
+          }
+        } else {
+          names(dim(found_lons)) <- new_lon_name
+        }
+        if (length(dim(found_lats)) > 1) {
+          if (which(sapply(ncdf_remapped$var$lat$dim, '[[', 'name') == found_lon_dim) < 
+              which(sapply(ncdf_remapped$var$lat$dim, '[[', 'name') == found_lat_dim)) {
+            names(dim(found_lats)) <- c(new_lon_name, new_lat_name)
+          } else {
+            names(dim(found_lats)) <- c(new_lat_name, new_lon_name)
+          }
+        } else {
+          names(dim(found_lats)) <- new_lat_name
+        }
+        lons_lats_taken <- TRUE
       }
       if (!is.null(dims_to_iterate)) {
         if (is.null(result_array)) {
@@ -542,7 +619,7 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
         new_dims <- dim(data_array)
         new_dims[c(lon_dim, lat_dim)] <- c(found_lon_dim_size, found_lat_dim_size)
         result_array <- ncvar_get(ncdf_remapped, 'var', collapse_degen = FALSE)
-        names(dim(result_array)) <- names(new_dims)
+        dim(result_array) <- new_dims
       }
       nc_close(ncdf_remapped)
       file.remove(tmp_file2)
@@ -559,8 +636,6 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
     }
     attribute_backup[['dim']][which(names(dim(result_array)) == lon_dim)] <- dim(result_array)[lon_dim]
     attribute_backup[['dim']][which(names(dim(result_array)) == lat_dim)] <- dim(result_array)[lat_dim]
-    new_lon_name <- names(dim(found_lons))[which(names(dim(found_lons)) %in% .KnownLonNames())]
-    new_lat_name <- names(dim(found_lats))[which(names(dim(found_lats)) %in% .KnownLatNames())]
     names(attribute_backup[['dim']])[which(names(dim(result_array)) == lon_dim)] <- new_lon_name
     names(attribute_backup[['dim']])[which(names(dim(result_array)) == lat_dim)] <- new_lat_name
     if (!is.null(attribute_backup[['variables']]) && (length(attribute_backup[['variables']]) > 0)) {

@@ -10,7 +10,7 @@ Filter <- function(xdata, freq) {
     for (phase in seq(0, pi, (pi / (10 * fac2)))) {
       xtest <- cos(phase + c(1:ndat) * jfreq * 2 * pi)
       test <- lm(xdata[is.na(xdata) == FALSE] ~ xtest[
-              is.na(xdata) == FALSE])$fitted.value
+              is.na(xdata) == FALSE])$fitted.values
       if (sum(test ^ 2) > maxi) { 
         endphase <- phase
         endfreq <- jfreq
@@ -21,7 +21,7 @@ Filter <- function(xdata, freq) {
   xend <- cos(endphase + c(1:ndat) * endfreq * 2 * pi)
   xdata[is.na(xdata) == FALSE] <- xdata[is.na(xdata) == FALSE] - lm(
                               xdata[is.na(xdata) == FALSE] ~ xend[is.na(xdata) == FALSE]
-                              )$fitted.value
+                              )$fitted.values
 
   xdata
 }

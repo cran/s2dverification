@@ -13,8 +13,8 @@ ArrayToNetCDF(arrays = list(temperature = array(1:9, c(3, 3))),
     \item{Via the dimension names of each provided array:}{The dimension names of each of the provided arrays will be interpreted as names for the dimensions of the NetCDF files. Read further for special dimension names that will trigger special behaviours, such as 'time' and 'var'.\cr
 E.g:\cr
       \code{
-temperature <- array(rnorm(10 * 50 * 100), dim = c(10, 50, 100))
-names(dim(temperature)) <- c('time', 'latitude', 'longitude')
+temperature <- array(rnorm(100 * 50 * 10), dim = c(100, 50, 10))
+names(dim(temperature)) <- c('longitude', 'latitude', 'time')
 ArrayToNetCDF(list(temperature = temperature), file_path = 'example.nc')
       }
     }

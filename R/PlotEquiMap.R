@@ -83,15 +83,27 @@ PlotEquiMap <- function(var, lon, lat, varu = NULL, varv = NULL,
   dims <- dim(var)
   # Transpose the input matrices because the base plot functions work directly 
   # with dimensions c(lon, lat).
+  transpose <- FALSE
+  if (!is.null(names(dims))) {
+    if (any(names(dims) %in% .KnownLonNames()) &&
+        any(names(dims) %in% .KnownLatNames())) {
+      if (which(names(dims) %in% .KnownLonNames()) != 1) {
+        transpose <- TRUE
+      }
+    }
+  }
   if (dims[1] != length(lon) || dims[2] != length(lat)) {
     if (dims[1] == length(lat) && dims[2] == length(lon)) {
-      var <- t(var)
-      if (!is.null(varu)) varu <- t(varu)
-      if (!is.null(varv)) varv <- t(varv)
-      if (!is.null(contours)) contours <- t(contours)
-      if (!is.null(dots)) dots <- aperm(dots, c(1, 3, 2))
-      dims <- dim(var)
+      transpose <- TRUE
     }
+  }
+  if (transpose) {
+    var <- t(var)
+    if (!is.null(varu)) varu <- t(varu)
+    if (!is.null(varv)) varv <- t(varv)
+    if (!is.null(contours)) contours <- t(contours)
+    if (!is.null(dots)) dots <- aperm(dots, c(1, 3, 2))
+    dims <- dim(var)
   }
 
   # Check lon

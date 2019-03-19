@@ -41,7 +41,7 @@ Multi-dimensional array with at least the dimensions expected by the specified p
 Parameters to be sent to the plotting function 'fun'. If multiple arrays are provided in 'var' and multiple functions are provided in 'fun', the parameters provided through \dots will be sent to all the plot functions, as common parameters. To specify concrete arguments for each of the plot functions see parameter 'special_args'.
   }
   \item{special_args}{
-List of sub-lists, each sub-list having extra arguments for each of the plot functions provided in 'fun'.
+List of sub-lists, each sub-list having specific extra arguments for each of the plot functions provided in 'fun'. If you want to fix a different value for each plot in the layout you can do so by a) splitting your array into a list of sub-arrays (each with the data for one plot) and providing it as parameter 'var', b) providing a list of named sub-lists in 'special_args', where the names of each sub-list match the names of the parameters to be adjusted, and each value in a sub-list contains the value of the corresponding parameter. 
   }
   \item{nrow}{
 Numeric value to force the number of rows in the automatically generated layout. If higher than the required, this will yield blank cells in the layout (which can then be populated). If lower than the required the function will stop. By default it is configured to arrange the layout in a shape as square as possible. Blank cells can be manually populated after with customized plots (see SwitchTofigure).

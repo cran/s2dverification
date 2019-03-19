@@ -78,11 +78,15 @@ Subset <- function(x, along, indices, drop = FALSE) {
     metadata[['dim']] <- metadata[['dim']][-dims_to_drop]
     if (is.character(dim_names)) {
       names(metadata[['dim']]) <- dim_names[-dims_to_drop]
-      metadata[['dimensions']] <- dim_names[-dims_to_drop]
+      if ('dimensions' %in% names(attributes(x))) {
+        metadata[['dimensions']] <- dim_names[-dims_to_drop]
+      }
     }
   } else if (is.character(dim_names)) {
     names(metadata[['dim']]) <- dim_names
-    metadata[['dimensions']] <- dim_names
+    if ('dimensions' %in% names(attributes(x))) {
+      metadata[['dimensions']] <- dim_names
+    }
   }
   attributes(subset) <- metadata
   subset

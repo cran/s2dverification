@@ -77,9 +77,10 @@ ColorBar <- function(brks = NULL, cols = NULL, vertical = TRUE,
       brks <- seq(bar_limits[1], bar_limits[2], length.out = brks)
     } else if (is.null(var_limits)) {
       # bar_limits is defined
-      brks <- seq(bar_limits[1], bar_limits[2], length.out = brks)
       var_limits <- bar_limits
-      var_limits[1] <- var_limits[1] + .Machine$double.xmin
+      half_width <- 0.5 * (var_limits[2] - var_limits[1]) / (brks - 1)  
+      brks <- seq(bar_limits[1], bar_limits[2], length.out = brks)
+      var_limits[1] <- var_limits[1] + half_width / 50
     } else {
       # both bar_limits and var_limits are defined
       brks <- seq(bar_limits[1], bar_limits[2], length.out = brks)
@@ -89,7 +90,8 @@ ColorBar <- function(brks = NULL, cols = NULL, vertical = TRUE,
       # brks is defined
       bar_limits <- c(head(brks, 1), tail(brks, 1))
       var_limits <- bar_limits
-      var_limits[1] <- var_limits[1] + .Machine$double.xmin
+      half_width <- 0.5 * (var_limits[2] - var_limits[1]) / (length(brks) - 1)  
+      var_limits[1] <- var_limits[1] + half_width / 50
     } else {
       # brks and var_limits are defined
       bar_limits <- c(head(brks, 1), tail(brks, 1))
@@ -221,6 +223,10 @@ ColorBar <- function(brks = NULL, cols = NULL, vertical = TRUE,
     stop("Parameter 'subsampleg' must be numeric.")
   }
   subsampleg <- round(subsampleg)
+  draw_labels <- TRUE
+  if ((subsampleg) < 1) {
+    draw_labels <- FALSE
+  }
 
   # Check plot
   if (!is.logical(plot)) {
@@ -431,7 +437,11 @@ ColorBar <- function(brks = NULL, cols = NULL, vertical = TRUE,
     labels <- c(labels, extra_labels)
     tick_reorder <- sort(at, index.return = TRUE)
     at <- tick_reorder$x
-    labels <- labels[tick_reorder$ix]
+    if (draw_labels) {
+      labels <- labels[tick_reorder$ix]
+    } else {
+      labels <- FALSE
+    }
     axis(d, at = at, tick = draw_ticks, labels = labels, cex.axis = cex_labels, tcl = cex_ticks)
     par(saved_pars)
   }

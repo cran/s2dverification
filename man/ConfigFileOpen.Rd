@@ -82,10 +82,11 @@ For example:\cr
   !!table of experiments\cr
   ecmwf, tos, /path/to/dataset/, $FILE_NAME$\cr
 There are some reserved variables that will offer information about the store frequency, the current startdate Load() is fetching, etc:\cr
-  $START_DATE$, $STORE_FREQ$, $MEMBER_NUMBER$\cr
-  for observations: $YEAR$, $MONTH$, $DAY$\cr
+  $VAR_NAME$, $START_DATE$, $STORE_FREQ$, $MEMBER_NUMBER$\cr
+  for experiments only: $EXP_NAME$\cr
+  for observations only: $OBS_NAME$, $YEAR$, $MONTH$, $DAY$\cr
 Additionally, from an element in an entry value you can access the other elements of the entry as:\cr
-  $EXP_NAME$, $VAR_NAME$, $EXP_MAIN_PATH$, $EXP_FILE_PATH$, \cr$VAR_NAME$, $SUFFIX$, $VAR_MIN$, $VAR_MAX$\cr
+  $EXP_MAIN_PATH$, $EXP_FILE_PATH$, \cr$VAR_NAME$, $SUFFIX$, $VAR_MIN$, $VAR_MAX$\cr
 
 The variable $SUFFIX$ is useful because it can be used to take part in the main or file path. For example: '/path/to$SUFFIX$/dataset/'.\cr
 It will be replaced by the value in the column that corresponds to the suffix unless the user specifies a different suffix via the parameter 'suffixexp' or 'suffixobs'.\cr
