@@ -1,3 +1,40 @@
+#'Smoothes An Array Along A Dimension
+#'
+#'Smoothes an array of any number of dimensions along one of its dimensions.
+#'
+#'@param var Array to be smoothed along one of its dimension (typically the 
+#'  forecast time dimension).
+#'@param runmeanlen Running mean length in number of sampling units 
+#'  (typically months).
+#'@param numdimt Dimension to smooth.
+#'
+#'@return Array with same the dimensions as 'var' but smoothed along the 
+#'  'numdimt'-th dimension.
+#'
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to R CRAN\cr
+#'1.1  -  2015-05  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Adding
+#'  security checks, fixing computation in cases where runmeanlen is odd and 
+#'  making it able to work on arrays of any number of dimensions.
+#'@examples
+#'# Load sample data as in Load() example:
+#'example(Load)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'ano_exp <- Ano(sampleData$mod, clim$clim_exp)
+#'ano_obs <- Ano(sampleData$obs, clim$clim_obs)
+#'runmean_months <- 12
+#'dim_to_smooth <- 4  # Smooth along lead-times
+#'smooth_ano_exp <- Smoothing(ano_exp, runmean_months, dim_to_smooth)
+#'smooth_ano_obs <- Smoothing(ano_obs, runmean_months, dim_to_smooth)
+#'  \donttest{
+#'PlotAno(smooth_ano_exp, smooth_ano_obs, startDates, 
+#'        toptitle = "Smoothed Mediterranean mean SST", ytitle = "K",
+#'        fileout = "tos_smoothed_ano.eps")
+#'  }
+#'@import plyr
+#'@export
 Smoothing <- function(var, runmeanlen = 12, numdimt = 4) {
   # Check var
   if (!is.numeric(var)) {

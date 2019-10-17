@@ -1,3 +1,97 @@
+#'Plot Plumes/Timeseries Of Anomaly Correlation Coefficients
+#'
+#'Plots plumes/timeseries of ACC from an array with dimensions 
+#'(output from \code{ACC()}): \cr
+#'c(nexp, nobs, nsdates, nltime, 4)\cr
+#'where the fourth dimension is of length 4 and contains the lower limit of 
+#'the 95\% confidence interval, the ACC, the upper limit of the 95\% 
+#'confidence interval and the 95\% significance level given by a one-sided 
+#'T-test.
+#'
+#'@param ACC ACC matrix with with dimensions:\cr
+#'  c(nexp, nobs, nsdates, nltime, 4)\cr
+#'  with the fourth dimension of length 4 containing the lower limit of the 
+#'  95\% confidence interval, the ACC, the upper limit of the 95\% confidence 
+#'  interval and the 95\% significance level.
+#'@param sdates List of startdates: c('YYYYMMDD','YYYYMMDD').
+#'@param toptitle Main title, optional.
+#'@param sizetit Multiplicative factor to scale title size, optional.
+#'@param ytitle Title of Y-axis for each experiment: c('',''), optional.
+#'@param limits c(lower limit, upper limit): limits of the Y-axis, optional.
+#'@param legends List of flags (characters) to be written in the legend, 
+#'  optional.
+#'@param freq 1 = yearly, 12 = monthly, 4 = seasonal, ... Default: 12.
+#'@param biglab TRUE/FALSE for presentation/paper plot, Default = FALSE.
+#'@param fill TRUE/FALSE if filled confidence interval. Default = FALSE.
+#'@param linezero TRUE/FALSE if a line at y=0 should be added. Default = FALSE.
+#'@param points TRUE/FALSE if points instead of lines. Default = TRUE.\cr
+#'  Must be TRUE if only 1 leadtime.
+#'@param vlines List of x location where to add vertical black lines, optional.
+#'@param fileout Name of output file. Extensions allowed: eps/ps, jpeg, png, 
+#'  pdf, bmp and tiff. \cr
+#'  Default = 'output_PlotACC.eps'
+#'@param width File width, in the units specified in the parameter size_units 
+#'  (inches by default). Takes 8 by default.
+#'@param height File height, in the units specified in the parameter 
+#'  size_units (inches by default). Takes 5 by default.
+#'@param size_units Units of the size of the device (file or window) to plot 
+#'  in. Inches ('in') by default. See ?Devices and the creator function of the 
+#'  corresponding device.
+#'@param res Resolution of the device (file or window) to plot in. See 
+#'  ?Devices and the creator function of the corresponding device.
+#'@param \dots Arguments to be passed to the method. Only accepts the following
+#'  graphical parameters:\cr
+#'  adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt 
+#'  csi cxy err family fg fig fin font font.axis font.lab font.main font.sub 
+#'  lend lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page 
+#'  plt smo srt tck tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog\cr
+#'  For more information about the parameters see `par`.
+#'
+#'@keywords dynamic
+#'@author History:\cr
+#'0.1  -  2013-08  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to CRAN
+#'@examples
+#'# See examples on Load() to understand the first lines in this example
+#'  \dontrun{
+#'data_path <- system.file('sample_data', package = 's2dverification')
+#'expA <- list(name = 'experiment', path = file.path(data_path,
+#'             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+#'             '$VAR_NAME$_$START_DATE$.nc'))
+#'obsX <- list(name = 'observation', path = file.path(data_path,
+#'             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+#'             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+#'
+#'# Now we are ready to use Load().
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- Load('tos', list(expA), list(obsX), startDates,
+#'                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat',
+#'                   latmin = 27, latmax = 48, lonmin = -12, lonmax = 40)
+#'  }
+#'  \dontshow{
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
+#'                                                c('observation'), startDates,
+#'                                                leadtimemin = 1,
+#'                                                leadtimemax = 4,
+#'                                                output = 'lonlat',
+#'                                                latmin = 27, latmax = 48,
+#'                                                lonmin = -12, lonmax = 40)
+#'  }
+#'sampleData$mod <- Season(sampleData$mod, 4, 11, 12, 2)
+#'sampleData$obs <- Season(sampleData$obs, 4, 11, 12, 2)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'ano_exp <- Ano(sampleData$mod, clim$clim_exp)
+#'ano_obs <- Ano(sampleData$obs, clim$clim_obs)
+#'acc <- ACC(Mean1Dim(sampleData$mod, 2), 
+#'           Mean1Dim(sampleData$obs, 2))
+#'  \donttest{
+#'PlotACC(acc$ACC, startDates, toptitle = "Anomaly Correlation Coefficient")
+#'
+#'  }
+#'@importFrom grDevices dev.cur dev.new dev.off 
+#'@importFrom stats ts
+#'@export
 PlotACC <- function(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "", 
                     limits = NULL, legends = NULL, freq = 12, biglab = FALSE, 
                     fill = FALSE, linezero = FALSE, points = TRUE, vlines = NULL, 

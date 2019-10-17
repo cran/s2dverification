@@ -1,3 +1,80 @@
+#'Plot Raw Or Smoothed Anomalies
+#'
+#'Plots timeseries of raw or smoothed anomalies of any variable output from 
+#'\code{Load()} or \code{Ano()} or or \code{Ano_CrossValid()} or 
+#'\code{Smoothing()}.
+#'
+#'@param exp_ano Array containing the experimental data:\cr
+#'  c(nmod/nexp, nmemb/nparam, nsdates, nltime).
+#'@param obs_ano Optional matrix containing the observational data:\cr
+#'  c(nobs, nmemb, nsdates, nltime)
+#'@param sdates List of starting dates: c('YYYYMMDD','YYYYMMDD').
+#'@param toptitle Main title for each experiment: c('',''), optional.
+#'@param ytitle Title of Y-axis for each experiment: c('',''), optional.
+#'@param limits c(lower limit, upper limit): limits of the Y-axis, optional.
+#'@param legends List of observational dataset names, optional.
+#'@param freq 1 = yearly, 12 = monthly, 4 = seasonal, ... Default: 12.
+#'@param biglab TRUE/FALSE for presentation/paper plot. Default = FALSE.
+#'@param fill TRUE/FALSE if the spread between members should be filled. 
+#'  Default = TRUE.
+#'@param memb TRUE/FALSE if all members/only the ensemble-mean should be 
+#'  plotted.\cr
+#'  Default = TRUE.
+#'@param ensmean TRUE/FALSE if the ensemble-mean should be plotted. 
+#'  Default = TRUE.
+#'@param linezero TRUE/FALSE if a line at y=0 should be added. 
+#'  Default = FALSE.
+#'@param points TRUE/FALSE if points instead of lines should be shown. 
+#'  Default = FALSE.
+#'@param vlines List of x location where to add vertical black lines, optional.
+#'@param sizetit Multiplicative factor to scale title size, optional.
+#'@param fileout Name of the output file for each experiment: c('',''). 
+#'  Extensions allowed: eps/ps, jpeg, png, pdf, bmp and tiff. If filenames 
+#'  with different extensions are passed, it will be considered only the first 
+#'  one and it will be extended to the rest. \cr
+#'  Default = c('output1_plotano.eps', 'output2_plotano.eps', 
+#'              'output3_plotano.eps', 'output4_plotano.eps', 
+#'              'output5_plotano.eps')
+#'@param width File width, in the units specified in the parameter size_units 
+#'  (inches by default). Takes 8 by default.
+#'@param height File height, in the units specified in the parameter 
+#'  size_units (inches by default). Takes 5 by default.
+#'@param size_units Units of the size of the device (file or window) to plot 
+#'  in. Inches ('in') by default. See ?Devices and the creator function of the 
+#'  corresponding device.
+#'@param res Resolution of the device (file or window) to plot in. See 
+#'  ?Devices and the creator function of the corresponding device.
+#'@param \dots Arguments to be passed to the method. Only accepts the following
+#'  graphical parameters:\cr  
+#'  adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt 
+#'  csi cxy err family fg fig font font.axis font.lab font.main font.sub lend 
+#'  lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page plt smo 
+#'  srt tck tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog \cr
+#'  For more information about the parameters see `par`.
+#'
+#'@keywords dynamic
+#'@author History:\cr
+#'0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to CRAN
+#'@examples
+#'# Load sample data as in Load() example:
+#'example(Load)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'ano_exp <- Ano(sampleData$mod, clim$clim_exp)
+#'ano_obs <- Ano(sampleData$obs, clim$clim_obs)
+#'runmean_nb_months <- 12
+#'dim_to_smooth <- 4  # Smooth along lead-times
+#'smooth_ano_exp <- Smoothing(ano_exp, runmean_nb_months, dim_to_smooth)
+#'smooth_ano_obs <- Smoothing(ano_obs, runmean_nb_months, dim_to_smooth)
+#'  \donttest{
+#'PlotAno(smooth_ano_exp, smooth_ano_obs, startDates, 
+#'        toptitle = paste('smoothed anomalies'), ytitle = c('K', 'K', 'K'), 
+#'        legends = 'ERSST', biglab = FALSE, fileout = 'tos_ano.eps')
+#'  }
+#'
+#'@importFrom grDevices dev.cur dev.new dev.off 
+#'@importFrom stats ts
+#'@export
 PlotAno <- function(exp_ano, obs_ano = NULL, sdates, toptitle = rep('', 15),
                     ytitle = rep('', 15), limits = NULL, legends = NULL, 
                     freq = 12, biglab = FALSE, fill = TRUE, memb = TRUE, 

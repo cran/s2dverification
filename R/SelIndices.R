@@ -1,3 +1,29 @@
+#'Slices A Matrix Along A Dimension
+#'
+#'This function selects a subset of ensemble members from an array containing 
+#'any number of dimensions.
+#'
+#'@param var An array with any number of dimensions.
+#'@param posdim The dimension along which the ensemble subset should be 
+#'  selected.
+#'@param limits The lower and upper limits for the selection of ensemble 
+#'  members along the posdim dimension.
+#'
+#'@return The subsetted array.
+#'
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2011-04  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+#'@examples
+#'a <- array(rnorm(24), dim = c(2, 3, 4, 1))
+#'print(a)
+#'print(a[, , 2:3, ])
+#'print(dim(a[, , 2:3, ]))
+#'print(SelIndices(a, 3, c(2, 3)))
+#'print(dim(SelIndices(a, 3, c(2, 3))))
+#'
+#'@export
 SelIndices <- function(var, posdim, limits) {
   #
   #  A few security checks

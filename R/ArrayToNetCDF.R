@@ -1,3 +1,232 @@
+#'Save multidimensional R arrays into NetCDF files
+#'
+#'This function takes as input one or a list of multidimensional R arrays and 
+#'stores them in a NetCDF file, using the \code{ncdf4} package. The full path 
+#'and name of the resulting file must be specified. Metadata can be attached 
+#'to the arrays and propagated into the NetCDF file in 3 possible ways:
+#'\itemize{
+#'  \item{
+#'  Via the list names if a list of arrays is provided: Each name in 
+#'  the input list, corresponding to one multidimensional array, will be 
+#'  interpreted as the name of the variable it contains.\cr
+#'  E.g:\cr
+#'  \code{ArrayToNetCDF(arrays = list(temperature = array(1:9, c(3, 3))),}\cr
+#'  \code{                       file_path = 'example.nc')}
+#'  }
+#'  \item{
+#'  Via the dimension names of each provided array: The dimension names 
+#'  of each of the provided arrays will be interpreted as names for the 
+#'  dimensions of the NetCDF files. Read further for special dimension names 
+#'  that will trigger special behaviours, such as 'time' and 'var'.\cr
+#'  E.g:\cr
+#'  \code{temperature <- array(rnorm(100 * 50 * 10), dim = c(100, 50, 10))}\cr
+#'  \code{names(dim(temperature)) <- c('longitude', 'latitude', 'time')}\cr
+#'  \code{ArrayToNetCDF(list(temperature = temperature), file_path = 'example.nc')}
+#'  }
+#'  \item{
+#'  Via the attribute 'variables' of each provided array: The arrays can 
+#'  be provided with metadata in an attribute named 'variables', which is 
+#'  expected to be a named list of named lists, where the names of the 
+#'  container list are the names of the variables present in the provided 
+#'  array, and where each sub-list contains metadata for each of the variables.
+#'   The attribute names and values supported in the sub-lists must follow the 
+#'  same format the package \code{ncdf4} uses to represent the NetCDF 
+#'  file headers.\cr
+#'  E.g:\cr
+#'  \code{a <- array(1:400, dim = c(5, 10, 4, 2))}\cr
+#'  \code{metadata <- list(tos = list(addOffset = 100,}\cr
+#'  \code{                 scaleFact = 10,}\cr
+#'  \code{                 dim = list(list(name = 'time',}\cr
+#'  \code{                                 unlim = FALSE))))}\cr
+#'  \code{attr(a, 'variables') <- metadata}\cr
+#'  \code{names(dim(a)) <- c('lat', 'lon', 'time', 'var')}\cr
+#'  \code{ArrayToNetCDF(a, 'tmp.nc')}
+#'  }
+#'}
+#'The special dimension names are 'var'/'variable' and 'time'.\cr
+#'If a dimension is named 'var' or 'variable', \code{ArrayToNetCDF} will 
+#'interpret each array entry along such dimension corresponds to a separate 
+#'new variable, hence will create a new variable inside the NetCDF file and 
+#'will use it to store all the data in the provided array for the 
+#'corresponding entry along the 'var'/'variable' dimension.\cr
+#'If a dimension is named 'time', by default it will be interpreted and built 
+#'as an unlimited dimension. The 'time' dimension must be the last dimension 
+#'of the array (the right-most). If a 'var'/'variable' dimension is present, 
+#'the 'time' dimension can be also placed on its left (i.e. the one before the 
+#'last dimension). The default behaviour of creating the 'time' as unlimited 
+#'dimension can be disabled by setting manually the attribute 
+#'\code{unlim = FALSE}, as shown in the previous example.
+#'
+#'@param arrays One or a list of multidimensional data arrays. The list can be 
+#'  provided with names, which will be interpreted as variable names. The 
+#'  arrays can be provided with dimension names. The arrays can be provided 
+#'  with metadata in the attribute 'variables' (read section Description for 
+#'  details).
+#'@param file_path Path and name of the NetCDF file to be created.
+#'
+#'@return This function returns NULL. 
+#'@keywords datagen
+#'@author History:\cr
+#'  0.0 - 2017-01 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Original code.
+#'
+#'@examples
+#'  \dontrun{
+#'# Minimal use case
+#'ArrayToNetCDF(array(1:9, c(3, 3)), 'tmp.nc')
+#'
+#'# Works with arrays of any number of dimensions
+#'ArrayToNetCDF(array(1:27, c(3, 3, 3)), 'tmp.nc')
+#'
+#'# Arrays can also be provided in [named] lists
+#'ArrayToNetCDF(list(tos = array(1:27, c(3, 3, 3))), 'tmp.nc')
+#'
+#'# Or with dimension names
+#'# 'var' dimension name will generate multiple variables in the 
+#'# resulting NetCDF file
+#'a <- array(1:27, dim = c(3, 3, 3))
+#'names(dim(a)) <- c('lon', 'lat', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# 'variable' as dimension name will do the same
+#'a <- array(1:27, dim = c(3, 3, 3))
+#'names(dim(a)) <- c('lon', 'lat', 'variable')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# The 'time' dimension will be built as unlimited dimension, by default
+#'a <- array(1:1600, dim = c(10, 20, 4, 2))
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Putting the 'time' dimension in a position which is not the last, or the one
+#'# right before 'var'/'variable' will crash. Unlimited dimension must be in the
+#'# last position
+#'a <- array(1:1600, dim = c(10, 20, 4, 2))
+#'names(dim(a)) <- c('time', 'lat', 'lon', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'a <- array(1:1600, dim = c(10, 20, 4, 2))
+#'names(dim(a)) <- c('lat', 'time', 'lon', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# The dimension 'var'/'variable' can be in any position and can have any length
+#'a <- array(1:1600, dim = c(10, 20, 4, 2))
+#'names(dim(a)) <- c('lat', 'var', 'lon', 'time')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Multiple arrays can be provided in a list
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(list(a, a), 'tmp.nc')
+#'
+#'# If no dimension names are given to an array, new names will be automatically
+#'# generated
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'b <- array(1:400, dim = c(5, 11, 4, 2))
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(list(a, b), 'tmp.nc')
+#'
+#'# If two arrays use a same dimension but their lengths differ, the function 
+#'# will crash
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'b <- array(1:400, dim = c(5, 11, 4, 2))
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'names(dim(b)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(list(a, b), 'tmp.nc')
+#'
+#'# Metadata can be provided for each variable in each array, via the
+#'# attribute 'variables'. In this example the metadata is empty.
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(),
+#'              tas = list()
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Variable names can be manually specified
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(name = 'name1'),
+#'              tas = list(name = 'name2')
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Units can be specified
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(units = 'K'),
+#'              tas = list(units = 'K')
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# addOffset and scaleFactor can be specified
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(addOffset = 100,
+#'                         scaleFact = 10),
+#'              tas = list(addOffset = 100,
+#'                         scaleFact = 10)
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Unlimited dimensions can be manually created
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(addOffset = 100,
+#'                         scaleFact = 10,
+#'                         dim = list(list(name = 'unlimited',
+#'                                         unlim = TRUE))),
+#'              tas = list(addOffset = 100,
+#'                         scaleFact = 10,
+#'                         dim = list(list(name = 'unlimited',
+#'                                         unlim = TRUE)))
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'unlimited', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# A 'time' dimension can be built without it necessarily being unlimited
+#'a <- array(1:400, dim = c(5, 10, 4, 2))
+#'metadata <- list(
+#'              tos = list(addOffset = 100,
+#'                         scaleFact = 10,
+#'                         dim = list(list(name = 'time',
+#'                                         unlim = FALSE))),
+#'              tas = list(addOffset = 100,
+#'                         scaleFact = 10,
+#'                         dim = list(list(name = 'time',
+#'                                         unlim = FALSE)))
+#'            )
+#'attr(a, 'variables') <- metadata
+#'names(dim(a)) <- c('lat', 'lon', 'time', 'var')
+#'ArrayToNetCDF(a, 'tmp.nc')
+#'
+#'# Multiple arrays with data for multiple variables can be saved into a 
+#'# NetCDF file at once.
+#'tos <- array(1:400, dim = c(5, 10, 4))
+#'metadata <- list(tos = list(units = 'K'))
+#'attr(tos, 'variables') <- metadata
+#'names(dim(tos)) <- c('lat', 'lon', 'time')
+#'lon <- seq(0, 360 - 360 / 10, length.out = 10)
+#'dim(lon) <- length(lon)
+#'metadata <- list(lon = list(units = 'degrees_east'))
+#'attr(lon, 'variables') <- metadata
+#'names(dim(lon)) <- 'lon'
+#'lat <- seq(-90, 90, length.out = 5)
+#'dim(lat) <- length(lat)
+#'metadata <- list(lat = list(units = 'degrees_north'))
+#'attr(lat, 'variables') <- metadata
+#'names(dim(lat)) <- 'lat'
+#'ArrayToNetCDF(list(tos, lon, lat), 'tmp.nc')
+#'}
+#'@import ncdf4
+#'@export
 ArrayToNetCDF <- function(arrays, file_path) {
   # Check parameter arrays.
   if (is.array(arrays)) {

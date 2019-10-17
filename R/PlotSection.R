@@ -1,3 +1,51 @@
+#'Plots A Vertical Section
+#'
+#'Plot a (longitude,depth) or (latitude,depth) section.
+#'
+#'@param var Matrix to plot with (longitude/latitude, depth) dimensions.
+#'@param horiz Array of longitudes or latitudes.
+#'@param depth Array of depths.
+#'@param toptitle Title, optional.
+#'@param sizetit Multiplicative factor to increase title size, optional.
+#'@param units Units, optional.
+#'@param brks Colour levels, optional.
+#'@param cols List of colours, optional.
+#'@param axelab TRUE/FALSE, label the axis. Default = TRUE.
+#'@param intydep Interval between depth ticks on y-axis. Default: 200m.
+#'@param intxhoriz Interval between longitude/latitude ticks on x-axis.\cr
+#'  Default: 20deg.
+#'@param drawleg Draw colorbar. Default: TRUE.
+#'@param width File width, in the units specified in the parameter size_units 
+#'  (inches by default). Takes 8 by default.
+#'@param height File height, in the units specified in the parameter 
+#' size_units (inches by default). Takes 5 by default.
+#'@param size_units Units of the size of the device (file or window) to plot 
+#' in. Inches ('in') by default. See ?Devices and the creator function of the 
+#' corresponding device.
+#'@param res Resolution of the device (file or window) to plot in. See 
+#'  ?Devices and the creator function of the corresponding device.
+#'@param fileout Name of output file. Extensions allowed: eps/ps, jpeg, png, 
+#'  pdf, bmp and tiff. \cr
+#'  Default = NULL
+#'@param ... Arguments to be passed to the method. Only accepts the following
+#'  graphical parameters:\cr
+#'  adj ann ask bg bty cex.lab cex.sub cin col.axis col.lab col.main col.sub 
+#'  cra crt csi cxy err family fg fig fin font font.axis font.lab font.main 
+#'  font.sub lend lheight ljoin lmitre lty lwd mex mfcol mfrow mfg mkh oma omd 
+#'  omi page pch pin plt pty smo srt tcl usr xaxp xaxs xaxt xlog xpd yaxp yaxs 
+#'  yaxt ylbias ylog \cr
+#'  For more information about the parameters see `par`.
+#'
+#'@keywords dynamic
+#'@author History:\cr
+#'0.1  -  2012-09  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to CRAN
+#'@examples
+#'sampleData <- s2dverification::sampleDepthData
+#'PlotSection(sampleData$mod[1, 1, 1, 1, , ], sampleData$lat, sampleData$depth,
+#'            toptitle = 'temperature 1995-11 member 0')
+#'@importFrom grDevices dev.cur dev.new dev.off rainbow
+#'@export
 PlotSection <- function(var, horiz, depth, toptitle = '', sizetit = 1, 
                         units = '', brks = NULL, cols = NULL, axelab = TRUE, 
                         intydep = 200, intxhoriz = 20, drawleg = TRUE, 

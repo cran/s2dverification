@@ -1,3 +1,63 @@
+#'Plots Climatologies
+#'
+#'Plots climatologies as a function of the forecast time for any index output 
+#'from \code{Clim()} and organized in matrix with dimensions:\cr
+#'c(nmod/nexp, nmemb/nparam, nltime) or c(nmod/nexp, nltime) for the 
+#'experiment data\cr
+#'c(nobs, nmemb, nltime) or c(nobs, nltime) for the observational data
+#'
+#'@param exp_clim Matrix containing the experimental data with dimensions:\cr
+#'  c(nmod/nexp, nmemb/nparam, nltime) or c(nmod/nexp, nltime) 
+#'@param obs_clim Matrix containing the observational data (optional) with 
+#'  dimensions:\cr
+#'  c(nobs, nmemb, nltime) or c(nobs, nltime) 
+#'@param toptitle Main title, optional.
+#'@param ytitle Title of Y-axis, optional.
+#'@param monini Starting month between 1 and 12. Default = 1.
+#'@param freq 1 = yearly, 12 = monthly, 4 = seasonal, ... Default = 12.
+#'@param limits c(lower limit, upper limit): limits of the Y-axis, optional.
+#'@param listexp List of experiment names, optional.
+#'@param listobs List of observational dataset names, optional.
+#'@param biglab TRUE/FALSE for presentation/paper plot. Default = FALSE.
+#'@param leg TRUE/FALSE to plot the legend or not.
+#'@param sizetit Multiplicative factor to scale title size, optional.
+#'@param width File width, in the units specified in the parameter size_units 
+#'  (inches by default). Takes 8 by default.
+#'@param height File height, in the units specified in the parameter 
+#'  size_units (inches by default). Takes 5 by default.
+#'@param size_units Units of the size of the device (file or window) to plot 
+#'  in. Inches ('in') by default. See ?Devices and the creator function of the 
+#'  corresponding device.
+#'@param res Resolution of the device (file or window) to plot in. See 
+#'  ?Devices and the creator function of the corresponding device.
+#'@param fileout Name of output file. Extensions allowed: eps/ps, jpeg, png, 
+#'  pdf, bmp and tiff. \cr
+#'  Default = 'output_plotclim.eps'.
+#'@param ... Arguments to be passed to the method. Only accepts the following
+#'  graphical parameters:\cr
+#'  adj ann ask bg bty cex.sub cin col.axis col.lab col.main col.sub cra crt 
+#'  csi cxy err family fg fig font font.axis font.lab font.main font.sub lend 
+#'  lheight ljoin lmitre mar mex mfcol mfrow mfg mkh oma omd omi page pch plt 
+#'  smo srt tck usr xaxp xaxs xaxt xlog xpd yaxp yaxs yaxt ylbias ylog \cr
+#'  For more information about the parameters see `par`.
+#'
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to CRAN
+#'@examples
+#'# Load sample data as in Load() example:
+#'example(Load)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'  \donttest{
+#'PlotClim(clim$clim_exp, clim$clim_obs, toptitle = paste('climatologies'), 
+#'         ytitle = 'K', monini = 11, listexp = c('CMIP5 IC3'), 
+#'         listobs = c('ERSST'), biglab = FALSE, fileout = 'tos_clim.eps')
+#'  }
+#'
+#'@importFrom grDevices dev.cur dev.new dev.off 
+#'@importFrom stats ts
+#'@export
 PlotClim <- function(exp_clim, obs_clim = NULL, toptitle = '', ytitle = '', 
                      monini = 1, freq = 12, limits = NULL, 
                      listexp = c('exp1', 'exp2', 'exp3'), 

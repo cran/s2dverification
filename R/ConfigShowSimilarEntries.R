@@ -1,3 +1,64 @@
+#'Find Similar Entries In Tables Of Datasets
+#'
+#'These functions help in finding similar entries in tables of supported 
+#'datasets by comparing all entries with some given information.\cr
+#'This is useful when dealing with complex configuration files and not sure 
+#'if already support certain variables or datasets.\cr
+#'At least one field must be provided in ConfigShowSimilarEntries(). 
+#'Other fields can be unspecified and won't be taken into account. If more 
+#'than one field is provided, sameness is avreaged over all provided fields 
+#'and entries are sorted from higher average to lower.
+#'
+#'@param configuration Configuration object obtained either from 
+#'  ConfigFileCreate() or ConfigFileOpen().
+#'@param dataset_name Optional dataset name to look for similars of.
+#'@param var_name Optional variable name to look for similars of.
+#'@param main_path Optional main path to look for similars of.
+#'@param file_path Optional file path to look for similars of.
+#'@param nc_var_name Optional variable name inside NetCDF file to look for similars of.
+#'@param suffix Optional suffix to look for similars of.
+#'@param varmin Optional variable minimum to look for similars of.
+#'@param varmax Optional variable maximum to look for similars of.
+#'@param n_results Top 'n_results' alike results will be shown only. Defaults 
+#'  to 10 in ConfigShowSimilarEntries() and to 5 in ConfigShowSimilarVars().
+#'
+#'@details
+#'Sameness is calculated with string distances as specified by Simon White 
+#'in [1].
+#'
+#'@return These functions return information about the found matches.
+#'
+#'@seealso ConfigApplyMatchingEntries, ConfigEditDefinition, 
+#'  ConfigEditEntry, ConfigFileOpen, ConfigShowSimilarEntries, ConfigShowTable
+#'@references
+#'[1] Simon White, string seamness: 
+#'  \url{http://www.catalysoft.com/articles/StrikeAMatch.html}
+#'@keywords datagen
+#'@author History:\cr
+#'  0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@@ic3.cat}) - First version\cr
+#'  1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@@ic3.cat}) - Removed grid column and storage formats
+#'@examples
+#'# Create an empty configuration file
+#'config_file <- paste0(tempdir(), "/example.conf")
+#'ConfigFileCreate(config_file, confirm = FALSE)
+#'# Open it into a configuration object
+#'configuration <- ConfigFileOpen(config_file)
+#'# Add an entry at the bottom of 4th level of file-per-startdate experiments 
+#'# table which will associate the experiment "ExampleExperiment2" and variable 
+#'# "ExampleVariable" to some information about its location.
+#'configuration <- ConfigAddEntry(configuration, "experiments", "last", 
+#'                 "ExampleExperiment2", "ExampleVariable", 
+#'                 "/path/to/ExampleExperiment2/", 
+#'                 "ExampleVariable/ExampleVariable_$START_DATE$.nc")
+#'# Edit entry to generalize for any variable. Changing variable needs .
+#'configuration <- ConfigEditEntry(configuration, "experiments", 1, 
+#'                 var_name = "Var.*", 
+#'                 file_path = "$VAR_NAME$/$VAR_NAME$_$START_DATE$.nc")
+#'# Look for similar entries
+#'ConfigShowSimilarEntries(configuration, dataset_name = "Exper", 
+#'                         var_name = "Vari")
+#'
+#'@export
 ConfigShowSimilarEntries <- function(configuration, dataset_name = NULL, var_name = NULL, main_path = NULL, file_path = NULL, nc_var_name = NULL, suffix = NULL, varmin = NULL, varmax = NULL, n_results = 10) {
   ## Simon White: http://www.catalysoft.com/articles/StrikeAMatch.html
   getBigrams <- function(str) {

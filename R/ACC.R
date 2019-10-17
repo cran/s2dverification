@@ -1,3 +1,100 @@
+#'Computes Anomaly Correlation Coefficient
+#'
+#'Calculates the Anomaly Correlation Coefficient for the ensemble mean of 
+#'each model and the corresponding references for each startdate and each 
+#'leadtime.\cr
+#'The domain of interest can be specified by providing the list 
+#'of longitudes/latitudes (lon/lat) of the grid together with the corners 
+#'of the domain:\cr
+#' lonlatbox = c(lonmin, lonmax, latmin, latmax).
+#'
+#'@param var_exp Array of experimental anomalies with dimensions: 
+#'  c(nexp, nsdates, nltimes, nlat, nlon) or 
+#'  c(nexp, nsdates, nmembers, nltimes, nlat, nlon).
+#'@param var_obs Array of observational anomalies, same dimensions as var_exp 
+#'  except along the first dimension and the second if it corresponds to the 
+#'  member dimension.
+#'@param lon Array of longitudes of the var_exp/var_obs grids, optional.
+#'@param lat Array of latitudes of the var_exp/var_obs grids, optional.
+#'@param lonlatbox Domain to select: c(lonmin, lonmax, latmin, latmax), 
+#'  optional.
+#'@param conf TRUE/FALSE: confidence intervals and significance level 
+#'  provided or not.
+#'@param conftype "Parametric" provides a confidence interval for the ACC 
+#'  computed by a Fisher transformation and a significance level for the ACC 
+#'  from a one-sided student-T distribution. "Bootstrap" provides a confidence 
+#'  interval for the ACC and MACC computed from bootstrapping on the members 
+#'  with 100 drawings with replacement. To guarantee the statistical robustness 
+#'  of the result, make sure that your experiments/oservations/startdates/
+#'  leadtimes always have the same number of members.
+#'@param siglev The confidence level for the computed confidence intervals.
+#'
+#'@return 
+#'\item{ACC}{
+#'  If \code{conf = TRUE}, array with dimensions: 
+#'  c(nexp, nobs, nsdates, nleadtimes, 4) 
+#'  The fifth dimension of length 4 corresponds to the lower limit of the 
+#'  \code{siglev}\% confidence interval, the ACC, the upper limit of the 
+#'  \code{siglev}\% confidence interval and the \code{siglev}\% significance 
+#'  level. If \code{conf = FALSE}, the array of the Anomaly Correlation 
+#'  Coefficient has dimensions c(nexp, nobs, nsdates, nleadtimes).
+#'}
+#'\item{MACC}{
+#'  The array of the Mean Anomaly Correlation Coefficient with dimensions 
+#'  c(nexp, nobs, nleadtimes).
+#'}
+#'
+#'@examples
+#'# See ?Load for explanations on the first part of this example.
+#'  \dontrun{
+#'data_path <- system.file('sample_data', package = 's2dverification')
+#'expA <- list(name = 'experiment', path = file.path(data_path, 
+#'             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+#'             '$VAR_NAME$_$START_DATE$.nc'))
+#'obsX <- list(name = 'observation', path = file.path(data_path,
+#'             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+#'             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+#'
+#'# Now we are ready to use Load().
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- Load('tos', list(expA), list(obsX), startDates, 
+#'                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat',
+#'                   latmin = 27, latmax = 48, lonmin = -12, lonmax = 40)
+#'  }
+#'  \dontshow{
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
+#'                                                c('observation'), startDates,
+#'                                                leadtimemin = 1,
+#'                                                leadtimemax = 4,
+#'                                                output = 'lonlat',
+#'                                                latmin = 27, latmax = 48,
+#'                                                lonmin = -12, lonmax = 40)
+#'  }
+#'sampleData$mod <- Season(sampleData$mod, 4, 11, 12, 2)
+#'sampleData$obs <- Season(sampleData$obs, 4, 11, 12, 2)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'ano_exp <- Ano(sampleData$mod, clim$clim_exp)
+#'ano_obs <- Ano(sampleData$obs, clim$clim_obs)
+#'acc <- ACC(Mean1Dim(ano_exp, 2), Mean1Dim(ano_obs, 2))
+#'  \donttest{
+#'PlotACC(acc$ACC, startDates)
+#'  }
+#'@references Joliffe and Stephenson (2012). Forecast Verification: A 
+#'  Practitioner's Guide in Atmospheric Science. Wiley-Blackwell.
+#'@keywords datagen
+#'@author 
+#'History:\cr
+#'  0.1 - 2013-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Original code\cr
+#'  1.0 - 2013-09 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Formatting to CRAN\cr
+#'  1.1 - 2013-09 (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - optimization\cr
+#'  1.2 - 2014-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Bug-fixes: handling of NA & selection of domain + Simplification of code\cr
+#'  1.3.0 - 2014-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Boostrapping over members\cr
+#'  1.3.1 - 2014-09 (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - Add comments and minor style changes\cr
+#'  1.3.2 - 2015-02 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Fixed ACC documentation and examples
+#'@import abind
+#'@importFrom stats qt qnorm quantile
+#'@export
 ACC <- function(var_exp, var_obs, lon = NULL, lat = NULL,
                 lonlatbox = NULL, conf = TRUE, conftype = "parametric",
                 siglev = 0.95) {

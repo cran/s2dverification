@@ -1,3 +1,122 @@
+#'Computes the North Atlantic Oscillation (NAO) Index
+#'
+#'Compute the North Atlantic Oscillation (NAO) index based on the leading EOF 
+#'of the sea level pressure (SLP) anomalies over the north Atlantic region 
+#'(20N-80N, 80W-40E). The PCs are obtained by projecting the forecast and 
+#'observed anomalies onto the observed EOF pattern (Pobs) or the forecast 
+#'anomalies onto the EOF pattern of the other years of the forecast (Pmod). 
+#'By default (ftime_average = 2:4) NAO() computes the NAO index for 1-month 
+#'lead seasonal forecasts that can be plotted with BoxPlot(). Returns 
+#'cross-validated PCs of the NAO index for forecast (ano_exp) and observations 
+#'(ano_obs) based on the leading EOF pattern.
+#'
+#'@param ano_exp Array of North Atlantic SLP (20N-80N, 80W-40E) forecast 
+#'  anomalies from \code{Ano()} or \code{Ano_CrossValid()} with dimensions 
+#'  (n. of experimental data sets, n. of ensemble members, n. of start dates, 
+#'  n. of forecast time steps, n. of latitudes, n. of longitudes). If only 
+#'  NAO of observational data needs to be computed, this parameter can be left 
+#'  to NULL (default).
+#'@param ano_obs Array of North Atlantic SLP (20N-80N, 80W-40E) observed 
+#'  anomalies from \code{Ano()} or \code{Ano_CrossValid()} with dimensions 
+#'  (n. of observational data sets, n. of obs. ensemble members, 
+#'  n. of start dates, n. of forecast time steps, n. of latitudes, 
+#'  n. of longitudes). If only NAO of experimental data needs to be computed, 
+#'  this parameter can be left to NULL (default).
+#'@param lon Vector with the longitudes of \code{ano_exp} and \code{ano_obs}.
+#'@param lat Vector with the latitudes of \code{ano_exp} and \code{ano_obs}.
+#'@param ftime_average A vector with the forecast time steps to average across 
+#'  defining the target period. Takes by default 2:4, i.e. from 2nd to 4th 
+#'  forecast time steps.
+#'@param obsproj \code{obsproj = TRUE} will compute the NAO index by 
+#'  projecting the forecast anomalies onto the leading EOF of observational 
+#'  reference.\cr
+#'  \code{obsproj = FALSE} will compute the NAO by first computing the leading 
+#'  EOF of the forecast anomalies (in cross-validation mode, i.e. leaving the 
+#'  year you are evaluating out), and then projecting forecast anomalies onto 
+#'  this EOF.
+#'
+#'@return 
+#'\item{NAO_exp}{
+#'  Array of forecast NAO index in verification format (ensemble members, 
+#'  start dates).
+#'  }
+#'\item{NAO_obs}{
+#'  Array of observed NAO index in verification format (1, number of start
+#'  dates).
+#'}
+#'\item{EOFs_obs}{
+#'  EOFs of the observational references.
+#'}
+#'
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2013-08  (F. Lienert, \email{flienert@ic3.cat})  -  Original code\cr
+#'0.2  -  2014-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Removing the 
+#'  rotation\cr
+#'0.3  -  2014-05  (L. Batte, \email{lauriane.batte@ic3.cat})  -  Changes to
+#'  simplify function and add Pobs and Pmod options for NAO projection 
+#'  calculations\cr
+#'0.4  -  2015-03  (L. Batte, \email{lauriane.batte@ic3.cat})  -  Polarity 
+#'  check and correction is wrong. Switched to have a negative NAO index when the
+#'  anomaly pattern corresponds to NAO-.
+#'1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  
+#'  Formatted to CRAN
+#'@references
+#'Doblas-Reyes, F.J., Pavan, V. and Stephenson, D. (2003). The skill of 
+#'  multi-model seasonal forecasts of the wintertime North Atlantic Oscillation. 
+#'  Climate Dynamics, 21, 501-514. DOI: 10.1007/s00382-003-0350-4
+#'
+#'@examples
+#'# See examples on Load() to understand the first lines in this example
+#'  \dontrun{
+#'data_path <- system.file('sample_data', package = 's2dverification')
+#'expA <- list(name = 'experiment', path = file.path(data_path,
+#'             'model/$EXP_NAME$/$STORE_FREQ$_mean/$VAR_NAME$_3hourly',
+#'             '$VAR_NAME$_$START_DATE$.nc'))
+#'obsX <- list(name = 'observation', path = file.path(data_path,
+#'             '$OBS_NAME$/$STORE_FREQ$_mean/$VAR_NAME$',
+#'             '$VAR_NAME$_$YEAR$$MONTH$.nc'))
+#'
+#'# Now we are ready to use Load().
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- Load('tos', list(expA), list(obsX), startDates,
+#'                   leadtimemin = 1, leadtimemax = 4, output = 'lonlat',
+#'                   latmin = 20, latmax = 90, lonmin = -80, lonmax = 40)
+#'  }
+#'  \dontshow{
+#'startDates <- c('19851101', '19901101', '19951101', '20001101', '20051101')
+#'sampleData <- s2dverification:::.LoadSampleData('tos', c('experiment'),
+#'                                                c('observation'), startDates,
+#'                                                leadtimemin = 1,
+#'                                                leadtimemax = 4,
+#'                                                output = 'lonlat',
+#'                                                latmin = 27, latmax = 48,
+#'                                                lonmin = -12, lonmax = 40)
+#'# No example data is available over NAO region, so in this example we will 
+#'# tweak the available data. In a real use case, one can Load() the data over 
+#'# NAO region directly.
+#'sampleData$lon[] <- c(40, 280, 340)
+#'attr(sampleData$lon, 'first_lon') <- 280
+#'attr(sampleData$lon, 'last_lon') <- 40
+#'attr(sampleData$lon, 'data_across_gw') <- TRUE
+#'sampleData$lat[] <- c(20, 80)
+#'attr(sampleData$lat, 'first_lat') <- 20
+#'attr(sampleData$lat, 'last_lat') <- 80
+#'  }
+#'
+#'# Now ready to compute the EOFs and project on, for example, the first 
+#'# variability mode.
+#'ano <- Ano_CrossValid(sampleData$mod, sampleData$obs)
+#'# Note that computing the NAO over the region for which there is available 
+#'# example data is not the full NAO area: NAO() will raise a warning.
+#'nao <- NAO(ano$ano_exp, ano$ano_obs, sampleData$lon, sampleData$lat)
+#'# Finally plot the NAO index
+#'  \donttest{
+#'PlotBoxWhisker(nao$NAO_exp, nao$NAO_obs, "NAO index, DJF", "NAO index (PC1) TOS",
+#'        monini = 12, yearini = 1985, freq = 1, "Exp. A", "Obs. X")
+#'  }
+#'
+#'@export
 NAO <- function(ano_exp = NULL, ano_obs = NULL, lon, lat, ftime_average = 2:4, obsproj = TRUE) {
   # Checking ano_exp
   if (!is.null(ano_exp)) {

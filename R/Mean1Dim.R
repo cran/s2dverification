@@ -1,3 +1,27 @@
+#'Averages An Array Along A Dimension
+#'
+#'Averages the array along the posdim dimension along the user specified 
+#'dimension. The user can specify a subset of the dimension to take the mean 
+#'along.
+#'
+#'@param var Matrix to average.
+#'@param posdim Dimension to average along.
+#'@param narm Ignore NA (TRUE) values or not (FALSE).
+#'@param limits Limits to average between. Default is to take the mean along 
+#'  the entire dimension.
+#'
+#'@return Array with one dimension less than the input array, containing 
+#'  the average along the posdim dimension.
+#'
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2011-04  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to R CRAN
+#'@examples
+#'a <- array(rnorm(24), dim = c(2, 3, 4))
+#'print(a)
+#'print(Mean1Dim(a, 2))
+#'@export
 Mean1Dim <- function(var, posdim, narm = TRUE, limits = NULL) {
   if (is.null(limits)) {
     limits <- c(1, dim(var)[posdim])

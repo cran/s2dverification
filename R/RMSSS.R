@@ -1,3 +1,78 @@
+#'Computes Root Mean Square Skill Score
+#'
+#'Computes the root mean square error skill score between an array of 
+#'forecasts, var_exp and an array of observations, var_obs, which should 
+#'have the same dimensions except along posloop where the lengths can be 
+#'different, with the number of experiments/models for var_exp (nexp) and 
+#'the number of obserational datasets for var_obs (nobs).\cr
+#'RMSSS computes the Root Mean Square Skill Score of each jexp in 1:nexp 
+#'against each jobs in 1:nobs which gives nexp x nobs RMSSS for each other 
+#'grid point of the matrix (each latitude/longitude/level/leadtime).\cr
+#'The RMSSS are computed along the posRMS dimension which should correspond 
+#'to the startdate dimension.\cr
+#'The p-value is optionally provided by a one-sided Fisher test.\cr\cr
+#'.RMSSS provides the same functionality but taking a matrix of ensemble 
+#'members as input (exp).
+#'
+#'@param var_exp Array of experimental data.
+#'@param var_obs Array of observational data, same dimensions as var_exp 
+#'  except along posloop dimension, where the length can be nobs instead of 
+#'  nexp.
+#'@param posloop Dimension nobs and nexp.
+#'@param posRMS Dimension along which the RMSE are to be computed (the 
+#'  dimension of the start dates).
+#'@param pval Whether to compute or not the p-value of the test Ho : 
+#'  RMSSS = 0. TRUE by default.
+#'@param exp N by M matrix of N forecasts from M ensemble members.
+#'@param obs Vector of the corresponding observations of length N. 
+#'
+#'@return RMSSS: Array with dimensions:\cr
+#'  c(length(posloop) in var_exp, length(posloop) in var_obs, 1 or 2, 
+#'  all other dimensions of var_exp & var_obs except posRMS).\cr
+#'The 3rd dimension corresponds to the RMSSS and, if \code{pval = TRUE}, 
+#'  the p-value of the one-sided Fisher test with Ho: RMSSS = 0.\cr\cr
+#'.RMSSS:
+#'  \itemize{
+#'    \item{$rmsss}{
+#'    The RMSSS.
+#'    }
+#'    \item{$p_val}{
+#'    Corresponds to the p values (only present if \code{pval = TRUE}) for 
+#'    the RMSSS.
+#'    }
+#'  }
+#'@keywords datagen
+#'@author History:\cr
+#'0.1  -  2012-04  (V. Guemas, \email{vguemas@@bsc.es})  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Formatting to R CRAN\cr
+#'1.1  -  2017-02  (A. Hunter, \email{alasdair.hunter@@bsc.es})  -  Adapted to veriApply()
+#'@examples
+#'# Load sample data as in Load() example:
+#'example(Load)
+#'clim <- Clim(sampleData$mod, sampleData$obs)
+#'ano_exp <- Ano(sampleData$mod, clim$clim_exp)
+#'ano_obs <- Ano(sampleData$obs, clim$clim_obs)
+#'rmsss <- RMSSS(Mean1Dim(ano_exp, 2), Mean1Dim(ano_obs, 2))
+#'rmsss_plot <- array(dim = c(dim(rmsss)[1:2], 4, dim(rmsss)[4]))
+#'rmsss_plot[, , 2, ] <- rmsss[, , 1, ]
+#'rmsss_plot[, , 4, ] <- rmsss[, , 2, ]
+#'  \donttest{
+#'PlotVsLTime(rmsss_plot, toptitle = "Root Mean Square Skill Score", ytitle = "", 
+#'            monini = 11, limits = c(-1, 1.3), listexp = c('CMIP5 IC3'), 
+#'            listobs = c('ERSST'), biglab = FALSE, hlines = c(-1, 0, 1), 
+#'            fileout = 'tos_rmsss.eps')
+#'  }
+#'# The following example uses veriApply combined with .RMSSS instead of RMSSS
+#'  \dontrun{
+#'require(easyVerification)
+#'RMSSS2 <- s2dverification:::.RMSSS
+#'rmsss2 <- veriApply("RMSSS2", ano_exp,
+#'                    # see ?veriApply for how to use the 'parallel' option
+#'                    Mean1Dim(ano_obs, 2),
+#'                    tdim = 3, ensdim = 2)
+#'  }
+#'@rdname RMSSS
+#'@export
 RMSSS <- function(var_exp, var_obs, posloop = 1, posRMS = 2, pval = TRUE) {
   #
   #  Enlarge var_exp & var_obs & clim to 10 dim + move posloop & posRMS  
@@ -87,7 +162,9 @@ RMSSS <- function(var_exp, var_obs, posloop = 1, posRMS = 2, pval = TRUE) {
   #
   enlRMSSS
 }
-
+#'@rdname RMSSS
+#'@importFrom stats pf
+#'@export
 .RMSSS <- function(exp, obs, pval = TRUE) {
   dif2 <- obs
   dif1 <- rowMeans(exp) - obs

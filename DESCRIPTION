@@ -1,10 +1,12 @@
 Package: s2dverification
 Title: Set of Common Tools for Forecast Verification
-Version: 2.8.5
+Version: 2.8.6
 Authors@R: c(
     person("BSC-CNS", role = c("aut", "cph")),
     person("Virginie", "Guemas", , "virginie.guemas@bsc.es", role = "aut"),
-    person("Nicolau", "Manubens", , "nicolau.manubens@bsc.es", role = c("aut", "cre")),
+    person("Nicolau", "Manubens", , "nicolau.manubens@bsc.es", role = "aut"),
+    person("An-Chi", "Ho", , "an.ho@bsc.es", role = c("ctb", "cre")),
+    person("Nuria", "Perez-Zanon", , "nuria.perez@bsc.es", role = "ctb"),
     person("Javier", "Garcia-Serrano", , "javier.garcia@bsc.es", role = "aut"),
     person("Neven", "Fuckar", , "neven.fuckar@bsc.es", role = "aut"),
     person("Louis-Philippe", "Caron", , "louis-philippe.caron@bsc.es", role = "aut"),
@@ -27,22 +29,31 @@ Authors@R: c(
     person("Ruben", "Cruz", , "ruben.cruzgarcia@bsc.es", role = "ctb"),
     person("Isabel", "Andreu-Burillo", , "isabel.andreu.burillo@ic3.cat", role = "ctb"),
     person("Ramiro", "Saurral", , "ramiro.saurral@ic3.cat", role = "ctb"))
-Description: Set of tools to verify forecasts through the computation of typical prediction scores against one or more observational datasets or reanalyses (a reanalysis being a physical extrapolation of observations that relies on the equations from a model, not a pure observational dataset). Intended for seasonal to decadal climate forecasts although can be useful to verify other kinds of forecasts. The package can be helpful in climate sciences for other purposes than forecasting. 
+Description: Set of tools to verify forecasts through the computation of typical
+    prediction scores against one or more observational datasets or reanalyses (a
+    reanalysis being a physical extrapolation of observations that relies on the
+    equations from a model, not a pure observational dataset). Intended for seasonal
+    to decadal climate forecasts although can be useful to verify other kinds of
+    forecasts. The package can be helpful in climate sciences for other purposes
+    than forecasting.
 Depends: maps, methods, R (>= 2.14.1)
 Imports: abind, bigmemory, GEOmap, geomapdata, mapproj, NbClust, ncdf4,
         parallel, plyr, SpecsVerification (>= 0.5.0)
-Suggests: easyVerification
+Suggests: easyVerification, testthat
 License: LGPL-3
 URL: https://earth.bsc.es/gitlab/es/s2dverification/wikis/home
 BugReports: https://earth.bsc.es/gitlab/es/s2dverification/issues
 LazyData: true
 SystemRequirements: cdo
 Encoding: UTF-8
+RoxygenNote: 5.0.0
 NeedsCompilation: no
-Packaged: 2019-03-19 17:32:45 UTC; nmanuben
+Packaged: 2019-10-16 13:46:36 UTC; aho
 Author: BSC-CNS [aut, cph],
   Virginie Guemas [aut],
-  Nicolau Manubens [aut, cre],
+  Nicolau Manubens [aut],
+  An-Chi Ho [ctb, cre],
+  Nuria Perez-Zanon [ctb],
   Javier Garcia-Serrano [aut],
   Neven Fuckar [aut],
   Louis-Philippe Caron [aut],
@@ -65,6 +76,6 @@ Author: BSC-CNS [aut, cph],
   Ruben Cruz [ctb],
   Isabel Andreu-Burillo [ctb],
   Ramiro Saurral [ctb]
-Maintainer: Nicolau Manubens <nicolau.manubens@bsc.es>
+Maintainer: An-Chi Ho <an.ho@bsc.es>
 Repository: CRAN
-Date/Publication: 2019-03-19 17:50:02 UTC
+Date/Publication: 2019-10-17 05:30:03 UTC
