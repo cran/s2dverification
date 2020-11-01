@@ -70,19 +70,49 @@ Clim <- function(var_exp, var_obs, memb = TRUE, kharin = FALSE, NDV = FALSE) {
   #  Find common points to compute climatologies 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   #
-  tmp <- MeanListDim(var_obs, dims = 5:7, narm = TRUE)
-  tmp2 <- MeanListDim(var_exp, dims = 5:7, narm = TRUE)
-  nan <- MeanListDim(tmp, dims = 1:2, narm = FALSE) + Mean1Dim(Mean1Dim(tmp2, 2, 
-                                                                    narm = TRUE), 
-                                                           1, narm = FALSE)
-  for (jdate in 1:dimexp[3]) {
-    for (jtime in 1:dimexp[4]) {
-      if (is.na(nan[jdate, jtime])) {
-        var_exp[, , jdate, jtime, , , ] <- NA
-        var_obs[, , jdate, jtime, , , ] <- NA
-      }
+
+  na_array <- array(0, dim = dim(var_exp)[3:7])
+
+  for (i_dat in 1:dimexp[1]) {
+    for (i_memb in 1:dimexp[2]) {
+      na_array <- na_array + as.numeric(is.na(var_exp[i_dat, i_memb, , , , , ]))
     }
   }
+  for (i_dat in 1:dimobs[1]) {
+    for (i_memb in 1:dimobs[2]) {
+      na_array <- na_array + as.numeric(is.na(var_obs[i_dat, i_memb, , , , , ]))
+    }
+  }
+  na_array <- as.logical(na_array)  # TRUE is NA, FALSE is not
+
+  for (i_dat in 1:dimexp[1]) {
+    for (i_memb in 1:dimexp[2]) {      
+      asd <- var_exp[i_dat, i_memb, , , , , ]
+      asd[which(na_array)] <- NA
+      var_exp[i_dat, i_memb, , , , , ] <- asd
+    }
+  }
+  for (i_dat in 1:dimobs[1]) {
+    for (i_memb in 1:dimobs[2]) {
+      asd <- var_obs[i_dat, i_memb, , , , , ]
+      asd[which(na_array)] <- NA
+      var_obs[i_dat, i_memb, , , , , ] <- asd
+    }
+  }
+
+#  nan <- MeanListDim(var_exp, dims = c(1:2, 5:7), narm = FALSE) + 
+#         MeanListDim(var_obs, dims = c(1:2, 5:7), narm = FALSE)
+#
+#  for (jdate in 1:dimexp[3]) {
+#    for (jtime in 1:dimexp[4]) {
+#      if (is.na(nan[jdate, jtime])) {
+#        var_exp[, , jdate, jtime, , , ] <- NA
+#        var_obs[, , jdate, jtime, , , ] <- NA
+#      }
+#    }
+#  }
+
+
 
   #
   #  Compute climatologies 

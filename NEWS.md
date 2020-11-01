@@ -1,4 +1,14 @@
-# s2dverification 2.8.6 (Release date: )
+# s2dverification 2.9.0 (Release date: 2020-10-30)
+- Correct the time retrieval in Load() when start date and the first lead time in netCDF file do not match. 
+In addition, when the lead time in each data set is not consistent, the retrieved data should change according to
+ the first data set in the same Load call.
+- One new parameter 'K' is added in Composite() to indicate the maximum number of composites.
+- Revise the per-paired method in Clim() when NA exists.
+- Correct the Corr() p-value.
+- Bugfix for CDO version reading. The error occurred when the CDO version number is followed by letters.
+- Bugfix for Ano() when obs and exp have inconsistent dimensions.
+
+# s2dverification 2.8.6 (Release date: 2019-10-17)
 - Apply Roxygen2 format to all the files.
 - Bug fix in Composite().
 - Bug fix in Ano(). Recommend to assign the dimensions by name to avoid confusion when the dimensions have same length.

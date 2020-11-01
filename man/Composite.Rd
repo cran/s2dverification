@@ -4,7 +4,7 @@
 \alias{Composite}
 \title{Computes composites}
 \usage{
-Composite(var, occ, lag = 0, eno = FALSE, fileout = NULL)
+Composite(var, occ, lag = 0, eno = FALSE, K = NULL, fileout = NULL)
 }
 \arguments{
 \item{var}{3-dimensional array (x, y, time) containing the variable to 
@@ -22,6 +22,8 @@ use +2 occurrences (i.e., shifted 2 time steps forward). Default is lag = 0.}
 
 \item{eno}{For using the effective sample size (TRUE) or the total sample 
 size (FALSE that is the default) for the number of degrees of freedom.}
+
+\item{K}{numeric value indicating the maximum number of composites. By default (NULL), it takes the maximum value provided in occ.}
 
 \item{fileout}{Name of the .sav output file (NULL is the default).}
 }
@@ -76,6 +78,13 @@ occ2 <- rep(0, 30)
 occ2[c(3, 9, 15, 21)] <- 1
 
 filled.contour(Composite(var=f1, occ=occ2)$composite[,,1])
+
+# Example with one missing composite (#3) in occ:
+data <- 1 : (4 * 5 * 6)
+dim(data) <- c(lon = 4, lat = 5, case = 6)
+occ <- c(1, 1, 2, 2, 3, 3) 
+res <- Composite(data, occ, K = 4)
+
 }
 \author{
 History:

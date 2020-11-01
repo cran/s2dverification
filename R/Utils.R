@@ -206,7 +206,11 @@
       if (Sys.which("cdo")[[1]] == "") {
         stop("Error: CDO libraries not available")
       }
-      cdo_version <- as.numeric_version(strsplit(suppressWarnings(system2("cdo", args = '-V', stderr = TRUE))[[1]], ' ')[[1]][5])
+
+     cdo_version <- strsplit(suppressWarnings(system2("cdo", args = '-V', stderr = TRUE))[[1]], ' ')[[1]][5]
+
+      cdo_version <- as.numeric_version(unlist(strsplit(cdo_version, "[A-Za-z]", fixed = FALSE))[[1]])
+
     }
     # If the variable to load is 2-d, we need to determine whether:
     #  - interpolation is needed
@@ -591,6 +595,9 @@
         nltime <- fnc$var[[namevar]][['dim']][[match(time_dimname, var_dimnames)]]$len
         expected_dims <- c(expected_dims, time_dimname)
         dim_matches <- match(expected_dims, var_dimnames)
+        first_time_step_in_file <- fnc$var[[namevar]][['dim']][[match(time_dimname,
+                                        var_dimnames)]]$vals[1]
+        time_units <- fnc$var[[namevar]][['dim']][[match(time_dimname, var_dimnames)]]$units
       } else {
         if (!is.null(old_members_dimname)) {
           expected_dims[which(expected_dims == 'lev')] <- old_members_dimname
@@ -631,7 +638,7 @@
         time_indices <- ts(time_indices, start = c(years[1], mons[1]), 
                            end = c(years[length(years)], mons[length(mons)]),
                            frequency = 12)
-        ltimes_list <- list()
+                ltimes_list <- list()
         for (sdate in work_piece[['startdates']]) {
           selected_time_indices <- window(time_indices, start = c(as.numeric(
                                    substr(sdate, 1, 4)), as.numeric(substr(sdate, 5, 6))), 
@@ -938,7 +945,9 @@
   if (explore_dims) {
     list(dims = dims, is_2d_var = is_2d_var, grid = grid_name, 
          units = units, var_long_name = var_long_name, 
-         data_across_gw = data_across_gw, array_across_gw = array_across_gw)
+         data_across_gw = data_across_gw, array_across_gw = array_across_gw,
+         time_dim = list(first_time_step_in_file = first_time_step_in_file,
+                        time_units = time_units))
   } else {
     ###if (!silent && !is.null(progress_connection) && !is.null(work_piece[['progress_amount']])) {
     ###  foobar <- writeBin(work_piece[['progress_amount']], progress_connection)

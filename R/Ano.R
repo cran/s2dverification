@@ -48,44 +48,112 @@ Ano <- function(var, clim) {
     clim <- InsertDim(clim, 2, dimvar[2])
   }
 
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[2] != dimvar[2])) {
-    clim <- InsertDim(clim, 2, dimvar[2])
-  }
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[2] == dimvar[2])) {
-    if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
-      stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
-    } else {
-      if (names(dim(clim)[2]) != names(dimvar[2])) {
-        clim <- InsertDim(clim, 2, dimvar[2])
+  # Check 2nd dim
+  if (length(dimvar) > length(dim(clim))) {
+
+    if (dim(clim)[2] != dimvar[2]) {
+      clim <- InsertDim(clim, 2, dimvar[2])
+    } else {  # clim[2] == dimvar[2]
+      if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
+        stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+      } else {
+        if (names(dim(clim)[2]) != names(dimvar[2])) {
+          clim <- InsertDim(clim, 2, dimvar[2])
+        }
       }
     }
+
   }
 
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[3] != dimvar[3])) {
+  # Check if clim has 3rd dim. If yes, directly go to the next if. If not, add 3rd dim.
+  if (length(dimvar) > length(dim(clim)) & length(dim(clim)) == 2) {
     clim <- InsertDim(clim, 3, dimvar[3])
   }
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[3] == dimvar[3])) {
-    if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
-      stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
-    } else {
-      if (names(dim(clim)[3]) != names(dimvar[3])) {
-        clim <- InsertDim(clim, 3, dimvar[3])
+
+  # Check 3rd dim
+  if (length(dimvar) > length(dim(clim))) {
+
+    if (dim(clim)[3] != dimvar[3]) {
+      clim <- InsertDim(clim, 3, dimvar[3])
+    } else {  # clim[3] == dimvar[3]
+      if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
+        stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+      } else {
+        if (names(dim(clim)[3]) != names(dimvar[3])) {
+          clim <- InsertDim(clim, 3, dimvar[3])
+        } 
       }
     }
-  }
 
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[4] != dimvar[4])) {
+  }
+  # Check if clim has 4th dim. If yes, directly go to the next if. If not, add 4th dim.
+  if (length(dimvar) > length(dim(clim)) & length(dim(clim)) == 3) {
     clim <- InsertDim(clim, 4, dimvar[4])
   }
-  if ((length(dimvar) > length(dim(clim))) & (dim(clim)[4] == dimvar[4])) {
-    if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
-      stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+
+  # Check 4th dim
+  if (length(dimvar) > length(dim(clim))) {
+
+    if (dim(clim)[4] != dimvar[4]) {
+      clim <- InsertDim(clim, 4, dimvar[4])
     } else {
-      if (names(dim(clim)[4]) != names(dimvar[4])) {
-        clim <- InsertDim(clim, 4, dimvar[4])
+      if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
+        stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+      } else {
+        if (names(dim(clim)[4]) != names(dimvar[4])) {
+          clim <- InsertDim(clim, 4, dimvar[4])
+        }
       }
     }
+
   }
+  # Check if clim has 5th dim. If yes, directly go to the next if. If not, add 5th dim.
+  if (length(dimvar) > length(dim(clim)) & length(dim(clim)) == 4) {
+    clim <- InsertDim(clim, 5, dimvar[5])
+  }
+
+  # Check 5th dim
+  if (length(dimvar) > length(dim(clim))) {
+
+    if (dim(clim)[5] != dimvar[5]) {
+      clim <- InsertDim(clim, 5, dimvar[5])
+    } else {
+      if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
+        stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+      } else {
+        if (names(dim(clim)[5]) != names(dimvar[5])) {
+          clim <- InsertDim(clim, 5, dimvar[5])
+        }
+      }
+    }
+
+  }
+  # Check if clim has 6th dim. If yes, directly go to the next if. If not, add 6th dim.
+  if (length(dimvar) > length(dim(clim)) & length(dim(clim)) == 5) {
+    clim <- InsertDim(clim, 6, dimvar[6])
+  }
+
+  # Check 6th dim
+  if (length(dimvar) > length(dim(clim))) {
+
+    if (dim(clim)[6] != dimvar[6]) {
+      clim <- InsertDim(clim, 6, dimvar[6])
+    } else {
+      if (is.null(names(dim(clim))) | is.null(names(dimvar))) {
+        stop('Provide dimension names on parameter \'var\' and \'clim\' to avoid ambiguity.')
+      } else {
+        if (names(dim(clim)[6]) != names(dimvar[6])) {
+          clim <- InsertDim(clim, 6, dimvar[6])
+        }
+      }
+    }
+
+  }
+  # Check if clim has 7th dim. If yes, directly go to the next if. If not, add 7th dim.
+  if (length(dimvar) > length(dim(clim)) & length(dim(clim)) == 6) {
+    clim <- InsertDim(clim, 7, dimvar[7])
+  }
+
 
   #
   #  Raw anomalies

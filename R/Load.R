@@ -840,6 +840,7 @@
 #'  } 
 #'@import parallel bigmemory methods
 #'@importFrom stats ts window na.omit
+#'@importFrom abind abind
 #'@export
 Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL, 
                  nmemberobs = NULL, nleadtime = NULL, leadtimemin = 1, 
@@ -850,6 +851,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
                  configfile = NULL, varmin = NULL, varmax = NULL, 
                  silent = FALSE, nprocs = NULL, dimnames = NULL, 
                  remapcells = 2, path_glob_permissive = 'partial') {
+
   #library(parallel)
   #library(bigmemory)
 
@@ -1052,7 +1054,6 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   if (!is.character(storefreq) || !(storefreq %in% c('monthly', 'daily'))) {
     stop("Error: parameter 'storefreq' is wrong, can take value 'daily' or 'monthly'.")
   }
-
   # sampleperiod
   if (is.null(sampleperiod) || !is.numeric(sampleperiod)) {
     stop("Error: parameter 'sampleperiod' is wrong. It should be numeric.")
@@ -1382,6 +1383,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   dims2define <- TRUE
   is_file_per_member_exp <- rep(nmod, FALSE)
   exp_work_pieces <- list()
+  first_time_step_list <- NULL
   jmod <- 1
   while (jmod <= nmod) {
     first_dataset_file_found <- FALSE
@@ -1426,6 +1428,21 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       replace_values[["DAY"]] <- substr(sdates[jsdate], 7, 8)
       if (is_file_per_member_exp[jmod]) {
         replace_values[["MEMBER_NUMBER"]] <- '*'
+      }
+      if (jsdate == 1) {
+        work_piecetime <- list(dataset_type = dataset_type,
+                           filename = .ConfigReplaceVariablesInString(quasi_final_path,
+                                                                      replace_values),
+                           namevar = namevar, grid = grid, remap = remap, 
+                           remapcells = remapcells,
+                           is_file_per_member = is_file_per_member_exp[jmod],
+                           is_file_per_dataset = FALSE,
+                           lon_limits = c(lonmin, lonmax),
+                           lat_limits = c(latmin, latmax), dimnames = exp[[jmod]][['dimnames']],
+                           single_dataset = single_dataset)
+        looking_time <- .LoadDataFile(work_piecetime, explore_dims = TRUE, 
+                                      silent = silent)
+        first_time_step_list <- c(first_time_step_list, list(looking_time$time_dim))
       }
       # If the dimensions of the output matrices are still to define, we try to read
       # the metadata of the data file that corresponds to the current iteration
@@ -1531,6 +1548,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       jsdate <- jsdate + 1
     }
     replace_values[extra_vars] <- NULL
+    #first_dataset_file_found <- FALSE
     jmod <- jmod + 1
   }
   if (dims2define && length(exp) > 0) {
@@ -1553,7 +1571,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
   # the current date.
   if (is.null(exp) || dims == 0) {
     if (is.null(leadtimemax)) {
-      diff <- Sys.time() - as.POSIXct(sdates[1], format = '%Y%m%d')
+      diff <- Sys.time() - as.POSIXct(sdates[1], format = '%Y%m%d', tz = "UTC")
       if (diff > 0) {
         .warning("Loading observations only and no 'leadtimemax' specified. Data will be loaded from each starting date to current time.")
         if (storefreq == 'monthly') { 
@@ -1571,7 +1589,52 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     }
     leadtimes <- seq(leadtimemin, leadtimemax, sampleperiod)
   }
-  
+  # If there are differences in the first time stamp in exp files:
+  if (!is.null(exp)) {
+    in_date <- lapply(first_time_step_list, function(x) {
+        origin <- as.POSIXct(
+          paste(strsplit(x$time_units, " ")[[1]][c(3,4)],
+                collapse = " "), tz = 'UTC')
+        units <- strsplit(x$time_units, " ")[[1]][1]
+        if (units == 'hours') {
+          exp_first_time_step <- as.POSIXct(
+            x$first_time_step_in_file *
+            3600, origin = origin, tz = 'UTC')
+        } else if (units == 'days') {
+          exp_first_time_step <- as.POSIXct(
+            x$first_time_step_in_file *
+            86400, origin = origin, tz = 'UTC')
+        }
+        day <- as.numeric(format(exp_first_time_step, "%d"))
+        return(day)
+    })
+    exp_first_time_step <- min(unlist(in_date))
+    if (max(unlist(in_date)) > 1) {
+      leadtimes <- seq(exp_first_time_step, leadtimemax + max(unlist(in_date)) - 1, 
+                       sampleperiod)
+    }
+    if (leadtimemin > 1 & length(in_date) > 1) {
+      lags <- lapply(in_date, function(x) {x - in_date[[1]]})
+      new_leadtimemin <- lapply(lags, function(x) {leadtimemin - x})
+      new_leadtimemax <- lapply(lags, function(x) {leadtimemax - x})
+      jmod <- 2
+      npieces <- length(exp_work_pieces)/nmod
+      while (jmod <= nmod) {
+        jpiece <- 1
+        while (jpiece <= npieces) {
+          exp_work_pieces[[npieces * (jmod - 1) + jpiece]]$leadtimes <- 
+            seq(new_leadtimemin[[jmod]], new_leadtimemax[[jmod]], sampleperiod)
+          jpiece <- jpiece + 1
+        }
+        jmod <- jmod + 1
+      }
+    }
+    lag <- 1 - in_date[[1]]
+    leadtimes <- seq(leadtimemin - lag, leadtimemax #+ max(unlist(in_date)) + lag,
+                     - lag,
+                     sampleperiod)
+    exp_first_time_step <- leadtimemin - lag
+  }
   # Now we start iterating over observations. We try to find the output matrix
   # dimensions and we build anyway the work pieces corresponding to the observational
   # data that time-corresponds the experimental data or the time-steps until the
@@ -1635,6 +1698,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
         found_data <- .LoadDataFile(work_piece, explore_dims = TRUE, silent = silent)
         found_dims <- found_data$dims
         var_long_name <- found_data$var_long_name
+        first_time_step_list <- c(first_time_step_list, list(found_data$time_dim))
         units <- found_data$units
         if (!is.null(found_dims)) {
           is_2d_var <- found_data$is_2d_var
@@ -1709,7 +1773,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           }
           day <- as.integer(day)
           startdate <- as.POSIXct(paste(substr(sdate, 1, 4), '-',
-                       substr(sdate, 5, 6), '-', day, ' 12:00:00', sep = '')) + 
+                       substr(sdate, 5, 6), '-', day, ' 12:00:00', sep = ''), tz = "UTC") + 
                        (leadtimemin - 1) * 86400
           year <- as.integer(substr(startdate, 1, 4))
           month <- as.integer(substr(startdate, 6, 7))
@@ -1732,7 +1796,18 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
             ## This condition must be fulfilled to put all the month time steps
             ## in the dimension of length nleadtimes. Otherwise it must be cut:
             #(length(leadtimes) - 1)*sampleperiod + 1 - (jleadtime - 1)*sampleperiod >= days_in_month - day + 1
-            obs_file_indices <- seq(day, min(days_in_month, (length(leadtimes) - jleadtime) * sampleperiod + day), sampleperiod)
+            
+            ## The first time step in exp could be different from sdate:
+            if (jleadtime == 1 & !is.null(exp)) {
+             if (is.null(first_time_step_list[[1]])) {
+                stop("Check 'time' variable in the experimental files ",
+                     "since not units or first time step have been found.")
+              } else {
+                  day <- leadtimes[1]
+              }
+            }
+          obs_file_indices <- seq(day, min(days_in_month,
+                  (length(leadtimes) - jleadtime) * sampleperiod + day), sampleperiod)
           } else {
             obs_file_indices <- 1
           }
@@ -1828,7 +1903,8 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
           }
           
           if (storefreq == 'daily') {
-            startdate <- startdate + 86400 * sampleperiod * length(obs_file_indices)
+            startdate <- startdate + 86400 * sampleperiod * 
+                         max(obs_file_indices)
             year <- as.integer(substr(startdate, 1, 4))
             month <- as.integer(substr(startdate, 6, 7))
             day <- as.integer(substr(startdate, 9, 10))
@@ -2142,49 +2218,54 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     attr(variable, 'daily_agg_cellfun') <- 'none'
     attr(variable, 'monthly_agg_cellfun') <- 'none'
     attr(variable, 'verification_time') <- 'none'
-
-    number_ftime <- NULL 
+    
+    number_ftime <- NULL
     if (is.null(var_exp)) {
       mod_data <- NULL
-    } else { 
+    } else {
       dim_reorder <- length(dim_exp):1
       dim_reorder[2:3] <- dim_reorder[3:2]
       old_dims <- dim_exp
       dim_exp <- dim_exp[dim_reorder]
-      mod_data <- aperm(array(bigmemory::as.matrix(var_exp), dim = old_dims), dim_reorder)
+      mod_data <-
+        aperm(array(bigmemory::as.matrix(var_exp), dim = old_dims), dim_reorder)
       attr(mod_data, 'dimensions') <- names(dim_exp)
       names(dim(mod_data)) <- names(dim_exp)
       number_ftime <- dim_exp[["ftime"]]
     }
-
+    
     if (is.null(var_obs)) {
       obs_data <- NULL
-    } else {                     
+    } else {
       dim_reorder <- length(dim_obs):1
       dim_reorder[2:3] <- dim_reorder[3:2]
       old_dims <- dim_obs
       dim_obs <- dim_obs[dim_reorder]
-      obs_data <- aperm(array(bigmemory::as.matrix(var_obs), dim = old_dims), dim_reorder)
+      obs_data <-
+        aperm(array(bigmemory::as.matrix(var_obs), dim = old_dims), dim_reorder)
       attr(obs_data, 'dimensions') <- names(dim_obs)
       names(dim(obs_data)) <- names(dim_obs)
       if (is.null(number_ftime)) {
         number_ftime <- dim_obs[["ftime"]]
       }
     }
-
     if (is.null(latitudes)) {
       lat <- 0
       attr(lat, 'cdo_grid_name') <- 'none'
       attr(lat, 'first_lat') <- 'none'
-      attr(lat, 'last_lat') <- 'none' 
+      attr(lat, 'last_lat') <- 'none'
     } else {
       lat <- latitudes
-      attr(lat, 'cdo_grid_name') <- if (is.null(grid)) 'none' else grid
+      attr(lat, 'cdo_grid_name') <-
+        if (is.null(grid))
+          'none'
+      else
+        grid
       attr(lat, 'first_lat') <- tail(lat, 1)
       attr(lat, 'last_lat') <- head(lat, 1)
     }
     attr(lat, 'projection') <- 'none'
-
+    
     if (is.null(longitudes)) {
       lon <- 0
       attr(lon, 'cdo_grid_name') <- 'none'
@@ -2194,14 +2275,18 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       attr(lon, 'last_lon') <- 'none'
     } else {
       lon <- longitudes
-      attr(lon, 'cdo_grid_name') <- if (is.null(grid)) 'none' else grid
+      attr(lon, 'cdo_grid_name') <-
+        if (is.null(grid))
+          'none'
+      else
+        grid
       attr(lon, 'data_across_gw') <- data_across_gw
       attr(lon, 'array_across_gw') <- array_across_gw
       attr(lon, 'first_lon') <- lon[which.min(abs(lon - lonmin))]
       attr(lon, 'last_lon') <- lon[which.min(abs(lon - lonmax))]
     }
     attr(lon, 'projection') <- 'none'
-
+    
     dates <- list()
     ## we must put a start and end time for each prediction c(start date, forecast time)
     if (storefreq == 'minutely') {
@@ -2209,26 +2294,46 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
     } else if (storefreq == 'hourly') {
       store_period <- 'hour'
     } else if (storefreq == 'daily') {
-      store_period <- 'day'
+      store_period <- 'DSTday'
     } else if (storefreq == 'monthly') {
       store_period <- 'month'
     }
-
+    
     addTime <- function(date, period, n = 1) {
       seq(date, by = paste(n, period), length = 2)[2]
     }
-
+    
     # We build dates, a list with components start and end.
     # Start is a list with as many components as start dates.
     # Each component is a vector of the initial POSIXct date of each
     # forecast time step
-    dates[["start"]] <- do.call(c, lapply(sdates,
+    if (!is.null(exp)) {
+      if (storefreq == 'daily' & leadtimes[[1]] > 1) {
+        origin <- leadtimes[[1]] - 1
+        leadtimemin <- 1
+      } else {
+        origin <- 0
+      }
+      dates[["start"]] <- do.call(c, lapply(sdates,
+          function(x) {
+            do.call(c, lapply((origin:(origin + number_ftime - 1)) * sampleperiod,
+              function(y) {
+                 addTime(as.POSIXct(x, format = "%Y%m%d", tz = "UTC"),
+                                    store_period, y + leadtimemin - 1)
+              }))
+           }))
+    } else {
+      origin <- 0
+      dates[["start"]] <- do.call(c, lapply(sdates,
       function(x) {
         do.call(c, lapply((0:(number_ftime - 1)) * sampleperiod,
           function(y) {
-            addTime(as.POSIXct(x, format = "%Y%m%d"), store_period, y + leadtimemin - 1)
+            addTime(as.POSIXct(x, format = "%Y%m%d", tz = "UTC"),
+                    store_period, y + leadtimemin - 1)
           }))
       }))
+    }
+    attr(dates[["start"]], "tzone") <- "UTC"
     # end is similar to start, but contains the end dates of each forecast 
     # time step
     dates[["end"]] <- do.call(c, lapply(dates[["start"]],
@@ -2238,6 +2343,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
             addTime(y, store_period)
           }))
       }))
+    attr(dates[["end"]], "tzone") <- "UTC"
 
     tags_to_find <- c('START_DATE', 'MEMBER_NUMBER', 'YEAR', 'MONTH', 'DAY')
     position_of_tags <- na.omit(match(tags_to_find, names(replace_values)))
@@ -2249,14 +2355,19 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
       models <- list()
       for (jmod in 1:length(exp)) {
         member_names <- paste0("Member_", 1:nmember[jmod])
-        models[[exp[[jmod]][["name"]]]] <- list(
-          InitializationDates = lapply(member_names,
+
+        InitializationDates <- do.call(c, lapply(member_names,
             function(x) {
               do.call(c, lapply(sdates, function(y) {
-                as.POSIXct(y, format = "%Y%m%d")
+                as.POSIXct(y, format = "%Y%m%d", tz = "UTC")
               }))
-            }),
+            }))
+        attr(InitializationDates, "tzone") <- "UTC"
+
+        models[[exp[[jmod]][["name"]]]] <- list(
+          InitializationDates = InitializationDates,
           Members = member_names)
+
         names(models[[exp[[jmod]][["name"]]]]$InitializationDates) <- member_names
         attr(models[[exp[[jmod]][["name"]]]], 'dataset') <- exp[[jmod]][["name"]]
         attr(models[[exp[[jmod]][["name"]]]], 'source') <- {

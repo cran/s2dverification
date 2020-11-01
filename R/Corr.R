@@ -198,9 +198,13 @@ Corr <- function(var_exp, var_obs, posloop = 1, poscor = 2, compROW = NULL,
                         }
                         if (pval) {
                           #t <- qt(0.95, eno - 2)
-                          t <- qt(siglev, eno - 2)
-                          CORR[jexp, jobs, dim_pval, j3, j4, j5, j6, j7, j8, j9, 
-                               j10] <- sqrt((t * t) / ((t * t) + eno - 2))
+#                          t <- qt(siglev, eno - 2)
+#                          CORR[jexp, jobs, dim_pval, j3, j4, j5, j6, j7, j8, j9, 
+#                               j10] <- sqrt((t * t) / ((t * t) + eno - 2))
+                          t <-sqrt(toto * toto * (eno - 2) / (1 - (toto ^ 2)))
+                          CORR[jexp, jobs, dim_pval, j3, j4, j5, j6, j7, j8, j9,
+                               j10] <- pt(t, eno - 2, lower.tail = FALSE)
+
                         }
                         if (conf) {
                           CORR[jexp, jobs, 1, j3, j4, j5, j6, j7, j8, j9, 

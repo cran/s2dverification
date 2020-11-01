@@ -147,7 +147,7 @@
 #'  ConfigEditEntry, ConfigFileOpen, ConfigShowSimilarEntries, ConfigShowTable
 #'@references
 #'[1] \url{https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html}\cr
-#'[2] \url{http://tldp.org/LDP/abs/html/globbingref.html}
+#'[2] \url{https://tldp.org/LDP/abs/html/globbingref.html}
 #'@author History:
 #'  0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@@ic3.cat}) - First version
 #'  1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@@ic3.cat}) - Removed grid column and storage formats

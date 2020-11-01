@@ -406,6 +406,7 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
   }
   if (is.logical(crop)) {
     if (crop) {
+            warning("Parameter 'crop' = 'TRUE'. The output grid range will follow the input lons and lats.")
       if (length(lons) == 1 || length(lats) == 1) {
         stop("CDORemap cannot remap if crop = TRUE and values for only one ",
              "longitude or one latitude are provided. Either a) provide ",
@@ -516,6 +517,8 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
         }
 ###---
       }
+    }  else if (crop == FALSE) {
+       warning("Parameter 'crop' = 'FALSE'. The output grid range will follow parameter 'grid'.")
     }
   } else if (is.numeric(crop)) {
     if (length(crop) != 4) {

@@ -1,6 +1,6 @@
 Package: s2dverification
 Title: Set of Common Tools for Forecast Verification
-Version: 2.8.6
+Version: 2.9.0
 Authors@R: c(
     person("BSC-CNS", role = c("aut", "cph")),
     person("Virginie", "Guemas", , "virginie.guemas@bsc.es", role = "aut"),
@@ -35,20 +35,21 @@ Description: Set of tools to verify forecasts through the computation of typical
     equations from a model, not a pure observational dataset). Intended for seasonal
     to decadal climate forecasts although can be useful to verify other kinds of
     forecasts. The package can be helpful in climate sciences for other purposes
-    than forecasting.
+    than forecasting. To find more details, see the review paper Manubens, N.et al. (2018)
+    <doi:10.1016/j.envsoft.2018.01.018>.
 Depends: maps, methods, R (>= 2.14.1)
 Imports: abind, bigmemory, GEOmap, geomapdata, mapproj, NbClust, ncdf4,
         parallel, plyr, SpecsVerification (>= 0.5.0)
 Suggests: easyVerification, testthat
 License: LGPL-3
-URL: https://earth.bsc.es/gitlab/es/s2dverification/wikis/home
-BugReports: https://earth.bsc.es/gitlab/es/s2dverification/issues
+URL: https://earth.bsc.es/gitlab/es/s2dverification/-/wikis/home
+BugReports: https://earth.bsc.es/gitlab/es/s2dverification/-/issues
 LazyData: true
 SystemRequirements: cdo
 Encoding: UTF-8
 RoxygenNote: 5.0.0
 NeedsCompilation: no
-Packaged: 2019-10-16 13:46:36 UTC; aho
+Packaged: 2020-10-30 13:00:56 UTC; aho
 Author: BSC-CNS [aut, cph],
   Virginie Guemas [aut],
   Nicolau Manubens [aut],
@@ -78,4 +79,4 @@ Author: BSC-CNS [aut, cph],
   Ramiro Saurral [ctb]
 Maintainer: An-Chi Ho <an.ho@bsc.es>
 Repository: CRAN
-Date/Publication: 2019-10-17 05:30:03 UTC
+Date/Publication: 2020-11-01 05:30:08 UTC
