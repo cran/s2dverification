@@ -27,10 +27,17 @@ Check an overview of the package functionalities and its modules at
 For more information load the package and check the help for each function  
 or the documentation attached to the package.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://earth.bsc.es/gitlab/es/s2dverification/-/wikis/home}
+  \item Report bugs at \url{https://earth.bsc.es/gitlab/es/s2dverification/-/issues}
+}
+
+}
 \author{
 Nicolau Manubens \email{nicolau.manubens@bsc.es}
 }
 \keyword{datagen}
 \keyword{dynamic}
 \keyword{package}
-

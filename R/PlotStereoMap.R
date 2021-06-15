@@ -4,8 +4,8 @@
 #'a polar stereographic world projection with coloured grid cells. Only the 
 #'region within a specified latitude interval is displayed. A colour bar 
 #'(legend) can be plotted and adjusted. It is possible to draw superimposed 
-#'dots, symbols and boxes. A number of options is provided to adjust the 
-#'position, size and colour of the components. This plot function is 
+#'dots, symbols, boxes, contours, and arrows. A number of options is provided to
+#'adjust the position, size and colour of the components. This plot function is 
 #'compatible with figure layouts if colour bar is disabled.
 #'
 #'@param var Array with the values at each cell of a grid on a regular 
@@ -24,6 +24,10 @@
 #'@param lat Numeric vector of latitude locations of the cell centers of the 
 #'  grid of 'var', in any order (same as 'var'). Expected to be from a regular 
 #'  rectangular or gaussian grid, within the range [-90, 90].
+#'@param varu Array of the zonal component of wind/current/other field with 
+#'  the same dimensions as 'var'.
+#'@param varv Array of the meridional component of wind/current/other field 
+#'  with the same dimensions as 'var'.
 #'@param latlims Latitudinal limits of the figure.\cr
 #'  Example : c(60, 90) for the North Pole\cr
 #'            c(-90,-60) for the South Pole
@@ -58,6 +62,24 @@
 #'  continents. Takes the value gray(0.5) by default.
 #'@param coast_width Line width of the coast line of the drawn projected 
 #'  continents. Takes the value 1 by default.
+#'@param contours Array of same dimensions as 'var' to be added to the plot 
+#'  and displayed with contours. Parameter 'brks2' is required to define the 
+#'  magnitude breaks for each contour curve.
+#'@param brks2 A numeric value or vector of magnitude breaks where to draw 
+#'  contour curves for the array provided in 'contours'. If it is a number, it
+#'  represents the number of breaks (n) that defines (n - 1) intervals to 
+#'  classify 'contours'.
+#'@param contour_lwd Line width of the contour curves provided via 'contours' 
+#'  and 'brks2'. The default value is 0.5.
+#'@param contour_color Line color of the contour curves provided via 'contours' 
+#'  and 'brks2'.
+#'@param contour_lty Line type of the contour curves. Takes 1 (solid) by 
+#'  default. See help on 'lty' in par() for other accepted values.
+#'@param contour_label_draw A logical value indicating whether to draw the 
+#'  contour labels (TRUE) or not (FALSE) when 'contours' is used. The default
+#'  value is TRUE.
+#'@param contour_label_scale Scale factor for the superimposed labels when 
+#'  drawing contour levels. The default value is 0.6.
 #'@param dots Array of same dimensions as 'var' or with dimensions 
 #'  c(n, dim(var)), where n is the number of dot/symbol layers to add to the 
 #'  plot. A value of TRUE at a grid cell will draw a dot/symbol on the 
@@ -74,6 +96,23 @@
 #'  layers in 'dots'. Takes 1 by default.
 #'@param intlat Interval between latitude lines (circles), in degrees. 
 #'  Defaults to 10.
+#'@param arr_subsamp A number as subsampling factor to select a subset of arrows 
+#'  in 'varu' and 'varv' to be drawn. Only one out of arr_subsamp arrows will 
+#'  be drawn. The default value is 1.
+#'@param arr_scale A number as scale factor for drawn arrows from 'varu' and 
+#'  'varv'. The default value is 1.
+#'@param arr_ref_len A number of the length of the refence arrow to be drawn as
+#'  legend at the bottom of the figure (in same units as 'varu' and 'varv', only
+#'  affects the legend for the wind or variable in these arrays). The default 
+#'  value is 15.
+#'@param arr_units Units of 'varu' and 'varv', to be drawn in the legend. 
+#'  Takes 'm/s' by default.
+#'@param arr_scale_shaft A number for the scale of the shaft of the arrows 
+#'  (which also depend on the number of figures and the arr_scale parameter). 
+#'  The default value is 1.
+#'@param arr_scale_shaft_angle A number for the scale of the angle of the 
+#'  shaft of the arrows (which also depend on the number of figure and the 
+#'  arr_scale parameter). The default value is 1.
 #'@param drawleg Whether to plot a color bar (legend, key) or not. 
 #'  Defaults to TRUE.
 #'@param boxlim Limits of a box to be added to the plot, in degrees: 
@@ -144,15 +183,21 @@
 #'@importFrom grDevices dev.cur dev.new dev.off gray
 #'@importFrom stats median
 #'@export
-PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90), 
+PlotStereoMap <- function(var, lon, lat, varu = NULL, varv = NULL, latlims = c(60, 90), 
                           toptitle = NULL, sizetit = NULL, units = NULL, 
                           brks = NULL, cols = NULL, bar_limits = NULL, 
                           triangle_ends = NULL, col_inf = NULL, col_sup = NULL,
                           colNA = NULL, color_fun = clim.palette(),
                           filled.continents = FALSE, coast_color = NULL, 
                           coast_width = 1,
+                          contours = NULL, brks2 = NULL, contour_lwd = 0.5,
+                          contour_color = 'black', contour_lty = 1,
+                          contour_label_draw = TRUE, contour_label_scale = 0.6,
                           dots = NULL, dot_symbol = 4, dot_size = 0.8,
                           intlat = 10, 
+                          arr_subsamp = floor(length(lon) / 30), arr_scale = 1,
+                          arr_ref_len = 15, arr_units = "m/s",
+                          arr_scale_shaft = 1, arr_scale_shaft_angle = 1,
                           drawleg = TRUE, subsampleg = NULL, 
                           bar_extra_labels = NULL, draw_bar_ticks = TRUE, 
                           draw_separators = FALSE, triangle_ends_scale = 1,
@@ -204,16 +249,39 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
     stop("Parameter 'var' must be a numeric array with two dimensions.")
   }
   dims <- dim(var)
+
+  # Check varu and varv
+  if (!is.null(varu) && !is.null(varv)) {
+    if (!is.array(varu) || !(length(dim(varu)) == 2)) {
+      stop("Parameter 'varu' must be a numerical array with two dimensions.")
+    }
+    if (!is.array(varv) || !(length(dim(varv)) == 2)) {
+      stop("Parameter 'varv' must be a numerical array with two dimensions.")
+    }
+  } else if (!is.null(varu) || !is.null(varv)) {
+    stop("Only one of the components 'varu' or 'varv' has been provided. Both must be provided.")
+  }
+
+  if (!is.null(varu) && !is.null(varv)) {
+    if (dim(varu)[1] != dims[1] || dim(varu)[2] != dims[2]) {
+      stop("Parameter 'varu' must have same number of longitudes and latitudes as 'var'.")
+    }
+    if (dim(varv)[1] != dims[1] || dim(varv)[2] != dims[2]) {
+      stop("Parameter 'varv' must have same number of longitudes and latitudes as 'var'.")
+    }
+  }
+
   # Transpose the input matrices because the base plot functions work directly 
   # with dimensions c(lon, lat).
   if (dims[1] != length(lon) || dims[2] != length(lat)) {
     if (dims[1] == length(lat) && dims[2] == length(lon)) {
       var <- t(var)
+      if (!is.null(varu)) varu <- t(varu)
+      if (!is.null(varv)) varv <- t(varv)
       if (!is.null(dots)) dots <- aperm(dots, c(1, 3, 2))
       dims <- dim(var)
     }
   }
-
 
   # Check lon
   if (length(lon) != dims[1]) {
@@ -225,6 +293,14 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
     stop("Parameter 'lat' must have as many elements as the number of cells along longitudes in the input array 'var'.")
   }
 
+  # Prepare sorted lon/lat and other arguments
+  latb <- sort(lat, index.return = TRUE)
+  lonb <- sort(lon, index.return = TRUE)
+  latmin <- floor(min(lat) / 10) * 10
+  latmax <- ceiling(max(lat) / 10) * 10
+  lonmin <- floor(min(lon) / 10) * 10
+  lonmax <- ceiling(max(lon) / 10) * 10
+
   # Check latlims
   if (!is.numeric(latlims) || length(latlims) != 2) {
     stop("Parameter 'latlims' must be a numeric vector with two elements.")
@@ -234,11 +310,15 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
   if (max(abs(latlims - center_at)) > 90 + 20) {
     stop("The range specified in 'latlims' is too wide. 110 degrees supported maximum.")
   }
-  dlon <- median(lon[2:dims[1]] - lon[1:(dims[1] - 1)]) / 2
-  dlat <- median(lat[2:dims[2]] - lat[1:(dims[2] - 1)]) / 2
+  dlon <- median(lonb$x[2:dims[1]] - lonb$x[1:(dims[1] - 1)]) / 2
+  dlat <- median(latb$x[2:dims[2]] - latb$x[1:(dims[2] - 1)]) / 2
   original_last_lat <- latlims[which.min(abs(latlims))]
-  last_lat <- lat[which.min(abs(lat - original_last_lat))] - dlat * sign(center_at)
+  last_lat <- latb$x[which.min(abs(latb$x - original_last_lat))] - dlat * sign(center_at)
   latlims[which.min(abs(latlims))] <- last_lat
+
+  # Subset lat by latlims
+  lat_plot_ind <- which(lat >= latlims[1] & lat <= latlims[2])
+  latb_plot_ind <- which(latb$x >= latlims[1] & latb$x <= latlims[2])
 
   # Check toptitle
   if (is.null(toptitle) || is.na(toptitle)) {
@@ -316,6 +396,69 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
   if (!is.numeric(coast_width)) {
     stop("Parameter 'coast_width' must be numeric.")
   }
+  # Check contours
+  if (!is.null(contours)) {
+    if (!is.array(contours)) {
+      stop("Parameter 'contours' must be a numeric array.")
+    }
+    if (length(dim(contours)) > 2) {
+      contours <- drop(contours)
+      dim(contours) <- head(c(dim(contours), 1, 1), 2)
+    }
+    if (length(dim(contours)) > 2) {
+      stop("Parameter 'contours' must be a numeric array with two dimensions.")
+    } else if (length(dim(contours)) < 2) {
+      stop("Parameter 'contours' must be a numeric array with two dimensions.")
+    }
+    # Transpose the input matrices because the base plot functions work directly 
+    # with dimensions c(lon, lat).
+    if (dim(contours)[1] == dims[2] & dim(contours)[2] == dims[1]) {
+      contours <- t(contours)
+    } else {
+      stop("Parameter 'contours' must have the same number of longitudes and latitudes as 'var'.")
+    }
+  }
+
+  # Check brks2
+  if (!is.null(contours)) {
+    if (is.null(brks2)) {
+      ll <- signif(min(contours, na.rm = TRUE), 2)
+      ul <- signif(max(contours, na.rm = TRUE), 2)
+      brks2 <- unique(signif(seq(ll, ul, length.out = length(brks)), 2))
+
+    } else if (is.numeric(brks2) & length(brks2) == 1) {
+      ll <- signif(min(contours, na.rm = TRUE), 2)
+      ul <- signif(max(contours, na.rm = TRUE), 2)
+      brks2 <- unique(signif(seq(ll, ul, length.out = brks2), 2))
+    } else if (!is.numeric(brks2)) {
+      stop("Parameter 'brks2' must be a numeric value or vector.")
+    }
+  }
+
+  # Check contour_lwd
+  if (!is.numeric(contour_lwd)) {
+    stop("Parameter 'contour_lwd' must be numeric.")
+  }
+
+  # Check contour_color
+  if (!.IsColor(contour_color)) {
+    stop("Parameter 'contour_color' must be a valid colour identifier.")
+  }
+
+  # Check contour_lty
+  if (!is.numeric(contour_lty) && !is.character(contour_lty)) {
+    stop("Parameter 'contour_lty' must be either a number or a character string.")
+  }
+
+  # Check contour_label_draw
+  if (!is.logical(contour_label_draw)) {
+    stop("Parameter 'contour_label_draw' must be a logical value.")
+  }
+
+  # Check contour_label_scale
+  if (!is.numeric(contour_label_scale)) {
+    stop("Parameter 'contour_label_scale' must be numeric.")
+  }
 
   # Check dots, dot_symbol and dot_size
   if (!is.null(dots)) {
@@ -343,6 +486,26 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
   # Check intlat
   if (!is.numeric(intlat)) {
     stop("Parameter 'intlat' must be numeric.")
+  }
+
+  # Check arrow parameters
+  if (!is.numeric(arr_subsamp)) {
+    stop("Parameter 'arr_subsamp' must be numeric.")
+  }
+  if (!is.numeric(arr_scale)) {
+    stop("Parameter 'arr_scale' must be numeric.")
+  }
+  if (!is.numeric(arr_ref_len)) {
+    stop("Parameter 'arr_ref_len' must be numeric.")
+  }
+  if (!is.character(arr_units)) {
+    stop("Parameter 'arr_units' must be character.")
+  }
+  if (!is.numeric(arr_scale_shaft)) {
+    stop("Parameter 'arr_scale_shaft' must be numeric.")
+  }
+  if (!is.numeric(arr_scale_shaft_angle)) {
+    stop("Parameter 'arr_scale_shaft_angle' must be numeric.")
   }
 
   # Check legend parameters
@@ -404,6 +567,9 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
       title_scale <- title_scale * scale
       margin_scale <- margin_scale * scale
       dot_size <- dot_size * scale
+      arr_scale <- arr_scale * scale
+      contour_label_scale <- contour_label_scale * scale
+      contour_lwd <- contour_lwd * scale
     }
   } 
 
@@ -433,6 +599,10 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
   }
   bar_extra_margin[1] <- bar_extra_margin[1] + margins[1]
   bar_extra_margin[3] <- bar_extra_margin[3] + margins[3]
+
+  if (!is.null(varu)) {
+    margins[1] <- margins[1] + 2.2 * units_scale
+  }
 
   if (drawleg) {
     layout(matrix(1:2, ncol = 2, nrow = 1), widths = c(8, 2))
@@ -468,35 +638,93 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
   col_inf_image <- ifelse(is.null(col_inf), colNA, col_inf)
   col_sup_image <- ifelse(is.null(col_sup), colNA, col_sup)
   # Draw the data polygons
-  for (jx in 1:dims[1]) { 
-    for (jy in 1:dims[2]) {
-      if (lat[jy] >= latlims[1] && latlims[2] >= lat[jy]) {
-        coord <- mapproj::mapproject(c(lon[jx] - dlon, lon[jx] + dlon,
-                                       lon[jx] + dlon, lon[jx] - dlon),
-                                     c(lat[jy] - dlat, lat[jy] - dlat,
-                                       lat[jy] + dlat, lat[jy] + dlat))
-        if (is.na(var[jx, jy] > 0)) {
-          col <- colNA
-        } else if (var[jx, jy] <= brks[1]) {
-          col <- col_inf_image
-        } else if (var[jx, jy] >= tail(brks, 1)) {
-          col <- col_sup_image
-        } else {
-          ind <- which(brks[-1] >= var[jx, jy] & var[jx, jy] > brks[-length(brks)])
-          col <- cols[ind]
+  for (jx in 1:dims[1]) {
+    for (jy in 1:length(lat_plot_ind)) {
+      coord <- mapproj::mapproject(c(lon[jx] - dlon, lon[jx] + dlon,
+                                     lon[jx] + dlon, lon[jx] - dlon),
+                                   c(lat[lat_plot_ind][jy] - dlat, lat[lat_plot_ind][jy] - dlat,
+                                     lat[lat_plot_ind][jy] + dlat, lat[lat_plot_ind][jy] + dlat))
+      if (is.na(var[jx, lat_plot_ind[jy]] > 0)) {
+        col <- colNA
+      } else if (var[jx, lat_plot_ind[jy]] <= brks[1]) {
+        col <- col_inf_image
+      } else if (var[jx, lat_plot_ind[jy]] >= tail(brks, 1)) {
+        col <- col_sup_image
+      } else {
+        ind <- which(brks[-1] >= var[jx, lat_plot_ind[jy]] & var[jx, lat_plot_ind[jy]] > brks[-length(brks)])
+        col <- cols[ind]
+      }
+      polygon(coord, col = col, border = NA)
+    }
+  }
+
+  # contours
+  if (!is.null(contours)) {
+    nbrks2 <- length(brks2)
+    for (n_brks2 in 1:nbrks2) {
+      cl <- grDevices::contourLines(x = lonb$x, y = latb$x[latb_plot_ind],
+                                    z = contours[lonb$ix, latb$ix[latb_plot_ind]],
+                                    levels = brks2[n_brks2])
+      if (length(cl) > 0) {
+        for (i in seq_along(cl)) {
+          xy <- mapproj::mapproject(cl[[i]]$x, cl[[i]]$y)
+          xc <- xy$x
+          yc <- xy$y
+          nc <- length(xc)
+          lines(xc, yc, col = contour_color, lwd = contour_lwd, lty = contour_lty)
+
+          # draw label
+          if (contour_label_draw) {
+            label_char <- as.character(signif(brks2[n_brks2], 2))
+            ## Check if the label has enough space to draw first.
+            last_slope <- Inf
+            put_label <- FALSE
+            for (p1 in 1:nc) {
+              p2 <- p1
+              while (p2 < nc) {
+                dist <- sqrt((yc[p2] - yc[p1])^2 + (xc[p2] - xc[p1])^2)
+                if (!is.infinite(dist) &
+                    dist > 1.2 * strwidth(label_char, cex = contour_label_scale)) {
+                  put_label <- TRUE
+                  slope <- (yc[p2] - yc[p1]) / (xc[p2] - xc[p1])
+                  # flatter is better
+                  if (abs(slope) < abs(last_slope)) {
+                    last_slope <- slope
+                    last_p1 <- p1
+                    last_p2 <- p2
+                  }
+                  break  # Found a proper space for label. Move to the next p1.
+                }
+                p2 <- p2 + 1  # If the dist is not enough, try next p2.
+              }
+            }
+
+            ## If label can be put
+            if (put_label) {
+              # Label should be at the middle of p1 and p2
+              p_label <- (last_p1 + last_p2) / 2
+              # string rotation angle is calculated from the slope
+              srt_label <- atan(last_slope) * 57.2958  # radian to degree
+
+              #NOTE: 'cex' in text() is the scale factor. The actual size will be 
+              #      contour_label_scale * par("cex")
+              text(xc[p_label], yc[p_label], label_char,
+                   cex = contour_label_scale, col = contour_color, srt = srt_label)
+            }
+          }
         }
-        polygon(coord, col = col, border = NA)
       }
     }
   }
+
   # Draw the dots
   if (!is.null(dots)) {
     numbfig <- 1  # for compatibility with PlotEquiMap code
-    dots <- dots[, , which(lat >= latlims[1] & lat <= latlims[2]), drop = FALSE]
-    data_avail <- !is.na(var[, which(lat >= latlims[1] & lat <= latlims[2]), drop = FALSE])
+    dots <- dots[, , lat_plot_ind, drop = FALSE]
+    data_avail <- !is.na(var[, lat_plot_ind, drop = FALSE])
     for (counter in 1:(dim(dots)[1])) {
       points <- which(dots[counter, , ] & data_avail, arr.ind = TRUE)
-      points_proj <- mapproj::mapproject(lon[points[, 1]], lat[points[, 2]])
+      points_proj <- mapproj::mapproject(lon[points[, 1]], lat[lat_plot_ind][points[, 2]])
       points(points_proj$x, points_proj$y,
              pch = dot_symbol[counter],
              cex = dot_size[counter] * 3 / sqrt(sqrt(sum(lat >= latlims[which.min(abs(latlims))]) * length(lon))),
@@ -541,6 +769,84 @@ PlotStereoMap <- function(var, lon, lat, latlims = c(60, 90),
       counter <- counter + 1
     }
   }
+
+  #
+  #  PlotWind
+  # ~~~~~~~~~~
+  #
+  if (!is.null(varu) && !is.null(varv)) {
+    # Create a two dimention array of longitude and latitude
+    lontab <- InsertDim(lonb$x, 2, length(latb$x[latb_plot_ind]))
+    lattab <- InsertDim(latb$x[latb_plot_ind], 1, length(lonb$x))
+    # Select a subsample of the points to an arrow for each "subsample" grid point
+    # latmin has the most arrows, and latmax (polar point) has no arrow.
+    sublon_max <- seq(1, length(lonb$x), arr_subsamp)
+    sublat_max <- seq(1, length(latb$x[latb_plot_ind]), arr_subsamp)
+    ## calculate the length of sublon for each lat
+    arr_num_at_lat <- round(seq(length(sublon_max), 0, length.out = length(lat[lat_plot_ind])))
+    ## If south hemisphere, revserse arr_num_at_lat (smaller lat has less arrows)
+    if (center_at < 0) {
+      arr_num_at_lat <- rev(arr_num_at_lat)
+    }
+    for (n_lat in seq_along(sublat_max)) {
+      sublat <- sublat_max[n_lat]
+      if (arr_num_at_lat[sublat] != 0) {
+        sublon <- round(seq(1, length(lon), length.out = arr_num_at_lat[sublat]))
+        # end points (start points + varu/varv)
+        uaux <- lontab[sublon, sublat] + varu[lonb$ix, latb$ix[latb_plot_ind]][sublon, sublat] * 0.5 * arr_scale
+        vaux <- lattab[sublon, sublat] + varv[lonb$ix, latb$ix[latb_plot_ind]][sublon, sublat] * 0.5 * arr_scale
+
+        # project the start and end points on stereographic
+        xy0 <- mapproj::mapproject(lontab[sublon, sublat], lattab[sublon, sublat])
+        xy1 <- mapproj::mapproject(uaux, vaux)
+        xc0 <- xy0$x
+        yc0 <- xy0$y
+        xc1 <- xy1$x
+        yc1 <- xy1$y
+        nc <- length(xc0)
+
+        lenshaft <- 0.18 * arr_scale * arr_scale_shaft
+        angleshaft <- 12 * arr_scale_shaft_angle
+
+        # Plot Wind
+        arrows(xc0, yc0,
+               xc1, yc1,
+               angle = angleshaft,
+               length = lenshaft)
+      }
+    }
+
+    # Plot an arrow at the bottom of the plot for the legend
+    # Put arrow at lon = 0, lat = lowest lat (i.e., biggest circle) - (latmax - latmin)/8
+    delta_arr_lengend <- (0.5 * arr_scale * arr_ref_len)
+    posarlon <- c(0 - delta_arr_lengend / 2, 0 + delta_arr_lengend / 2)
+    posarlat <- rep(min(abs(lat[lat_plot_ind])) - diff(range(lat[lat_plot_ind]))/8, 2)
+#NOTE: The following lines put legend at bottom left corner. But it's hard to put it horizontal
+#    delta_arr_lengend <- (0.5 * arr_scale * arr_ref_len)/sqrt(2)
+#    posarlat[1] <- posarlat[1] - delta_arr_lengend / 2
+#    posarlat[2] <- posarlat[2] + delta_arr_lengend / 2
+    ## turn into stereographic
+    arr_lengend <- mapproj::mapproject(posarlon, posarlat)
+
+    arrows(arr_lengend$x[1], arr_lengend$y[1],
+           arr_lengend$x[2], arr_lengend$y[2],
+           length = lenshaft, angle = angleshaft,
+           xpd = TRUE)
+    #save the parameter value
+    xpdsave <- par('xpd')
+    #desactivate xpd to be able to plot in margen
+    par(xpd = NA)
+    #plot text
+    mtext(paste(as.character(arr_ref_len), arr_units, sep = ""),
+          line = min(arr_lengend$y) + 1.8 * abs(min(arr_lengend$y)),
+          side = 1,
+          at = mean(arr_lengend$x),
+          cex = units_scale)
+    #come back to the previous xpd value
+    par(xpd = xpdsave)
+
+  }
+
 
   #
   #  Colorbar

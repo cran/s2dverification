@@ -4,15 +4,36 @@
 \alias{Load}
 \title{Loads Experimental And Observational Data}
 \usage{
-Load(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
-  nmemberobs = NULL, nleadtime = NULL, leadtimemin = 1,
-  leadtimemax = NULL, storefreq = "monthly", sampleperiod = 1,
-  lonmin = 0, lonmax = 360, latmin = -90, latmax = 90,
-  output = "areave", method = "conservative", grid = NULL,
-  maskmod = vector("list", 15), maskobs = vector("list", 15),
-  configfile = NULL, varmin = NULL, varmax = NULL, silent = FALSE,
-  nprocs = NULL, dimnames = NULL, remapcells = 2,
-  path_glob_permissive = "partial")
+Load(
+  var,
+  exp = NULL,
+  obs = NULL,
+  sdates,
+  nmember = NULL,
+  nmemberobs = NULL,
+  nleadtime = NULL,
+  leadtimemin = 1,
+  leadtimemax = NULL,
+  storefreq = "monthly",
+  sampleperiod = 1,
+  lonmin = 0,
+  lonmax = 360,
+  latmin = -90,
+  latmax = 90,
+  output = "areave",
+  method = "conservative",
+  grid = NULL,
+  maskmod = vector("list", 15),
+  maskobs = vector("list", 15),
+  configfile = NULL,
+  varmin = NULL,
+  varmax = NULL,
+  silent = FALSE,
+  nprocs = NULL,
+  dimnames = NULL,
+  remapcells = 2,
+  path_glob_permissive = "partial"
+)
 }
 \arguments{
 \item{var}{Short name of the variable to load. It should coincide with the 
@@ -883,4 +904,3 @@ History:\cr
 1.4  -  2016-01  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Added subsetting capabilities
 }
 \keyword{datagen}
-

@@ -4,9 +4,17 @@
 \alias{UltimateBrier}
 \title{Computes Brier Scores}
 \usage{
-UltimateBrier(ano_exp, ano_obs, posdatasets = 1, posmemb = 2,
-  posdates = 3, quantile = TRUE, thr = c(5/100, 95/100), type = "BS",
-  decomposition = TRUE)
+UltimateBrier(
+  ano_exp,
+  ano_obs,
+  posdatasets = 1,
+  posmemb = 2,
+  posdates = 3,
+  quantile = TRUE,
+  thr = c(5/100, 95/100),
+  type = "BS",
+  decomposition = TRUE
+)
 }
 \arguments{
 \item{ano_exp}{Array of forecast anomalies, as provided by \code{Ano()}. 
@@ -124,4 +132,3 @@ History:\cr
                 N. Manubens, \email{nicolau.manubens@bsc.es})  -  First version
 }
 \keyword{datagen}
-

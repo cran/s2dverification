@@ -4,13 +4,30 @@
 \alias{ColorBar}
 \title{Draws a Color Bar}
 \usage{
-ColorBar(brks = NULL, cols = NULL, vertical = TRUE, subsampleg = NULL,
-  bar_limits = NULL, var_limits = NULL, triangle_ends = NULL,
-  col_inf = NULL, col_sup = NULL, color_fun = clim.palette(),
-  plot = TRUE, draw_ticks = TRUE, draw_separators = FALSE,
-  triangle_ends_scale = 1, extra_labels = NULL, title = NULL,
-  title_scale = 1, label_scale = 1, tick_scale = 1,
-  extra_margin = rep(0, 4), label_digits = 4, ...)
+ColorBar(
+  brks = NULL,
+  cols = NULL,
+  vertical = TRUE,
+  subsampleg = NULL,
+  bar_limits = NULL,
+  var_limits = NULL,
+  triangle_ends = NULL,
+  col_inf = NULL,
+  col_sup = NULL,
+  color_fun = clim.palette(),
+  plot = TRUE,
+  draw_ticks = TRUE,
+  draw_separators = FALSE,
+  triangle_ends_scale = 1,
+  extra_labels = NULL,
+  title = NULL,
+  title_scale = 1,
+  label_scale = 1,
+  tick_scale = 1,
+  extra_margin = rep(0, 4),
+  label_digits = 4,
+  ...
+)
 }
 \arguments{
 \item{brks}{Can be provided in two formats:
@@ -185,4 +202,3 @@ History:\cr
                 (V. Torralba, \email{veronica.torralba@bsc.es})
 }
 \keyword{hplot}
-

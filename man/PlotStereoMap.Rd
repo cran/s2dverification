@@ -4,19 +4,68 @@
 \alias{PlotStereoMap}
 \title{Maps A Two-Dimensional Variable On A Polar Stereographic Projection}
 \usage{
-PlotStereoMap(var, lon, lat, latlims = c(60, 90), toptitle = NULL,
-  sizetit = NULL, units = NULL, brks = NULL, cols = NULL,
-  bar_limits = NULL, triangle_ends = NULL, col_inf = NULL,
-  col_sup = NULL, colNA = NULL, color_fun = clim.palette(),
-  filled.continents = FALSE, coast_color = NULL, coast_width = 1,
-  dots = NULL, dot_symbol = 4, dot_size = 0.8, intlat = 10,
-  drawleg = TRUE, subsampleg = NULL, bar_extra_labels = NULL,
-  draw_bar_ticks = TRUE, draw_separators = FALSE, triangle_ends_scale = 1,
-  bar_label_digits = 4, bar_label_scale = 1, units_scale = 1,
-  bar_tick_scale = 1, bar_extra_margin = rep(0, 4), boxlim = NULL,
-  boxcol = "purple2", boxlwd = 5, margin_scale = rep(1, 4),
-  title_scale = 1, numbfig = NULL, fileout = NULL, width = 6,
-  height = 5, size_units = "in", res = 100, ...)
+PlotStereoMap(
+  var,
+  lon,
+  lat,
+  varu = NULL,
+  varv = NULL,
+  latlims = c(60, 90),
+  toptitle = NULL,
+  sizetit = NULL,
+  units = NULL,
+  brks = NULL,
+  cols = NULL,
+  bar_limits = NULL,
+  triangle_ends = NULL,
+  col_inf = NULL,
+  col_sup = NULL,
+  colNA = NULL,
+  color_fun = clim.palette(),
+  filled.continents = FALSE,
+  coast_color = NULL,
+  coast_width = 1,
+  contours = NULL,
+  brks2 = NULL,
+  contour_lwd = 0.5,
+  contour_color = "black",
+  contour_lty = 1,
+  contour_label_draw = TRUE,
+  contour_label_scale = 0.6,
+  dots = NULL,
+  dot_symbol = 4,
+  dot_size = 0.8,
+  intlat = 10,
+  arr_subsamp = floor(length(lon)/30),
+  arr_scale = 1,
+  arr_ref_len = 15,
+  arr_units = "m/s",
+  arr_scale_shaft = 1,
+  arr_scale_shaft_angle = 1,
+  drawleg = TRUE,
+  subsampleg = NULL,
+  bar_extra_labels = NULL,
+  draw_bar_ticks = TRUE,
+  draw_separators = FALSE,
+  triangle_ends_scale = 1,
+  bar_label_digits = 4,
+  bar_label_scale = 1,
+  units_scale = 1,
+  bar_tick_scale = 1,
+  bar_extra_margin = rep(0, 4),
+  boxlim = NULL,
+  boxcol = "purple2",
+  boxlwd = 5,
+  margin_scale = rep(1, 4),
+  title_scale = 1,
+  numbfig = NULL,
+  fileout = NULL,
+  width = 6,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{var}{Array with the values at each cell of a grid on a regular 
@@ -37,6 +86,12 @@ longitude range can also be provided, e.g. \code{lon = c(0:50, 300:360)}
 \item{lat}{Numeric vector of latitude locations of the cell centers of the 
 grid of 'var', in any order (same as 'var'). Expected to be from a regular 
 rectangular or gaussian grid, within the range [-90, 90].}
+
+\item{varu}{Array of the zonal component of wind/current/other field with 
+the same dimensions as 'var'.}
+
+\item{varv}{Array of the meridional component of wind/current/other field 
+with the same dimensions as 'var'.}
 
 \item{latlims}{Latitudinal limits of the figure.\cr
 Example : c(60, 90) for the North Pole\cr
@@ -82,6 +137,31 @@ continents. Takes the value gray(0.5) by default.}
 \item{coast_width}{Line width of the coast line of the drawn projected 
 continents. Takes the value 1 by default.}
 
+\item{contours}{Array of same dimensions as 'var' to be added to the plot 
+and displayed with contours. Parameter 'brks2' is required to define the 
+magnitude breaks for each contour curve.}
+
+\item{brks2}{A numeric value or vector of magnitude breaks where to draw 
+contour curves for the array provided in 'contours'. If it is a number, it
+represents the number of breaks (n) that defines (n - 1) intervals to 
+classify 'contours'.}
+
+\item{contour_lwd}{Line width of the contour curves provided via 'contours' 
+and 'brks2'. The default value is 0.5.}
+
+\item{contour_color}{Line color of the contour curves provided via 'contours' 
+and 'brks2'.}
+
+\item{contour_lty}{Line type of the contour curves. Takes 1 (solid) by 
+default. See help on 'lty' in par() for other accepted values.}
+
+\item{contour_label_draw}{A logical value indicating whether to draw the 
+contour labels (TRUE) or not (FALSE) when 'contours' is used. The default
+value is TRUE.}
+
+\item{contour_label_scale}{Scale factor for the superimposed labels when 
+drawing contour levels. The default value is 0.6.}
+
 \item{dots}{Array of same dimensions as 'var' or with dimensions 
 c(n, dim(var)), where n is the number of dot/symbol layers to add to the 
 plot. A value of TRUE at a grid cell will draw a dot/symbol on the 
@@ -101,6 +181,29 @@ layers in 'dots'. Takes 1 by default.}
 
 \item{intlat}{Interval between latitude lines (circles), in degrees. 
 Defaults to 10.}
+
+\item{arr_subsamp}{A number as subsampling factor to select a subset of arrows 
+in 'varu' and 'varv' to be drawn. Only one out of arr_subsamp arrows will 
+be drawn. The default value is 1.}
+
+\item{arr_scale}{A number as scale factor for drawn arrows from 'varu' and 
+'varv'. The default value is 1.}
+
+\item{arr_ref_len}{A number of the length of the refence arrow to be drawn as
+legend at the bottom of the figure (in same units as 'varu' and 'varv', only
+affects the legend for the wind or variable in these arrays). The default 
+value is 15.}
+
+\item{arr_units}{Units of 'varu' and 'varv', to be drawn in the legend. 
+Takes 'm/s' by default.}
+
+\item{arr_scale_shaft}{A number for the scale of the shaft of the arrows 
+(which also depend on the number of figures and the arr_scale parameter). 
+The default value is 1.}
+
+\item{arr_scale_shaft_angle}{A number for the scale of the angle of the 
+shaft of the arrows (which also depend on the number of figure and the 
+arr_scale parameter). The default value is 1.}
 
 \item{drawleg}{Whether to plot a color bar (legend, key) or not. 
 Defaults to TRUE.}
@@ -172,8 +275,8 @@ Map longitude-latitude array (on a regular rectangular or gaussian grid) on
 a polar stereographic world projection with coloured grid cells. Only the 
 region within a specified latitude interval is displayed. A colour bar 
 (legend) can be plotted and adjusted. It is possible to draw superimposed 
-dots, symbols and boxes. A number of options is provided to adjust the 
-position, size and colour of the components. This plot function is 
+dots, symbols, boxes, contours, and arrows. A number of options is provided to
+adjust the position, size and colour of the components. This plot function is 
 compatible with figure layouts if colour bar is disabled.
 }
 \examples{
@@ -192,4 +295,3 @@ History:\cr
                                                                      border and Constantin boxes.
 }
 \keyword{dynamic}
-

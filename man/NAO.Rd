@@ -4,8 +4,14 @@
 \alias{NAO}
 \title{Computes the North Atlantic Oscillation (NAO) Index}
 \usage{
-NAO(ano_exp = NULL, ano_obs = NULL, lon, lat, ftime_average = 2:4,
-  obsproj = TRUE)
+NAO(
+  ano_exp = NULL,
+  ano_obs = NULL,
+  lon,
+  lat,
+  ftime_average = 2:4,
+  obsproj = TRUE
+)
 }
 \arguments{
 \item{ano_exp}{Array of North Atlantic SLP (20N-80N, 80W-40E) forecast 
@@ -113,6 +119,11 @@ PlotBoxWhisker(nao$NAO_exp, nao$NAO_obs, "NAO index, DJF", "NAO index (PC1) TOS"
  }
 
 }
+\references{
+Doblas-Reyes, F.J., Pavan, V. and Stephenson, D. (2003). The skill of 
+ multi-model seasonal forecasts of the wintertime North Atlantic Oscillation. 
+ Climate Dynamics, 21, 501-514. DOI: 10.1007/s00382-003-0350-4
+}
 \author{
 History:\cr
 0.1  -  2013-08  (F. Lienert, \email{flienert@ic3.cat})  -  Original code\cr
@@ -127,10 +138,4 @@ History:\cr
 1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  
  Formatted to CRAN
 }
-\references{
-Doblas-Reyes, F.J., Pavan, V. and Stephenson, D. (2003). The skill of 
- multi-model seasonal forecasts of the wintertime North Atlantic Oscillation. 
- Climate Dynamics, 21, 501-514. DOI: 10.1007/s00382-003-0350-4
-}
 \keyword{datagen}
-

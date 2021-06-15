@@ -4,11 +4,27 @@
 \alias{PlotACC}
 \title{Plot Plumes/Timeseries Of Anomaly Correlation Coefficients}
 \usage{
-PlotACC(ACC, sdates, toptitle = "", sizetit = 1, ytitle = "",
-  limits = NULL, legends = NULL, freq = 12, biglab = FALSE,
-  fill = FALSE, linezero = FALSE, points = TRUE, vlines = NULL,
-  fileout = "output_PlotACC.eps", width = 8, height = 5,
-  size_units = "in", res = 100, ...)
+PlotACC(
+  ACC,
+  sdates,
+  toptitle = "",
+  sizetit = 1,
+  ytitle = "",
+  limits = NULL,
+  legends = NULL,
+  freq = 12,
+  biglab = FALSE,
+  fill = FALSE,
+  linezero = FALSE,
+  points = TRUE,
+  vlines = NULL,
+  fileout = "output_PlotACC.eps",
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{ACC}{ACC matrix with with dimensions:\cr
@@ -122,4 +138,3 @@ History:\cr
 1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
 }
 \keyword{dynamic}
-

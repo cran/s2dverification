@@ -52,14 +52,13 @@ match_info <- ConfigApplyMatchingEntries(configuration, 'tas',
              exp = c('ExampleExperiment2'), show_result = TRUE)
 
 }
-\author{
-History:
- 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - First version
-}
 \seealso{
 [ConfigApplyMatchingEntries()], [ConfigEditDefinition()], 
  [ConfigEditEntry()], [ConfigFileOpen()], [ConfigShowSimilarEntries()], 
  [ConfigShowTable()].
 }
+\author{
+History:
+ 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - First version
+}
 \keyword{datagen}
-

@@ -75,6 +75,9 @@ for (i in 1:dim(sampleData$mod)[2]) {
 }
 
 }
+\seealso{
+EOF, NAO, PlotBoxWhisker
+}
 \author{
 History:\cr
 0.1  -  2012-03  (F. Lienert, \email{flienert@ic3.cat}  -  Original code\cr
@@ -105,8 +108,4 @@ multiplied by W. Getting input dimensions.
 1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN\cr
                 (J.-P. Baudouin, \email{jean.baudouin@bsc.es})  -  Example code and testing
 }
-\seealso{
-EOF, NAO, PlotBoxWhisker
-}
 \keyword{datagen}
-

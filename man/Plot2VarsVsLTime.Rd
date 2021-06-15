@@ -4,12 +4,30 @@
 \alias{Plot2VarsVsLTime}
 \title{Plot Two Scores With Confidence Intervals In A Common Plot}
 \usage{
-Plot2VarsVsLTime(var1, var2, toptitle = "", ytitle = "", monini = 1,
-  freq = 12, nticks = NULL, limits = NULL, listexp = c("exp1", "exp2",
-  "exp3"), listvars = c("var1", "var2"), biglab = FALSE, hlines = NULL,
-  leg = TRUE, siglev = FALSE, sizetit = 1, show_conf = TRUE,
-  fileout = "output_plot2varsvsltime.eps", width = 8, height = 5,
-  size_units = "in", res = 100, ...)
+Plot2VarsVsLTime(
+  var1,
+  var2,
+  toptitle = "",
+  ytitle = "",
+  monini = 1,
+  freq = 12,
+  nticks = NULL,
+  limits = NULL,
+  listexp = c("exp1", "exp2", "exp3"),
+  listvars = c("var1", "var2"),
+  biglab = FALSE,
+  hlines = NULL,
+  leg = TRUE,
+  siglev = FALSE,
+  sizetit = 1,
+  show_conf = TRUE,
+  fileout = "output_plot2varsvsltime.eps",
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{var1}{Matrix of dimensions (nexp/nmod, nltime).}
@@ -120,4 +138,3 @@ History:\cr
  - Original code
 }
 \keyword{dynamic}
-

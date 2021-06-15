@@ -47,4 +47,3 @@ History:\cr
  making it able to work on arrays of any number of dimensions.
 }
 \keyword{datagen}
-

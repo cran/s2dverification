@@ -4,12 +4,28 @@
 \alias{PlotMatrix}
 \title{Function to convert any numerical table to a grid of coloured squares.}
 \usage{
-PlotMatrix(var, brks = NULL, cols = NULL, toptitle = NULL,
-  title.color = "royalblue4", xtitle = NULL, ytitle = NULL,
-  xlabels = NULL, xvert = FALSE, ylabels = NULL, line = 3,
-  figure.width = 1, legend = TRUE, legend.width = 0.15,
-  xlab_dist = NULL, ylab_dist = NULL, fileout = NULL, size_units = "px",
-  res = 100, ...)
+PlotMatrix(
+  var,
+  brks = NULL,
+  cols = NULL,
+  toptitle = NULL,
+  title.color = "royalblue4",
+  xtitle = NULL,
+  ytitle = NULL,
+  xlabels = NULL,
+  xvert = FALSE,
+  ylabels = NULL,
+  line = 3,
+  figure.width = 1,
+  legend = TRUE,
+  legend.width = 0.15,
+  xlab_dist = NULL,
+  ylab_dist = NULL,
+  fileout = NULL,
+  size_units = "px",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{var}{A numerical matrix containing the values to be displayed in a 
@@ -93,4 +109,3 @@ PlotMatrix(var = matrix(rnorm(n = 120, mean = 0.3), 10, 12),
            xlabels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", 
                        "Aug", "Sep", "Oct", "Nov", "Dec"))
 }
-

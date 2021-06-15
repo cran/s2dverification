@@ -4,12 +4,30 @@
 \alias{PlotAno}
 \title{Plot Raw Or Smoothed Anomalies}
 \usage{
-PlotAno(exp_ano, obs_ano = NULL, sdates, toptitle = rep("", 15),
-  ytitle = rep("", 15), limits = NULL, legends = NULL, freq = 12,
-  biglab = FALSE, fill = TRUE, memb = TRUE, ensmean = TRUE,
-  linezero = FALSE, points = FALSE, vlines = NULL, sizetit = 1,
-  fileout = paste0("output", 1:5, "_plotano.eps"), width = 8, height = 5,
-  size_units = "in", res = 100, ...)
+PlotAno(
+  exp_ano,
+  obs_ano = NULL,
+  sdates,
+  toptitle = rep("", 15),
+  ytitle = rep("", 15),
+  limits = NULL,
+  legends = NULL,
+  freq = 12,
+  biglab = FALSE,
+  fill = TRUE,
+  memb = TRUE,
+  ensmean = TRUE,
+  linezero = FALSE,
+  points = FALSE,
+  vlines = NULL,
+  sizetit = 1,
+  fileout = paste0("output", 1:5, "_plotano.eps"),
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{exp_ano}{Array containing the experimental data:\cr
@@ -109,4 +127,3 @@ History:\cr
 1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
 }
 \keyword{dynamic}
-

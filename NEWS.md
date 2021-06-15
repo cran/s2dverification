@@ -1,3 +1,13 @@
+# s2dverification 2.10.0 (Release date: 2021-06-15)
+- Load(): Remove the last development for the first time step
+- Load(): Modify the regrid criteria for the condition that only one data is retrieved and grid is specified and the data grids need to shift (e.g., first lon is 0.5 rather than 0.). Load() regrids the data as long as grid is specified.
+- CDORemap(): able to transform irregular curvilinear grids to regular grids.
+- StatsSeasAtlHurr(): Fix the statement & to |
+- EOF(): Add check for NA handling to ensure the correct result
+- PlotEquiMap(): Add parameter 'lake_color', 'contour_draw_label', 'lab_dist_x', and 'lab_dist_y'
+- PlotEquiMap(): Bugfix of argument contour_label_scale; Fix the problem that the border grids were plotted half only
+- PlotStereoMap(): Bugfix of dots feature; Add contour and arrow features
+
 # s2dverification 2.9.0 (Release date: 2020-10-30)
 - Correct the time retrieval in Load() when start date and the first lead time in netCDF file do not match. 
 In addition, when the lead time in each data set is not consistent, the retrieved data should change according to

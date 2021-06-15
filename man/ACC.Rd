@@ -4,8 +4,16 @@
 \alias{ACC}
 \title{Computes Anomaly Correlation Coefficient}
 \usage{
-ACC(var_exp, var_obs, lon = NULL, lat = NULL, lonlatbox = NULL,
-  conf = TRUE, conftype = "parametric", siglev = 0.95)
+ACC(
+  var_exp,
+  var_obs,
+  lon = NULL,
+  lat = NULL,
+  lonlatbox = NULL,
+  conf = TRUE,
+  conftype = "parametric",
+  siglev = 0.95
+)
 }
 \arguments{
 \item{var_exp}{Array of experimental anomalies with dimensions: 
@@ -97,6 +105,10 @@ acc <- ACC(Mean1Dim(ano_exp, 2), Mean1Dim(ano_obs, 2))
 PlotACC(acc$ACC, startDates)
  }
 }
+\references{
+Joliffe and Stephenson (2012). Forecast Verification: A 
+ Practitioner's Guide in Atmospheric Science. Wiley-Blackwell.
+}
 \author{
 History:\cr
  0.1 - 2013-08 (V. Guemas, \email{virginie.guemas@bsc.es}) - Original code\cr
@@ -107,9 +119,4 @@ History:\cr
  1.3.1 - 2014-09 (C. Prodhomme, \email{chloe.prodhomme@bsc.es}) - Add comments and minor style changes\cr
  1.3.2 - 2015-02 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Fixed ACC documentation and examples
 }
-\references{
-Joliffe and Stephenson (2012). Forecast Verification: A 
- Practitioner's Guide in Atmospheric Science. Wiley-Blackwell.
-}
 \keyword{datagen}
-

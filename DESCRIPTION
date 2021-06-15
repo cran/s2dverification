@@ -1,6 +1,6 @@
 Package: s2dverification
 Title: Set of Common Tools for Forecast Verification
-Version: 2.9.0
+Version: 2.10.0
 Authors@R: c(
     person("BSC-CNS", role = c("aut", "cph")),
     person("Virginie", "Guemas", , "virginie.guemas@bsc.es", role = "aut"),
@@ -41,15 +41,15 @@ Depends: maps, methods, R (>= 2.14.1)
 Imports: abind, bigmemory, GEOmap, geomapdata, mapproj, NbClust, ncdf4,
         parallel, plyr, SpecsVerification (>= 0.5.0)
 Suggests: easyVerification, testthat
-License: LGPL-3
+License: Apache License 2.0
 URL: https://earth.bsc.es/gitlab/es/s2dverification/-/wikis/home
 BugReports: https://earth.bsc.es/gitlab/es/s2dverification/-/issues
 LazyData: true
 SystemRequirements: cdo
 Encoding: UTF-8
-RoxygenNote: 5.0.0
+RoxygenNote: 7.0.1
 NeedsCompilation: no
-Packaged: 2020-10-30 13:00:56 UTC; aho
+Packaged: 2021-06-15 13:45:23 UTC; aho
 Author: BSC-CNS [aut, cph],
   Virginie Guemas [aut],
   Nicolau Manubens [aut],
@@ -79,4 +79,4 @@ Author: BSC-CNS [aut, cph],
   Ramiro Saurral [ctb]
 Maintainer: An-Chi Ho <an.ho@bsc.es>
 Repository: CRAN
-Date/Publication: 2020-11-01 05:30:08 UTC
+Date/Publication: 2021-06-15 14:50:02 UTC

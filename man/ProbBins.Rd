@@ -4,8 +4,15 @@
 \alias{ProbBins}
 \title{Computes Probabilistic Information of a Forecast Relative to a Threshold or a Quantile}
 \usage{
-ProbBins(ano, fcyr = "all", thr, quantile = TRUE, posdates = 3,
-  posdim = 2, compPeriod = "Full period")
+ProbBins(
+  ano,
+  fcyr = "all",
+  thr,
+  quantile = TRUE,
+  posdates = 3,
+  posdim = 2,
+  compPeriod = "Full period"
+)
 }
 \arguments{
 \item{ano}{Array of anomalies from Ano().\cr
@@ -86,4 +93,3 @@ History:\cr
 2.1  -  2017-02  (V. Torralba and N. Manubens, \email{veronica.torralba@bsc.es})  -  Fix bug with cross-validation
 }
 \keyword{datagen}
-

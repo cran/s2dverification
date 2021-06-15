@@ -85,7 +85,7 @@
 #'  a1[i1, ] <- x1 + rnorm(4, mean = mean1, sd = sd1)
 #'}
 #'
-#'c1p5 <- c0[!(c0 \%in\% c1)]
+#'c1p5 <- c0[!(c0 %in% c1)]
 #'c2 <- c1p5[seq(1, length(c1p5), 2)] 
 #'x2 <- c(2, 2, 4, 4)
 #'for (i2 in c2) {

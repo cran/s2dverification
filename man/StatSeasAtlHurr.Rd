@@ -67,10 +67,6 @@ hr_count <- StatSeasAtlHurr(atlano = AtlAno,
 print(hr_count$mean)
 
 }
-\author{
-History:\cr
-0.1  -  2015-11  (Louis-Philippe Caron, \email{louis-philippe.caron@bsc.es})  -  Original code
-}
 \references{
 Villarini et al. (2010) Mon Wea Rev, 138, 2681-2705.\cr
 Villarini et al. (2012) Mon Wea Rev, 140, 44-65.\cr
@@ -81,5 +77,8 @@ Caron, L.-P. et al. (2014) Multi-year prediction skill of Atlantic hurricane
  activity in CMIP5 decadal hindcasts. Climate Dynamics, 42, 2675-2690. 
  doi:10.1007/s00382-013-1773-1.
 }
+\author{
+History:\cr
+0.1  -  2015-11  (Louis-Philippe Caron, \email{louis-philippe.caron@bsc.es})  -  Original code
+}
 \keyword{datagen}
-

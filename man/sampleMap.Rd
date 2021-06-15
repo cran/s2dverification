@@ -47,4 +47,3 @@ Check the documentation on 'Load()' in the package 's2dverification' for more in
 Nicolau Manubens \email{nicolau.manubens@bsc.es}
 }
 \keyword{datasets}
-

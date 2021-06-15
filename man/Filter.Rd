@@ -48,4 +48,3 @@ History:\cr
 1.0  -  2012-02  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN
 }
 \keyword{datagen}
-

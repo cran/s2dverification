@@ -4,20 +4,52 @@
 \alias{PlotLayout}
 \title{Arrange and Fill Multi-Pannel Layouts With Optional Colour Bar}
 \usage{
-PlotLayout(fun, plot_dims, var, ..., special_args = NULL, nrow = NULL,
-  ncol = NULL, toptitle = NULL, row_titles = NULL, col_titles = NULL,
-  bar_scale = 1, title_scale = 1, title_margin_scale = 1,
-  title_left_shift_scale = 1, subtitle_scale = 1,
-  subtitle_margin_scale = 1, brks = NULL, cols = NULL, drawleg = "S",
-  titles = NULL, subsampleg = NULL, bar_limits = NULL,
-  triangle_ends = NULL, col_inf = NULL, col_sup = NULL,
-  color_fun = clim.colors, draw_bar_ticks = TRUE, draw_separators = FALSE,
-  triangle_ends_scale = 1, bar_extra_labels = NULL, units = NULL,
-  units_scale = 1, bar_label_scale = 1, bar_tick_scale = 1,
-  bar_extra_margin = rep(0, 4), bar_left_shift_scale = 1,
-  bar_label_digits = 4, extra_margin = rep(0, 4), fileout = NULL,
-  width = NULL, height = NULL, size_units = "in", res = 100,
-  close_device = TRUE)
+PlotLayout(
+  fun,
+  plot_dims,
+  var,
+  ...,
+  special_args = NULL,
+  nrow = NULL,
+  ncol = NULL,
+  toptitle = NULL,
+  row_titles = NULL,
+  col_titles = NULL,
+  bar_scale = 1,
+  title_scale = 1,
+  title_margin_scale = 1,
+  title_left_shift_scale = 1,
+  subtitle_scale = 1,
+  subtitle_margin_scale = 1,
+  brks = NULL,
+  cols = NULL,
+  drawleg = "S",
+  titles = NULL,
+  subsampleg = NULL,
+  bar_limits = NULL,
+  triangle_ends = NULL,
+  col_inf = NULL,
+  col_sup = NULL,
+  color_fun = clim.colors,
+  draw_bar_ticks = TRUE,
+  draw_separators = FALSE,
+  triangle_ends_scale = 1,
+  bar_extra_labels = NULL,
+  units = NULL,
+  units_scale = 1,
+  bar_label_scale = 1,
+  bar_tick_scale = 1,
+  bar_extra_margin = rep(0, 4),
+  bar_left_shift_scale = 1,
+  bar_label_digits = 4,
+  extra_margin = rep(0, 4),
+  fileout = NULL,
+  width = NULL,
+  height = NULL,
+  size_units = "in",
+  res = 100,
+  close_device = TRUE
+)
 }
 \arguments{
 \item{fun}{Plot function (or name of the function) to be called on the 
@@ -47,6 +79,12 @@ or, if properly specified in 'fun', a different plot function will be
 applied to each of them. NAs can be passed to the list: a NA will yield a 
 blank cell in the layout, which can be populated after 
 (see .SwitchToFigure).}
+
+\item{\dots}{Parameters to be sent to the plotting function 'fun'. If 
+multiple arrays are provided in 'var' and multiple functions are provided 
+in 'fun', the parameters provided through \dots will be sent to all the 
+plot functions, as common parameters. To specify concrete arguments for 
+each of the plot functions see parameter 'special_args'.}
 
 \item{special_args}{List of sub-lists, each sub-list having specific extra 
 arguments for each of the plot functions provided in 'fun'. If you want to 
@@ -164,12 +202,6 @@ the layout and a 'fileout' has been specified. This is useful to avoid
 closing the device when saving the layout into a file and willing to add 
 extra elements or figures. Takes TRUE by default. Disregarded if no 
 'fileout' has been specified.}
-
-\item{\dots}{Parameters to be sent to the plotting function 'fun'. If 
-multiple arrays are provided in 'var' and multiple functions are provided 
-in 'fun', the parameters provided through \dots will be sent to all the 
-plot functions, as common parameters. To specify concrete arguments for 
-each of the plot functions see parameter 'special_args'.}
 }
 \value{
 \item{brks}{
@@ -249,4 +281,3 @@ History:\cr
  0.1  -  2016-08  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Original code
 }
 \keyword{dynamic}
-

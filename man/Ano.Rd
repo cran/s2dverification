@@ -49,4 +49,3 @@ History:\cr
  1.0 - 2013-09 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - Formatting to R CRAN
 }
 \keyword{datagen}
-

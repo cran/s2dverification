@@ -45,4 +45,3 @@ PlotLayout(PlotEquiMap, c('lat', 'lon'), subset,
 
 }
 \keyword{datagen}
-

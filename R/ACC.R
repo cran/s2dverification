@@ -92,7 +92,7 @@
 #'  1.3.0 - 2014-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Boostrapping over members\cr
 #'  1.3.1 - 2014-09 (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - Add comments and minor style changes\cr
 #'  1.3.2 - 2015-02 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Fixed ACC documentation and examples
-#'@import abind
+#'@importFrom abind abind
 #'@importFrom stats qt qnorm quantile
 #'@export
 ACC <- function(var_exp, var_obs, lon = NULL, lat = NULL,

@@ -726,10 +726,45 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
       if (!is.null(dims_to_iterate)) {
         slice_indices <- which(slices_to_iterate == i, arr.ind = TRUE)
         subset <- Subset(data_array, dims_to_iterate, as.list(slice_indices), drop = 'selected')
+        # Fix issue 259, curvilinear grid, the order of the dimensions in slices and 
+        # coordinates needs to match
+        if (is_irregular) {
+          pos_lon <- which(names(dim(subset)) == lon_dim)
+          pos_lat <- which(names(dim(subset)) == lat_dim)
+          pos_lon_dim_in_lons <- which(names(dim(lons)) == lon_dim)
+          pos_lat_dim_in_lons <- which(names(dim(lons)) == lat_dim)
+        if ((pos_lon > pos_lat && pos_lon_dim_in_lons < pos_lat_dim_in_lons) || 
+         (pos_lon < pos_lat && pos_lon_dim_in_lons > pos_lat_dim_in_lons)) {
+            new_pos <- 1:length(dim(subset))
+            new_pos[pos_lon] <- pos_lat
+            new_pos[pos_lat] <- pos_lon
+            subset <- .aperm2(subset, new_pos)   
+          }
+          # The unlimited dimension should be placed in the last position
+          if ('time' %in% names(dim(subset)) && 
+            which(names(dim(subset)) == 'time') != length(dim(subset))) {
+            new_pos <- 2:length(dim(subset))
+            new_pos[length(dim(subset))] <- 1
+            subset <- .aperm2(subset, new_pos)
+          }
+        }
 #        dims_before_crop <- dim(subset)
         # Make sure subset goes along with metadata
         ArrayToNetCDF(setNames(list(subset, lons, lats), c('var', lon_var_name, lat_var_name)), tmp_file)
       } else {
+         if (is_irregular) {
+           pos_lon <- which(names(dim(data_array)) == lon_dim)
+           pos_lat <- which(names(dim(data_array)) == lat_dim)
+           pos_lon_dim_in_lons <- which(names(dim(lons)) == lon_dim)
+           pos_lat_dim_in_lons <- which(names(dim(lons)) == lat_dim)
+           if ((pos_lon > pos_lat && pos_lon_dim_in_lons < pos_lat_dim_in_lons) ||
+         (pos_lon < pos_lat && pos_lon_dim_in_lons > pos_lat_dim_in_lons)) {
+             new_pos <- 1:length(dim(data_array))
+             new_pos[pos_lon] <- pos_lat
+             new_pos[pos_lat] <- pos_lon
+             data_array <- .aperm2(data_array, new_pos)
+           }
+         }
 #        dims_before_crop <- dim(data_array)
         ArrayToNetCDF(setNames(list(data_array, lons, lats), c('var', lon_var_name, lat_var_name)), tmp_file)
       }
@@ -818,24 +853,63 @@ CDORemap <- function(data_array = NULL, lons, lats, grid, method,
           if (return_array) {
             new_dims <- dim(data_array)
             new_dims[c(lon_dim, lat_dim)] <- c(found_lon_dim_size, found_lat_dim_size)
+            lon_pos <- which(names(new_dims) == lon_dim)
+            lat_pos <- which(names(new_dims) == lat_dim)
+        # Fix issue 259, expected order from CDO output is lon lat
+# If is irregular, lat and lon position need to be checked:
+            if (is_irregular) {
+              if (lon_pos > lat_pos) {
+                new_pos <- 1:length(new_dims)
+                new_pos[lon_pos] <- lat_pos
+                new_pos[lat_pos] <- lon_pos
+                new_dims <- new_dims[new_pos]
+              }
+            }
             result_array <- array(dim = new_dims)
             store_indices <- as.list(rep(TRUE, length(dim(result_array))))
           }
         }
         if (return_array) {
           store_indices[dims_to_iterate] <- as.list(slice_indices)
+          # If is irregular, the order of dimenesions in result_array and file may be different and need to be checked before reading the temporal file:
+          if (is_irregular) {
+            test_dims <- dim(ncvar_get(ncdf_remapped, 'var', 
+                             collapse_degen = FALSE))
+            test_dims <- test_dims[which(test_dims > 1)] 
+            pos_test_dims <- match(dim(result_array), test_dims)
+            if (is.unsorted(pos_test_dims, na.rm = TRUE)) {
+               # pos_new_dims is used later in the code. Don't overwrite
+               pos_new_dims <- 1:length(dim(result_array))
+               pos_new_dims[which(!is.na(pos_test_dims))] <- 
+                                              match(test_dims, dim(result_array)) 
+               backup_result_array_dims <- dim(result_array)
+               dim(result_array) <- dim(result_array)[pos_new_dims]
+            }
+          }
           result_array <- do.call('[<-', c(list(x = result_array), store_indices, 
                                            list(value = ncvar_get(ncdf_remapped, 'var', collapse_degen = FALSE))))
         }
       } else {
         new_dims <- dim(data_array)
         new_dims[c(lon_dim, lat_dim)] <- c(found_lon_dim_size, found_lat_dim_size)
+        
         result_array <- ncvar_get(ncdf_remapped, 'var', collapse_degen = FALSE)
         dim(result_array) <- new_dims
       }
       nc_close(ncdf_remapped)
       file.remove(tmp_file2)
     }
+ # If is irregular, the order of dimension may need to be recovered after reading all the file:
+          if (is_irregular & (!is.null(dims_to_iterate))) {
+            if (exists('pos_new_dims')) {
+              pos_new_dims <- 1:length(dim(result_array))
+              dims_to_change <- match(backup_result_array_dims, dim(result_array))
+              pos_new_dims[which(dims_to_change != 1)] <-
+                                        dims_to_change[which(dims_to_change != 1)]
+              result_array <- .aperm2(result_array, pos_new_dims)
+            }
+          }
+
     if (!is.null(permutation)) {
       dim_backup <- dim(result_array)
       result_array <- aperm(result_array, permutation_back)

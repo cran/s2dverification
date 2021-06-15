@@ -136,7 +136,7 @@ StatSeasAtlHurr <- function(atlano = NULL, tropano = NULL, hrvar = "HR") {
   # mean.  PDI follows a gamma distribution, with sigma =
   # -0.57.  (variance = sigma^2 * mean^2).
   # -----------------------------------------------------------
-  if (hrvar == "HR" && hrvar == "TC") {
+  if (hrvar == "HR" | hrvar == "TC") {
     statval$var <- statval$mean
   } else {
     sigma <- -0.57

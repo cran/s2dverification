@@ -4,12 +4,29 @@
 \alias{PlotVsLTime}
 \title{Plots A Score Along The Forecast Time With Its Confidence Interval}
 \usage{
-PlotVsLTime(var, toptitle = "", ytitle = "", monini = 1, freq = 12,
-  nticks = NULL, limits = NULL, listexp = c("exp1", "exp2", "exp3"),
-  listobs = c("obs1", "obs2", "obs3"), biglab = FALSE, hlines = NULL,
-  leg = TRUE, siglev = FALSE, sizetit = 1, show_conf = TRUE,
-  fileout = "output_plotvsltime.eps", width = 8, height = 5,
-  size_units = "in", res = 100, ...)
+PlotVsLTime(
+  var,
+  toptitle = "",
+  ytitle = "",
+  monini = 1,
+  freq = 12,
+  nticks = NULL,
+  limits = NULL,
+  listexp = c("exp1", "exp2", "exp3"),
+  listobs = c("obs1", "obs2", "obs3"),
+  biglab = FALSE,
+  hlines = NULL,
+  leg = TRUE,
+  siglev = FALSE,
+  sizetit = 1,
+  show_conf = TRUE,
+  fileout = "output_plotvsltime.eps",
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{var}{Matrix containing any Prediction Score with dimensions:\cr
@@ -133,4 +150,3 @@ History:\cr
 1.0  -  2013-11  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
 }
 \keyword{dynamic}
-

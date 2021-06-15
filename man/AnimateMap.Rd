@@ -4,13 +4,33 @@
 \alias{AnimateMap}
 \title{Animate Maps of Forecast/Observed Values or Scores Over Forecast Time}
 \usage{
-AnimateMap(var, lon, lat, toptitle = rep("", 11), sizetit = 1, units = "",
-  monini = 1, freq = 12, msk95lev = FALSE, brks = NULL, cols = NULL,
-  filled.continents = FALSE, lonmin = 0, lonmax = 360, latmin = -90,
-  latmax = 90, intlon = 20, intlat = 30, drawleg = TRUE,
-  subsampleg = 1, colNA = "white", equi = TRUE,
+AnimateMap(
+  var,
+  lon,
+  lat,
+  toptitle = rep("", 11),
+  sizetit = 1,
+  units = "",
+  monini = 1,
+  freq = 12,
+  msk95lev = FALSE,
+  brks = NULL,
+  cols = NULL,
+  filled.continents = FALSE,
+  lonmin = 0,
+  lonmax = 360,
+  latmin = -90,
+  latmax = 90,
+  intlon = 20,
+  intlat = 30,
+  drawleg = TRUE,
+  subsampleg = 1,
+  colNA = "white",
+  equi = TRUE,
   fileout = c("output1_animvsltime.gif", "output2_animvsltime.gif",
-  "output3_animvsltime.gif"), ...)
+    "output3_animvsltime.gif"),
+  ...
+)
 }
 \arguments{
 \item{var}{Matrix of dimensions (nltime, nlat, nlon) or 
@@ -194,4 +214,3 @@ History:\cr
  1.2 - 2015-05 (V. Guemas, \email{virginie.guemas@bsc.es}) - Use of PlotEquiMap and PlotStereoMap
 }
 \keyword{dynamic}
-

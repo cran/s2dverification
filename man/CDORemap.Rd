@@ -4,8 +4,17 @@
 \alias{CDORemap}
 \title{Interpolates arrays with longitude and latitude dimensions using CDO}
 \usage{
-CDORemap(data_array = NULL, lons, lats, grid, method, avoid_writes = TRUE,
-  crop = TRUE, force_remap = FALSE, write_dir = tempdir())
+CDORemap(
+  data_array = NULL,
+  lons,
+  lats,
+  grid,
+  method,
+  avoid_writes = TRUE,
+  crop = TRUE,
+  force_remap = FALSE,
+  write_dir = tempdir()
+)
 }
 \arguments{
 \item{data_array}{Multidimensional numeric array to be interpolated. If 
@@ -226,4 +235,3 @@ History:\cr
  0.0 - 2017-01 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Original code.
 }
 \keyword{datagen}
-

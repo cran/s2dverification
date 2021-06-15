@@ -29,4 +29,3 @@ History:\cr
  1.1  -  2015-03  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Improved\cr
 }
 \keyword{datagen}
-

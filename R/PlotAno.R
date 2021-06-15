@@ -117,6 +117,11 @@ PlotAno <- function(exp_ano, obs_ano = NULL, sdates, toptitle = rep('', 15),
   } else {
     nobs <- 0
   }
+  # sdate check
+  if (!all(nchar(sdates) == 8)) { 
+    stop ("The parameter 'sdates' must be formatted as YYYYMMDD.")
+  }
+
   if (is.null(limits) == TRUE) {
     if (memb) {
       ll <- min(min(exp_ano, na.rm = TRUE), min(obs_ano, na.rm = TRUE), na.rm = TRUE)

@@ -92,7 +92,7 @@ for (i1 in c1) {
  a1[i1, ] <- x1 + rnorm(4, mean = mean1, sd = sd1)
 }
 
-c1p5 <- c0[!(c0 \\\%in\\\% c1)]
+c1p5 <- c0[!(c0 \%in\% c1)]
 c2 <- c1p5[seq(1, length(c1p5), 2)] 
 x2 <- c(2, 2, 4, 4)
 for (i2 in c2) {
@@ -114,12 +114,11 @@ res2 <- Cluster(var = a1, weights = array(1, dim = dim(a1)[2]))
 print(res2$cluster)
 print(res2$centers)
 }
+\references{
+Wilks, 2011, Statistical Methods in the Atmospheric Sciences, 3rd ed., Elsevire, pp 676.
+}
 \author{
 History:\cr
  1.0 # 2014-10 (N.S. Fuckar, \email{neven.fuckar@bsc.es}) - Original code
 }
-\references{
-Wilks, 2011, Statistical Methods in the Atmospheric Sciences, 3rd ed., Elsevire, pp 676.
-}
 \keyword{datagen}
-

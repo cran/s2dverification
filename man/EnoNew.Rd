@@ -56,15 +56,14 @@ eno <- EnoNew(sampleData$mod[1, 1, , 1, 2, 3])
 print(eno)
 
 }
-\author{
-History:\cr
-0.1  -  2012-06  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN
-}
 \references{
 Guemas V, Auger L, Doblas-Reyes FJ, Rust H, Ribes A, 2014, Dependencies in 
  Statistical Hypothesis Tests for Climate Time Series. Bulletin of the 
  American Meteorological Society, 95 (11), 1666-1667.
 }
+\author{
+History:\cr
+0.1  -  2012-06  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN
+}
 \keyword{datagen}
-

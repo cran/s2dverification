@@ -4,10 +4,24 @@
 \alias{PlotBoxWhisker}
 \title{Box-And-Whisker Plot of Time Series with Ensemble Distribution}
 \usage{
-PlotBoxWhisker(exp, obs, toptitle = "", ytitle = "", monini = 1,
-  yearini = 0, freq = 1, expname = "exp 1", obsname = "obs 1",
-  drawleg = TRUE, fileout = "output_PlotBoxWhisker.ps", width = 8,
-  height = 5, size_units = "in", res = 100, ...)
+PlotBoxWhisker(
+  exp,
+  obs,
+  toptitle = "",
+  ytitle = "",
+  monini = 1,
+  yearini = 0,
+  freq = 1,
+  expname = "exp 1",
+  obsname = "obs 1",
+  drawleg = TRUE,
+  fileout = "output_PlotBoxWhisker.ps",
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{exp}{Forecast array of multi-member time series, e.g., the NAO index 
@@ -120,6 +134,9 @@ PlotBoxWhisker(nao$NAO_exp, nao$NAO_obs, "NAO index, DJF", "NAO index (PC1) TOS"
  }
 
 }
+\seealso{
+EOF, ProjectField, NAO
+}
 \author{
 History:\cr
 0.1  -  2013-09  (F. Lienert, \email{flienert@ic3.cat})  -  Original code\cr
@@ -127,8 +144,4 @@ History:\cr
  normalization for sake of clarity.
 1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN
 }
-\seealso{
-EOF, ProjectField, NAO
-}
 \keyword{datagen}
-

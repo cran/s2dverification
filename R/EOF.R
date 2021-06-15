@@ -5,7 +5,9 @@
 #'\code{TRUE}.
 #'
 #'@param ano Array of anomalies with dimensions (number of timesteps, 
-#'  number of latitudes, number of longitudes).
+#'  number of latitudes, number of longitudes). NAs could exist but it should 
+#'  be consistent along time_dim. That is, if one grid point has NAs, all the 
+#'  time steps at this point should be NAs. 
 #'@param lon Vector of longitudes of \code{ano}.
 #'@param lat Vector of latitudes of \code{ano}.
 #'@param neofs Number of modes to be kept. Default = 15.
@@ -152,6 +154,17 @@ EOF <- function(ano, lon, lat, neofs = 15, corr = FALSE) {
     stop("Inconsistent number of longitudes and input field dimensions.")
   }
   
+  # Check if all the time steps at one grid point are NA-consistent.
+  # The grid point should have all NAs or no NA along time dim.
+  if (any(is.na(ano))) {
+    ano_latlon <- array(ano, dim = c(nt, ny * nx))  # [time, lat*lon]
+    na_ind <- which(is.na(ano_latlon), arr.ind = T)
+    if (dim(na_ind)[1] != nt * length(unique(na_ind[, 2]))) {
+      stop("Detect certain grid points have NAs but not consistent across time ",
+           "dimension. If the grid point is NA, it should have NA at all time step.")
+    }
+  }
+
   # Buildup of the mask
   mask <- ano[1, , ]
   mask[!is.finite(mask)] <- NA

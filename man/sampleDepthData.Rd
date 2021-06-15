@@ -32,4 +32,3 @@ Its name within IC3 local database is 'i00k'.
 Nicolau Manubens \email{nicolau.manubens@bsc.es}
 }
 \keyword{data}
-

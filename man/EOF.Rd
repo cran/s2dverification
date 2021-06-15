@@ -8,7 +8,9 @@ EOF(ano, lon, lat, neofs = 15, corr = FALSE)
 }
 \arguments{
 \item{ano}{Array of anomalies with dimensions (number of timesteps, 
-number of latitudes, number of longitudes).}
+number of latitudes, number of longitudes). NAs could exist but it should 
+be consistent along time_dim. That is, if one grid point has NAs, all the 
+time steps at this point should be NAs.}
 
 \item{lon}{Vector of longitudes of \code{ano}.}
 
@@ -83,6 +85,9 @@ eof <- EOF(Mean1Dim(ano$ano_exp, 2)[1, , 1, , ], sampleData$lon, sampleData$lat)
 PlotEquiMap(eof$EOFs[1, , ], sampleData$lon, sampleData$lat)
 
 }
+\seealso{
+ProjectField, NAO, PlotBoxWhisker
+}
 \author{
 History:\cr
 0.1  -  2012-10  (F. Lienert, \email{fabian.lienert@ic3.cat})  -  Original
@@ -115,8 +120,4 @@ weighted by cos(lat)\cr
 EOF * PC\cr
 1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN
 }
-\seealso{
-ProjectField, NAO, PlotBoxWhisker
-}
 \keyword{datagen}
-

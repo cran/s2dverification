@@ -4,8 +4,14 @@
 \alias{ConfigApplyMatchingEntries}
 \title{Apply Matching Entries To Dataset Name And Variable Name To Find Related Info}
 \usage{
-ConfigApplyMatchingEntries(configuration, var, exp = NULL, obs = NULL,
-  show_entries = FALSE, show_result = TRUE)
+ConfigApplyMatchingEntries(
+  configuration,
+  var,
+  exp = NULL,
+  obs = NULL,
+  show_entries = FALSE,
+  show_result = TRUE
+)
 }
 \arguments{
 \item{configuration}{Configuration object obtained from ConfigFileOpen() 
@@ -63,15 +69,14 @@ configuration <- ConfigEditEntry(configuration, "experiments", 1,
 match_info <- ConfigApplyMatchingEntries(configuration, 'tas', 
              exp = c('ExampleExperiment2'), show_result = TRUE)
 }
-\author{
-History:\cr
- 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - First version\cr
- 1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - Removed grid column and storage types
-}
 \seealso{
 ConfigApplyMatchingEntries, ConfigEditDefinition, 
  ConfigEditEntry, ConfigFileOpen, ConfigShowSimilarEntries, 
  ConfigShowTable
 }
+\author{
+History:\cr
+ 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - First version\cr
+ 1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - Removed grid column and storage types
+}
 \keyword{datagen}
-

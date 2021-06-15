@@ -4,10 +4,26 @@
 \alias{PlotSection}
 \title{Plots A Vertical Section}
 \usage{
-PlotSection(var, horiz, depth, toptitle = "", sizetit = 1, units = "",
-  brks = NULL, cols = NULL, axelab = TRUE, intydep = 200,
-  intxhoriz = 20, drawleg = TRUE, fileout = NULL, width = 8,
-  height = 5, size_units = "in", res = 100, ...)
+PlotSection(
+  var,
+  horiz,
+  depth,
+  toptitle = "",
+  sizetit = 1,
+  units = "",
+  brks = NULL,
+  cols = NULL,
+  axelab = TRUE,
+  intydep = 200,
+  intxhoriz = 20,
+  drawleg = TRUE,
+  fileout = NULL,
+  width = 8,
+  height = 5,
+  size_units = "in",
+  res = 100,
+  ...
+)
 }
 \arguments{
 \item{var}{Matrix to plot with (longitude/latitude, depth) dimensions.}
@@ -75,4 +91,3 @@ History:\cr
 1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
 }
 \keyword{dynamic}
-

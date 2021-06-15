@@ -4,8 +4,15 @@
 \alias{SVD}
 \title{Single Value Decomposition (Maximum Covariance Analysis)}
 \usage{
-SVD(vary, varx, laty = NULL, latx = NULL, nmodes = 15, corr = FALSE,
-  weight = TRUE)
+SVD(
+  vary,
+  varx,
+  laty = NULL,
+  latx = NULL,
+  nmodes = 15,
+  corr = FALSE,
+  weight = TRUE
+)
 }
 \arguments{
 \item{vary}{Array containing the anomalies field for the predictor. The 
@@ -117,4 +124,3 @@ History:\cr
 1.0  -  2016-04  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN
 }
 \keyword{datagen}
-
