@@ -15,8 +15,8 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2012-02  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
-#'1.0  -  2012-02  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to CRAN
+#'0.1  -  2012-02  (V. Guemas, \email{virginie.guemas at bsc.es})  -  Original code\cr
+#'1.0  -  2012-02  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Formatting to CRAN
 #'@examples
 #'# Load sample data as in Load() example:
 #'example(Load)

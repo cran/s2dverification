@@ -23,7 +23,7 @@ print(LeapYear(1993))
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{vguemas@ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+0.1  -  2011-03  (V. Guemas, \email{vguemas@bsc.es})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
 }
 \keyword{datagen}

@@ -75,7 +75,7 @@ PlotAno(experimental_data, observational_data, start_dates_out,
 }
 \author{
 History:\cr
-0.1  -  2012-11  (V. Guemas, \email{vguemas@ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+0.1  -  2012-11  (V. Guemas)  -  Original code\cr
+1.0  -  2013-09  (N. Manubens)  -  Formatting to CRAN
 }
 \keyword{datagen}

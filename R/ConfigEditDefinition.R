@@ -17,7 +17,7 @@
 #'  [ConfigEditEntry()], [ConfigFileOpen()], [ConfigShowSimilarEntries()], 
 #'  [ConfigShowTable()].
 #'@author History:
-#'  0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@@ic3.cat}) - First version
+#'  0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - First version
 #'@keywords datagen
 #'@examples
 #'# Create an empty configuration file

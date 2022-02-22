@@ -134,7 +134,7 @@ Plot2VarsVsLTime(InsertDim(rms[, , , ], 1, 1), spread$sd,
 }
 \author{
 History:\cr
-1.0  -  2013-03  (I. Andreu-Burillo, \email{isabel.andreu-burillo@ic3.cat}) 
+1.0  -  2013-03  (I. Andreu-Burillo) 
  - Original code
 }
 \keyword{dynamic}

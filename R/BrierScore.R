@@ -47,7 +47,7 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'  0.1 - 2012-04 (L. Rodrigues, \email{lrodrigues@@ic3.cat}) - Original code\cr
+#'  0.1 - 2012-04 (L. Rodrigues) - Original code\cr
 #'  0.2 - 2017-02 (A. Hunter, \email{alasdair.hunter@@bsc.es}) - Adapted to veriApply()
 #'
 #'@examples

@@ -80,15 +80,15 @@ EOF, NAO, PlotBoxWhisker
 }
 \author{
 History:\cr
-0.1  -  2012-03  (F. Lienert, \email{flienert@ic3.cat}  -  Original code\cr
-0.2  -  2014-03  (Lauriane Batte, \email{lauriane.batte@ic3.cat}  -  Bug-fixes:\cr
+0.1  -  2012-03  (F. Lienert)  -  Original code\cr
+0.2  -  2014-03  (Lauriane Batte)  -  Bug-fixes:\cr
        1- Extra weighting of the anomalies before projection.\cr
        2- Reversion of the anomalies along latitudes.\cr
        3- Extra-normalisation not necessary.\cr
 0.3  -  2014-03  (Virginie Guemas, \email{virginie.guemas@bsc.es}  -  Bug-fixes:\cr
        1- Another extra-normalisation.\cr
        2- 15 lines to compute the em reduced to 1.
-0.4  -  2014-03  (Lauriane Batte, \email{lauriane.batte@ic3.cat}  -  Normalization\cr
+0.4  -  2014-03  (Lauriane Batte)  -  Normalization\cr
 by std before returning PCs to be coherent with EOF().\cr
 0.5  -  2014-04  (Virginie Guemas, \email{virginie.guemas@bsc.es}  - Fixes:\cr
        1- Removal of lon, lat, ncpu and neofs argument unused\cr

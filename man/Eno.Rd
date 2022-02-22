@@ -56,7 +56,7 @@ PlotEquiMap(eno, sampleData$lon, sampleData$lat)
 }
 \author{
 History:\cr
-0.1  -  2011-05  (V. Guemas, \email{virginie.guemas at ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  Formatting to R CRAN
+0.1  -  2011-05  (V. Guemas, \email{virginie.guemas at bsc.es})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens at bsc.es})  -  Formatting to R CRAN
 }
 \keyword{datagen}

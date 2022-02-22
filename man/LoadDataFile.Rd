@@ -111,7 +111,7 @@ data <- s2dverification:::.LoadDataFile(list(dataset_type = 'exp',
 }
 \author{
 History:\cr
-0.1  -  2015-01  (N. Manubens, \email{nicolau.manubens at ic3.cat})  -  First version
+0.1  -  2015-01  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  First version
 }
 \keyword{datagen}
 \keyword{internal}

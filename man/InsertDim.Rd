@@ -29,8 +29,8 @@ print(dim(InsertDim(InsertDim(a[, , , ], 2, 1), 4, 1)))
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to R CRAN\cr
-1.1  -  2015-03  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Improvements
+0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
+1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN\cr
+1.1  -  2015-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Improvements
 }
 \keyword{datagen}

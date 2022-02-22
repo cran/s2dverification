@@ -144,9 +144,9 @@ PlotVsLTime(corr, toptitle = "correlations", ytitle = "correlation",
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
-0.2  -  2013-03  (I. Andreu-Burillo, \email{isabel.andreu-burillo@ic3.cat})  -  Introduced parameter sizetit\cr
-0.3  -  2013-10  (I. Andreu-Burillo, \email{isabel.andreu-burillo@ic3.cat})  -  Introduced parameter show_conf\cr
-1.0  -  2013-11  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
+0.2  -  2013-03  (I. Andreu-Burillo, \email{isabel.andreu-burillo@bsc.es})  -  Introduced parameter sizetit\cr
+0.3  -  2013-10  (I. Andreu-Burillo, \email{isabel.andreu-burillo@bsc.es})  -  Introduced parameter show_conf\cr
+1.0  -  2013-11  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
 }
 \keyword{dynamic}

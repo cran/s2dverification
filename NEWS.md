@@ -1,3 +1,6 @@
+# s2dverification 2.10.1 (Release date: 2022-02-22)
+- Renew the outdated email addresses
+
 # s2dverification 2.10.0 (Release date: 2021-06-15)
 - Load(): Remove the last development for the first time step
 - Load(): Modify the regrid criteria for the condition that only one data is retrieved and grid is specified and the data grids need to shift (e.g., first lon is 0.5 rather than 0.). Load() regrids the data as long as grid is specified.

@@ -31,6 +31,6 @@ plot(series, type = 'l')
 \author{
 History:\cr
 0.1  -  2012-04  (L. Auger, \email{ludovic.auger@meteo.fr})  -  Original code\cr
-1.0  -  2012-04  (N. Manubens, \email{nicolau.manubens@ic3.cat})  -  Formatting to CRAN
+1.0  -  2012-04  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
 }
 \keyword{datagen}

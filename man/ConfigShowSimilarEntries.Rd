@@ -89,7 +89,7 @@ ConfigApplyMatchingEntries, ConfigEditDefinition,
 }
 \author{
 History:\cr
- 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - First version\cr
- 1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@ic3.cat}) - Removed grid column and storage formats
+ 0.1 - 2015-05 (N. Manubens, \email{nicolau.manubens@bsc.es}) - First version\cr
+ 1.0 - 2015-11 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Removed grid column and storage formats
 }
 \keyword{datagen}

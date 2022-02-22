@@ -90,9 +90,9 @@ ProjectField, NAO, PlotBoxWhisker
 }
 \author{
 History:\cr
-0.1  -  2012-10  (F. Lienert, \email{fabian.lienert@ic3.cat})  -  Original
+0.1  -  2012-10  (F. Lienert)  -  Original
 code, inspired by R. Benestad's EOF() in R package clim.pact.\cr
-0.2  -  2014-03  (Lauriane Batte, \email{lauriane.batte@ic3.cat})  -  Bug-fixes:\cr
+0.2  -  2014-03  (Lauriane Batte)  -  Bug-fixes:\cr
        1- Reversion of latitudes in the weights\cr
        2- Correlation matrix was used instead of covariance\cr
        3- Double use of the weights\cr
@@ -101,7 +101,7 @@ code, inspired by R. Benestad's EOF() in R package clim.pact.\cr
        2- Shuffling of EOFs in EOF.2 intermediate vector\cr
        3- Crash when neofs = 1 sorted out\cr
        4- Crash when neofs > nt sorted out\cr
-0.4  -  2014-03  (Lauriane Batte, \email{lauriane.batte@ic3.cat})  -  Fixes:\cr
+0.4  -  2014-03  (Lauriane Batte)  -  Fixes:\cr
        1- BIG cleanup of code and clarification\cr
        2- Reduction of the number of transpositions and associated bug-fixes\cr
        4- Remove of the obsolete LINPACK options\cr

@@ -49,8 +49,8 @@
 #'@seealso EOF, ProjectField, NAO
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2013-09  (F. Lienert, \email{flienert@@ic3.cat})  -  Original code\cr
-#'0.2  -  2015-03  (L. Batte, \email{lauriane.batte@@ic3.cat})  -  Removed all\cr
+#'0.1  -  2013-09  (F. Lienert)  -  Original code\cr
+#'0.2  -  2015-03  (L. Batte)  -  Removed all\cr
 #'  normalization for sake of clarity.
 #'1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Formatting to R CRAN
 #'@examples

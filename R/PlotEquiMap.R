@@ -186,10 +186,10 @@
 #'
 #'@keywords dynamic
 #'@author History:\cr
-#'  0.1  -  2011-11  (V. Guemas, \email{virginie.guemas@@ic3.cat})  -  Original code\cr
-#'  0.2  -  2013-04  (R. Saurral \email{ramiro.saurral@@ic3.cat}) - LabW\cr
-#'  1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@ic3.cat})  -  Formatting to R CRAN\cr
-#'  1.1  -  2013-09  (C. Prodhomme, \email{chloe.prodhomme@@ic3.cat})  - add winds\cr
+#'  0.1  -  2011-11  (V. Guemas, \email{virginie.guemas@@bsc.es})  -  Original code\cr
+#'  0.2  -  2013-04  (R. Saurral \email{ramiro.saurral@@bsc.es}) - LabW\cr
+#'  1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Formatting to R CRAN\cr
+#'  1.1  -  2013-09  (C. Prodhomme, \email{chloe.prodhomme@@bsc.es})  - add winds\cr
 #'  1.2  -  2016-08  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Refactored and added features,
 #'                                                                       and adapted to new ColorBar.
 #'@examples

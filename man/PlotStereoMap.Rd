@@ -288,7 +288,7 @@ PlotStereoMap(data, x, y, latlims = c(60, 90), brks = 50,
 }
 \author{
 History:\cr
-1.0  -  2014-07  (V. Guemas, \email{virginie.guemas@ic3.cat})  -  Original code\cr
+1.0  -  2014-07  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
 1.1  -  2015-12  (C. Ardilouze, \email{constantin.ardilouze@meteo.fr})  - Box(es) drawing\cr
 1.2  -  2016-08  (N. Manubens, \email{nicolau.manubens@bsc.es})  - Refacotred the function and 
                                                                      merged in Jean-Philippe circle
