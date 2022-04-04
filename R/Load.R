@@ -2127,7 +2127,7 @@ Load <- function(var, exp = NULL, obs = NULL, sdates, nmember = NULL,
 
   })
 
-  if (class(errors) == 'try-error') {
+  if (is(errors, 'try-error')) {
     invisible(list(load_parameters = load_parameters))
   } else {
     # Before ending, the data is arranged in the common format, with the following

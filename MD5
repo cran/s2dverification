@@ -1,6 +1,6 @@
-61cba8a45fa9e29ac66c9eef4288611e *DESCRIPTION
+d36d71a1c870a1534acc83c25171be31 *DESCRIPTION
 c4da426d2f41bde6baf419bd5efffbda *NAMESPACE
-511190f036cfe4374c16a051102fbb72 *NEWS.md
+0c2aa8d5a614ea89a523357aab1b6edf *NEWS.md
 345c652e409e2ba3895bdb74dcef7031 *R/ACC.R
 766ee495fde3f44aedf6491dd17c8c26 *R/Alpha.R
 c3df29fc8545d5f198cc7944a3c729b3 *R/AnimateMap.R
@@ -23,9 +23,9 @@ ab68f232d093a9a1b5de17b9f48d9c1a *R/Consist_Trend.R
 578e5f3e74a720c0bc7ac42d8426a7a7 *R/Corr.R
 addfc5da59525db1778e02b3da6a5bae *R/EOF.R
 c65a6eb524c25975a16d34a0165bb0ee *R/Enlarge.R
-a0af63657b68ae465547605b4dafa7bc *R/Eno.R
+af7a5a3717973aaf08103d9b3d6f78e0 *R/Eno.R
 374b03df648f7ae7e8c4e2f97b10a093 *R/EnoNew.R
-d37c17bb4f14bac15e716522fd8ee761 *R/Filter.R
+bff5cbc6134d8437ad8f2c8ffc85ff66 *R/Filter.R
 ef0dcf62863d6588cb4495fef3376d79 *R/FitAcfCoef.R
 473700014f25ca01bccd46858163563f *R/FitAutocor.R
 e2de2762d3f6701e6be1639533c5ad33 *R/GenSeries.R
@@ -33,7 +33,7 @@ d4faddab8592759929067080c67d5d4c *R/Histo2Hindcast.R
 42fb344a5279d36622488b7332ccbb1e *R/IniListDims.R
 40d0fcc0e27cd4986d4f66b7bc9fd754 *R/InsertDim.R
 6a5ceaef3395de0055e2d23fcf5ec7de *R/LeapYear.R
-b03e4803aa6f4bfefe7a1f83aba1662f *R/Load.R
+ad36845d2d1e99ebe104e836bce2de16 *R/Load.R
 bef9592de6f1374080a80fd2ad127c78 *R/Mean1Dim.R
 8ddd577b76304067fad5655e18a63d96 *R/MeanListDim.R
 cea569bae9b9fd35972f3c537a9542b6 *R/NAO.R
@@ -105,9 +105,9 @@ d1b401b8fd6ba0a69c498f0a8fbc1eae *man/Consist_Trend.Rd
 ad9e5c29781e7614ed4165a9f3850ecd *man/Corr.Rd
 5b2c99b9a420b1bdde7293d07a9bcaa4 *man/EOF.Rd
 a4fa1d0e3b889c7aaaf5b56c23c76e46 *man/Enlarge.Rd
-fbe789b99eccb25a6a739eeab0bbef3f *man/Eno.Rd
+04a0c3bd0ffd8ecd0c011340d9908b22 *man/Eno.Rd
 e39e390f7a049233b1c99858f88cd0fa *man/EnoNew.Rd
-9592005c112404bd96bb2983d17acc82 *man/Filter.Rd
+adf353fd8e27f6766569ab0de9215715 *man/Filter.Rd
 a0a22b693a407a2bfa66ec650dc1565f *man/FitAcfCoef.Rd
 4f2d69a3905e0f4630cc64c0ceef4e17 *man/FitAutocor.Rd
 5b0a09b3f56ecd000eef6779dd728ccf *man/GenSeries.Rd

@@ -1,12 +1,12 @@
 Package: s2dverification
 Title: Set of Common Tools for Forecast Verification
-Version: 2.10.1
+Version: 2.10.2
 Authors@R: c(
     person("BSC-CNS", role = c("aut", "cph")),
     person("Virginie", "Guemas", , "virginie.guemas@bsc.es", role = "aut"),
     person("Nicolau", "Manubens", , "nicolau.manubens@bsc.es", role = "aut"),
     person("An-Chi", "Ho", , "an.ho@bsc.es", role = c("ctb", "cre")),
-    person("Nuria", "Perez-Zanon", , "nuria.perez@bsc.es", role = "ctb"),
+    person("Nuria", "Perez-Zanon", , "nuria.perez@bsc.es", role = "aut"),
     person("Javier", "Garcia-Serrano", , "javier.garcia@bsc.es", role = "aut"),
     person("Neven", "Fuckar", , "neven.fuckar@bsc.es", role = "aut"),
     person("Louis-Philippe", "Caron", , "louis-philippe.caron@bsc.es", role = "aut"),
@@ -49,12 +49,12 @@ SystemRequirements: cdo
 Encoding: UTF-8
 RoxygenNote: 7.0.1
 NeedsCompilation: no
-Packaged: 2022-02-22 15:00:22 UTC; aho
+Packaged: 2022-04-04 14:06:01 UTC; aho
 Author: BSC-CNS [aut, cph],
   Virginie Guemas [aut],
   Nicolau Manubens [aut],
   An-Chi Ho [ctb, cre],
-  Nuria Perez-Zanon [ctb],
+  Nuria Perez-Zanon [aut],
   Javier Garcia-Serrano [aut],
   Neven Fuckar [aut],
   Louis-Philippe Caron [aut],
@@ -79,4 +79,4 @@ Author: BSC-CNS [aut, cph],
   Ramiro Saurral [ctb]
 Maintainer: An-Chi Ho <an.ho@bsc.es>
 Repository: CRAN
-Date/Publication: 2022-02-22 16:10:02 UTC
+Date/Publication: 2022-04-04 15:40:02 UTC

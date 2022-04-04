@@ -1,3 +1,6 @@
+# s2dverification 2.10.2 (Release date: 2022-04-04)
+- Correct email addresses format
+
 # s2dverification 2.10.1 (Release date: 2022-02-22)
 - Renew the outdated email addresses
 
