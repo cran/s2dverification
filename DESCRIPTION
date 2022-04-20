@@ -1,6 +1,6 @@
 Package: s2dverification
 Title: Set of Common Tools for Forecast Verification
-Version: 2.10.2
+Version: 2.10.3
 Authors@R: c(
     person("BSC-CNS", role = c("aut", "cph")),
     person("Virginie", "Guemas", , "virginie.guemas@bsc.es", role = "aut"),
@@ -49,7 +49,7 @@ SystemRequirements: cdo
 Encoding: UTF-8
 RoxygenNote: 7.0.1
 NeedsCompilation: no
-Packaged: 2022-04-04 14:06:01 UTC; aho
+Packaged: 2022-04-20 07:24:38 UTC; aho
 Author: BSC-CNS [aut, cph],
   Virginie Guemas [aut],
   Nicolau Manubens [aut],
@@ -79,4 +79,4 @@ Author: BSC-CNS [aut, cph],
   Ramiro Saurral [ctb]
 Maintainer: An-Chi Ho <an.ho@bsc.es>
 Repository: CRAN
-Date/Publication: 2022-04-04 15:40:02 UTC
+Date/Publication: 2022-04-20 08:10:06 UTC

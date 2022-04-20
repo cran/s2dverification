@@ -89,7 +89,7 @@ PB <- ProbBins(ano_exp, fcyr = 3, thr = c(1/3, 2/3), quantile = TRUE, posdates =
 \author{
 History:\cr
 1.0  -  2013  (F.Lienert)  -  Original code\cr
-2.0  -  2014-03  (N. Gonzalez and V. Torralba, \email{veronica.torralba@bsc.es})  -  Debugging
-2.1  -  2017-02  (V. Torralba and N. Manubens, \email{veronica.torralba@bsc.es})  -  Fix bug with cross-validation
+2.0  -  2014-03  (N. Gonzalez and V. Torralba)  -  Debugging
+2.1  -  2017-02  (V. Torralba and N. Manubens)  -  Fix bug with cross-validation
 }
 \keyword{datagen}

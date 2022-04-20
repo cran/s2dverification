@@ -79,6 +79,6 @@ Caron, L.-P. et al. (2014) Multi-year prediction skill of Atlantic hurricane
 }
 \author{
 History:\cr
-0.1  -  2015-11  (Louis-Philippe Caron, \email{louis-philippe.caron@bsc.es})  -  Original code
+0.1  -  2015-11  (Louis-Philippe Caron)  -  Original code
 }
 \keyword{datagen}

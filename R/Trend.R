@@ -41,9 +41,9 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2011-05  (V. Guemas, \email{virginie.guemas@@bsc.es})  -  Original code\cr
-#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Formatting to CRAN\cr
-#'2.0  -  2017-02  (A. Hunter, \email{alasdair.hunter@@bsc.es})  -  Adapt to veriApply()
+#'0.1  -  2011-05  (V. Guemas)  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens)  -  Formatting to CRAN\cr
+#'2.0  -  2017-02  (A. Hunter)  -  Adapt to veriApply()
 #'@examples
 #'# Load sample data as in Load() example:
 #'example(Load)

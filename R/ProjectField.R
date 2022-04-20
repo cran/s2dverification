@@ -24,12 +24,12 @@
 #'        1- Extra weighting of the anomalies before projection.\cr
 #'        2- Reversion of the anomalies along latitudes.\cr
 #'        3- Extra-normalisation not necessary.\cr
-#'0.3  -  2014-03  (Virginie Guemas, \email{virginie.guemas@bsc.es}  -  Bug-fixes:\cr
+#'0.3  -  2014-03  (Virginie Guemas)  -  Bug-fixes:\cr
 #'        1- Another extra-normalisation.\cr
 #'        2- 15 lines to compute the em reduced to 1.
 #'0.4  -  2014-03  (Lauriane Batte)  -  Normalization\cr
 #'by std before returning PCs to be coherent with EOF().\cr
-#'0.5  -  2014-04  (Virginie Guemas, \email{virginie.guemas@bsc.es}  - Fixes:\cr
+#'0.5  -  2014-04  (Virginie Guemas)  - Fixes:\cr
 #'        1- Removal of lon, lat, ncpu and neofs argument unused\cr
 #'        2- Security checks ano and eof consistency\cr
 #'        3- Removal of the mask which is already contained in the EOFs\cr
@@ -44,8 +44,8 @@
 #'        6 - Since W *X = PC * EOF if EOF is multiplied back by the weights,\cr
 #'PC = W * X * t(EOF) and X the input field to be projected (X) needs to be\cr
 #'multiplied by W. Getting input dimensions.
-#'1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN\cr
-#'                 (J.-P. Baudouin, \email{jean.baudouin@bsc.es})  -  Example code and testing
+#'1.0  -  2016-03  (N. Manubens)  -  Formatting to R CRAN\cr
+#'                 (J.-P. Baudouin)  -  Example code and testing
 #'
 #'@examples
 #'# See examples on Load() to understand the first lines in this example

@@ -278,6 +278,6 @@ PlotLayout(PlotEquiMap, c('lat', 'lon'), sampleData$mod[1, , 1, 1, , ],
 }
 \author{
 History:\cr
- 0.1  -  2016-08  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Original code
+ 0.1  -  2016-08  (N. Manubens)  -  Original code
 }
 \keyword{dynamic}

@@ -91,9 +91,9 @@
 #'
 #'@keywords dynamic
 #'@author History:\cr
-#'  1.0 - 2012-04 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Original code\cr
-#'  1.1 - 2014-04 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Formatting to CRAN\cr
-#'  1.2 - 2015-05 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Use of PlotEquiMap and PlotStereoMap
+#'  1.0 - 2012-04 (V. Guemas) - Original code\cr
+#'  1.1 - 2014-04 (N. Manubens) - Formatting to CRAN\cr
+#'  1.2 - 2015-05 (V. Guemas) - Use of PlotEquiMap and PlotStereoMap
 #'
 #'@examples
 #'# See ?Load for explanations on the first part of this example

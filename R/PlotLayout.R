@@ -163,7 +163,7 @@
 #'
 #'@keywords dynamic
 #'@author History:\cr
-#'  0.1  -  2016-08  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Original code
+#'  0.1  -  2016-08  (N. Manubens)  -  Original code
 #'@examples
 #'# See examples on Load() to understand the first lines in this example
 #'  \dontrun{

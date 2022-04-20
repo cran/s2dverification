@@ -168,9 +168,9 @@
 #'
 #'@keywords dynamic
 #'@author History:\cr
-#'1.0  -  2014-07  (V. Guemas, \email{virginie.guemas@@bsc.es})  -  Original code\cr
-#'1.1  -  2015-12  (C. Ardilouze, \email{constantin.ardilouze@@meteo.fr})  - Box(es) drawing\cr
-#'1.2  -  2016-08  (N. Manubens, \email{nicolau.manubens@@bsc.es})  - Refacotred the function and 
+#'1.0  -  2014-07  (V. Guemas)  -  Original code\cr
+#'1.1  -  2015-12  (C. Ardilouze)  - Box(es) drawing\cr
+#'1.2  -  2016-08  (N. Manubens)  - Refacotred the function and 
 #'                                                                      merged in Jean-Philippe circle
 #'                                                                      border and Constantin boxes.
 #'@examples

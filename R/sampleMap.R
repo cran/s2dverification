@@ -40,7 +40,7 @@
 #'
 #' @name sampleMap
 #' @docType data
-#' @author Nicolau Manubens \email{nicolau.manubens@bsc.es}
+#' @author Nicolau Manubens
 #' @keywords datasets
 sampleMap <- function(){}
 

@@ -22,6 +22,6 @@
 #' 
 #'@name s2dverification
 #'@docType package 
-#'@author Nicolau Manubens \email{nicolau.manubens@bsc.es} 
+#'@author Nicolau Manubens 
 #'@keywords package datagen dynamic
 "_PACKAGE"

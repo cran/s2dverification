@@ -36,7 +36,7 @@ Useful links:
 
 }
 \author{
-Nicolau Manubens \email{nicolau.manubens@bsc.es}
+Nicolau Manubens
 }
 \keyword{datagen}
 \keyword{dynamic}

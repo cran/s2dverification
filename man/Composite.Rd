@@ -88,6 +88,6 @@ res <- Composite(data, occ, K = 4)
 }
 \author{
 History:
- 0.1  #  2014-08  (N.S. Fuckar, \email{neven.fuckar@bsc.es}) # Original code
+ 0.1  #  2014-08  (N.S. Fuckar) # Original code
 }
 \keyword{datagen}

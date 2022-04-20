@@ -11,7 +11,7 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.0  -  2016-01  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Original code.
+#'0.0  -  2016-01  (N. Manubens)  -  Original code.
 #'@examples
 #'lims <- seq(-1, 1, length.out = 21)
 #'

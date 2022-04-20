@@ -71,7 +71,7 @@
 #'Wilks, 2011, Statistical Methods in the Atmospheric Sciences, 3rd ed., Elsevire, pp 676.
 #'@keywords datagen
 #'@author History:\cr
-#'  1.0 # 2014-10 (N.S. Fuckar, \email{neven.fuckar@@bsc.es}) - Original code
+#'  1.0 # 2014-10 (N.S. Fuckar) - Original code
 #'@examples
 #'# Generating synthetic data
 #'a1 <- array(dim = c(200, 4))

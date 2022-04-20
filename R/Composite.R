@@ -32,7 +32,7 @@
 #'}
 #'@keywords datagen
 #'@author History:
-#'  0.1  #  2014-08  (N.S. Fuckar, \email{neven.fuckar@@bsc.es}) # Original code
+#'  0.1  #  2014-08  (N.S. Fuckar) # Original code
 #'
 #'@examples
 #'blank <- array(0, dim=c(20, 10, 30))

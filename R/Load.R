@@ -672,11 +672,11 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
-#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN\cr
-#'1.2  -  2015-02  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Generalisation + parallelisation\cr
-#'1.3  -  2015-07  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Improvements related to configuration file mechanism\cr
-#'1.4  -  2016-01  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Added subsetting capabilities
+#'0.1  -  2011-03  (V. Guemas)  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens)  -  Formatting to CRAN\cr
+#'1.2  -  2015-02  (N. Manubens)  -  Generalisation + parallelisation\cr
+#'1.3  -  2015-07  (N. Manubens)  -  Improvements related to configuration file mechanism\cr
+#'1.4  -  2016-01  (N. Manubens)  -  Added subsetting capabilities
 #'@examples
 #'# Let's assume we want to perform verification with data of a variable
 #'# called 'tos' from a model called 'model' and observed data coming from 

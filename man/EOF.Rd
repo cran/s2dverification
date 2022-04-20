@@ -96,7 +96,7 @@ code, inspired by R. Benestad's EOF() in R package clim.pact.\cr
        1- Reversion of latitudes in the weights\cr
        2- Correlation matrix was used instead of covariance\cr
        3- Double use of the weights\cr
-0.3  -  2014-03  (Virginie Guemas, \email{virginie.guemas@bsc.es})  -  Bug-fixes:\cr
+0.3  -  2014-03  (Virginie Guemas)  -  Bug-fixes:\cr
        1- Weight computation - division by sum of cos(lat)\cr
        2- Shuffling of EOFs in EOF.2 intermediate vector\cr
        3- Crash when neofs = 1 sorted out\cr
@@ -105,7 +105,7 @@ code, inspired by R. Benestad's EOF() in R package clim.pact.\cr
        1- BIG cleanup of code and clarification\cr
        2- Reduction of the number of transpositions and associated bug-fixes\cr
        4- Remove of the obsolete LINPACK options\cr
-0.5  -  2014-04  (Virginie Guemas, \email{virginie.guemas@bsc.es})  - Fixes:\cr
+0.5  -  2014-04  (Virginie Guemas)  - Fixes:\cr
        1- Bug-fix in dimensions handling EOF composition restitutes now the
 original field in all cases\cr
        2- Simplification of the convention transpose\cr
@@ -118,6 +118,6 @@ original file\cr
 weighted by cos(lat)\cr
        7- Division of EOF by weights so that the reconstruction is simply 
 EOF * PC\cr
-1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN
+1.0  -  2016-03  (N. Manubens)  -  Formatting to R CRAN
 }
 \keyword{datagen}

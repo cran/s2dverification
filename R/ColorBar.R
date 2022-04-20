@@ -136,12 +136,12 @@
 #'
 #'@keywords hplot
 #'@author History:\cr
-#'  0.1 - 2012-04  (V. Guemas, \email{virginie.guemas@@bsc.es}) - Original code\cr
-#'  0.2 - 2013-04  (I. Andreu-Burillo, \email{isabel.andreu-burillo@@bsc.es}) - Vert option\cr
-#'  1.0 - 2013-09  (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Formatting to CRAN\cr
-#'  1.1 - 2013-09  (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - Add cex option\cr
-#'  1.2 - 2016-08  (N. Manubens, \email{nicolau.manubens@@bsc.es}) - New ColorBar\cr
-#'                 (V. Torralba, \email{veronica.torralba@@bsc.es})
+#'  0.1 - 2012-04  (V. Guemas) - Original code\cr
+#'  0.2 - 2013-04  (I. Andreu-Burillo) - Vert option\cr
+#'  1.0 - 2013-09  (N. Manubens) - Formatting to CRAN\cr
+#'  1.1 - 2013-09  (C. Prodhomme) - Add cex option\cr
+#'  1.2 - 2016-08  (N. Manubens) - New ColorBar\cr
+#'                 (V. Torralba)
 #'@examples
 #'cols <- c("dodgerblue4", "dodgerblue1", "forestgreen", "yellowgreen", "white",
 #'          "white", "yellow", "orange", "red", "saddlebrown")

@@ -42,7 +42,7 @@
 #'  activity in CMIP5 decadal hindcasts. Climate Dynamics, 42, 2675-2690. 
 #'  doi:10.1007/s00382-013-1773-1.
 #'@author History:\cr
-#'0.1  -  2015-11  (Louis-Philippe Caron, \email{louis-philippe.caron@@bsc.es})  -  Original code 
+#'0.1  -  2015-11  (Louis-Philippe Caron)  -  Original code 
 #'@examples
 #'# Let AtlAno represents 5 different 5-year forecasts of seasonally averaged 
 #'# Atlantic sea surface temperature anomalies.

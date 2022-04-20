@@ -50,7 +50,7 @@ PlotAno(season_means_mod, season_means_obs, startDates,
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
+0.1  -  2011-03  (V. Guemas)  -  Original code\cr
+1.0  -  2013-09  (N. Manubens)  -  Formatting to CRAN
 }
 \keyword{datagen}

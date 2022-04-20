@@ -13,8 +13,8 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2012-04  (L. Auger, \email{ludovic.auger@meteo.fr})  -  Original code\cr
-#'1.0  -  2012-04  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
+#'0.1  -  2012-04  (L. Auger)  -  Original code\cr
+#'1.0  -  2012-04  (N. Manubens)  -  Formatting to CRAN
 #'@examples
 #'series <- GenSeries(1000, 0.35, 2, 1)
 #'plot(series, type = 'l')

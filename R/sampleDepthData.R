@@ -23,6 +23,6 @@
 #'sampleDepthData$lat is an array with the 21 latitudes covered by the data.\cr\cr
 #'@name sampleDepthData
 #'@docType data
-#'@author Nicolau Manubens \email{nicolau.manubens@bsc.es}
+#'@author Nicolau Manubens
 #'@keywords data
 sampleDepthData <- function(){}

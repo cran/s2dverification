@@ -16,8 +16,8 @@
 #'  [ConfigShowTable()].
 #'@keywords datagen
 #'@author History:\cr
-#'  0.1  -  2015-05  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  First version\cr
-#'  1.0  -  2015-11  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Removed grid column and storage formats
+#'  0.1  -  2015-05  (N. Manubens)  -  First version\cr
+#'  1.0  -  2015-11  (N. Manubens)  -  Removed grid column and storage formats
 #'@return These functions return nothing.
 #'
 #'@examples

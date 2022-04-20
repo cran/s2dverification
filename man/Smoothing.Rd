@@ -40,9 +40,9 @@ PlotAno(smooth_ano_exp, smooth_ano_obs, startDates,
 }
 \author{
 History:\cr
-0.1  -  2011-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
-1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to R CRAN\cr
-1.1  -  2015-05  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Adding
+0.1  -  2011-03  (V. Guemas)  -  Original code\cr
+1.0  -  2013-09  (N. Manubens)  -  Formatting to R CRAN\cr
+1.1  -  2015-05  (N. Manubens)  -  Adding
  security checks, fixing computation in cases where runmeanlen is odd and 
  making it able to work on arrays of any number of dimensions.
 }

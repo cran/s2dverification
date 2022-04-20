@@ -39,7 +39,7 @@ PlotAno(anomalies$ano_exp, anomalies$ano_obs, startDates,
 }
 \author{
 History:\cr
- 0.1 - 2011-12 (V. Guemas, \email{virginie.guemas@bsc.es}) - Original code\cr
- 1.0 - 2013-09 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Formatting to CRAN
+ 0.1 - 2011-12 (V. Guemas) - Original code\cr
+ 1.0 - 2013-09 (N. Manubens) - Formatting to CRAN
 }
 \keyword{datagen}

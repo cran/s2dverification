@@ -51,7 +51,7 @@
 #'@keywords datagen
 #'@author History:\cr
 #'0.1  -  2013-08  (F. Lienert)  -  Original code\cr
-#'0.2  -  2014-03  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Removing the 
+#'0.2  -  2014-03  (V. Guemas)  -  Removing the 
 #'  rotation\cr
 #'0.3  -  2014-05  (L. Batte)  -  Changes to
 #'  simplify function and add Pobs and Pmod options for NAO projection 
@@ -59,7 +59,7 @@
 #'0.4  -  2015-03  (L. Batte)  -  Polarity 
 #'  check and correction is wrong. Switched to have a negative NAO index when the
 #'  anomaly pattern corresponds to NAO-.
-#'1.0  -  2016-03  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  
+#'1.0  -  2016-03  (N. Manubens)  -  
 #'  Formatted to CRAN
 #'@references
 #'Doblas-Reyes, F.J., Pavan, V. and Stephenson, D. (2003). The skill of 

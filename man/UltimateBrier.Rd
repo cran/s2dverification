@@ -125,10 +125,10 @@ bss <- UltimateBrier(ano_exp, ano_obs, type = 'BSS')
 }
 \author{
 History:\cr
-0.1  -  2015-05 (V. Guemas \email{virginie.guemas@bsc.es},\cr
-                C. Prodhomme \email{chloe.prodhomme@bsc.es},\cr
-                O. Bellprat \email{omar.bellprat@bsc.es}\cr
-                V. Torralba \email{veronica.torralba@bsc.es}\cr
-                N. Manubens, \email{nicolau.manubens@bsc.es})  -  First version
+0.1  -  2015-05 (V. Guemas,\cr
+                C. Prodhomme,\cr
+                O. Bellprat,\cr
+                V. Torralba,\cr
+                N. Manubens)  -  First version
 }
 \keyword{datagen}

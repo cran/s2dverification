@@ -62,11 +62,11 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'  0.1  -  2011-04  (V. Guemas, \email{vguemas@@bsc.es})  -  Original code\cr
-#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@@bsc.es})  -  Formatting to R CRAN\cr
-#'1.1  -  2014-10  (M. Menegoz, \email{martin.menegoz@@bsc.es})  -  Adding siglev argument\cr
-#'1.2  -  2015-03  (L.P. Caron, \email{louis-philippe.caron@@bsc.es})  - Adding method argument\cr
-#'1.3  -  2017-02  (A. Hunter, \email{alasdair.hunter@@bsc.es})  -  Adapted to veriApply()
+#'  0.1  -  2011-04  (V. Guemas)  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens)  -  Formatting to R CRAN\cr
+#'1.1  -  2014-10  (M. Menegoz)  -  Adding siglev argument\cr
+#'1.2  -  2015-03  (L.P. Caron)  - Adding method argument\cr
+#'1.3  -  2017-02  (A. Hunter)  -  Adapted to veriApply()
 #'@examples
 #'# Load sample data as in Load() example: 
 #'example(Load) 

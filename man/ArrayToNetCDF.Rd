@@ -235,6 +235,6 @@ ArrayToNetCDF(list(tos, lon, lat), 'tmp.nc')
 }
 \author{
 History:\cr
- 0.0 - 2017-01 (N. Manubens, \email{nicolau.manubens@bsc.es}) - Original code.
+ 0.0 - 2017-01 (N. Manubens) - Original code.
 }
 \keyword{datagen}

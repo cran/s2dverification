@@ -85,13 +85,13 @@
 #'@keywords datagen
 #'@author 
 #'History:\cr
-#'  0.1 - 2013-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Original code\cr
-#'  1.0 - 2013-09 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Formatting to CRAN\cr
-#'  1.1 - 2013-09 (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - optimization\cr
-#'  1.2 - 2014-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Bug-fixes: handling of NA & selection of domain + Simplification of code\cr
-#'  1.3.0 - 2014-08 (V. Guemas, \email{virginie.guemas@@bsc.es}) - Boostrapping over members\cr
-#'  1.3.1 - 2014-09 (C. Prodhomme, \email{chloe.prodhomme@@bsc.es}) - Add comments and minor style changes\cr
-#'  1.3.2 - 2015-02 (N. Manubens, \email{nicolau.manubens@@bsc.es}) - Fixed ACC documentation and examples
+#'  0.1 - 2013-08 (V. Guemas) - Original code\cr
+#'  1.0 - 2013-09 (N. Manubens) - Formatting to CRAN\cr
+#'  1.1 - 2013-09 (C. Prodhomme) - optimization\cr
+#'  1.2 - 2014-08 (V. Guemas) - Bug-fixes: handling of NA & selection of domain + Simplification of code\cr
+#'  1.3.0 - 2014-08 (V. Guemas) - Boostrapping over members\cr
+#'  1.3.1 - 2014-09 (C. Prodhomme) - Add comments and minor style changes\cr
+#'  1.3.2 - 2015-02 (N. Manubens) - Fixed ACC documentation and examples
 #'@importFrom abind abind
 #'@importFrom stats qt qnorm quantile
 #'@export

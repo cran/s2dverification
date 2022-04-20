@@ -43,6 +43,6 @@
 #'
 #' @name sampleTimeSeries
 #' @docType data
-#' @author Nicolau Manubens \email{nicolau.manubens@bsc.es}
+#' @author Nicolau Manubens
 #' @keywords datasets
 sampleTimeSeries <- function(){}

@@ -25,8 +25,8 @@
 #'
 #'@keywords datagen
 #'@author History:\cr
-#'0.1  -  2013-05  (V. Guemas, \email{virginie.guemas@bsc.es})  -  Original code\cr
-#'1.0  -  2013-09  (N. Manubens, \email{nicolau.manubens@bsc.es})  -  Formatting to CRAN
+#'0.1  -  2013-05  (V. Guemas)  -  Original code\cr
+#'1.0  -  2013-09  (N. Manubens)  -  Formatting to CRAN
 #'@examples
 #'# See examples on Load() to understand the first lines in this example
 #'  \dontrun{
